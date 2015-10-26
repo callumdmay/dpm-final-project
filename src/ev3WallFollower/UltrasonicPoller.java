@@ -1,5 +1,7 @@
 package ev3WallFollower;
 
+import java.util.Arrays;
+
 import lejos.robotics.SampleProvider;
 import lejos.utility.Timer;
 import lejos.utility.TimerListener;
@@ -38,12 +40,28 @@ public class UltrasonicPoller implements TimerListener{
 
 	public void timedOut() {
 		while (true) {
-			ultraSonicSensorSampleProvider.fetchSample(usData,0);							// acquire data
+			float sampleData[] = new float[7];
+
+			for(int index = 0 ; index < sampleData.length; index++)
+			{
+				ultraSonicSensorSampleProvider.fetchSample(usData, 0);
+
+				sampleData[index] = usData[0]*100;
+				try {
+					Thread.sleep(5);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+			Arrays.sort(sampleData);
 
 			//The poller now simply updates the distance variable, it does not influence the controller at all
 			synchronized(lock){
-				setDistance((int)(usData[0]*100.0));
+				setDistance((Math.round(sampleData[2])));
 			}
+			
 			
 		}
 	}

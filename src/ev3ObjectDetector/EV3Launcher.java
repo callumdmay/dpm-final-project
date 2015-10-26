@@ -12,12 +12,13 @@ import ev3WallFollower.UltrasonicController;
 import ev3WallFollower.UltrasonicPoller;
 import lejos.hardware.*;
 import lejos.hardware.ev3.LocalEV3;
+import lejos.hardware.lcd.TextLCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.port.Port;
 import lejos.hardware.sensor.*;
 import lejos.robotics.SampleProvider;
 
-public class Lab5 {
+public class EV3Launcher {
 
 	// Static Resources:
 	// Left motor connected to output A
@@ -26,6 +27,9 @@ public class Lab5 {
 	// Color sensor port connected to input S2
 	private static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("C"));
 	private static final EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
+	private static final EV3LargeRegulatedMotor leftSideUltraSoundMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
+	private static final EV3LargeRegulatedMotor rightSideUltraSoundMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
+	private static final EV3LargeRegulatedMotor liftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
 	private static final Port usPort = LocalEV3.get().getPort("S1");		
 	private static final Port colorPort = LocalEV3.get().getPort("S4");		
 
@@ -59,23 +63,55 @@ public class Lab5 {
 		// setup the odometer and display
 		Odometer odometer = new Odometer(WHEEL_RADIUS, TRACK, leftMotor, rightMotor);
 		odometer.start();
-		LCDInfo lcd = new LCDInfo(odometer);
-
+		
 		//Create motors object
-		Motors motors = new Motors(leftMotor, rightMotor, WHEEL_RADIUS, TRACK);
-		//Create navigator
-		Navigator navigator = new Navigator(odometer, motors);
+		Motors motors = new Motors(leftMotor, rightMotor, leftSideUltraSoundMotor, rightSideUltraSoundMotor, liftMotor, WHEEL_RADIUS, TRACK);
 
 		UltrasonicController pController = new PController(motors);
-
-		// perform the ultrasonic localization
-		USLocalizer usl = new USLocalizer(odometer, usValue, usData, USLocalizer.LocalizationType.RISING_EDGE, navigator);
-		usl.doLocalization();
 
 		ObstacleAvoider obstacleAvoider = new ObstacleAvoider(odometer, usPoller, pController, motors);
 		ObjectDetector objectDetector = new ObjectDetector(usPoller,colorValue, colorData, odometer, obstacleAvoider);
 
+		//Create navigator
+		Navigator navigator = new Navigator(odometer, objectDetector, motors);
+		
+		// perform the ultrasonic localization
+		USLocalizer usl = new USLocalizer(odometer, usValue, usData, USLocalizer.LocalizationType.RISING_EDGE, navigator);
 
+
+		int buttonChoice;
+		TextLCD t = LocalEV3.get().getTextLCD();
+
+		LCDInfo lcd;
+
+		do {
+			// clear the display
+			t.clear();
+
+			// ask the user whether the motors should drive in a square or float
+			t.drawString("< Left | Right > ", 0, 0);
+			t.drawString("       |         ", 0, 1);
+			t.drawString("TODO   |TODO     ", 0, 2);
+			t.drawString("       |         ", 0, 3);
+			t.drawString("		 |         ", 0, 4);
+
+			buttonChoice = Button.waitForAnyPress();
+		} while (buttonChoice == 0 );
+
+		switch(buttonChoice) {
+
+		case Button.ID_LEFT :
+			break;
+
+		case Button.ID_RIGHT:
+			break;
+
+		default:
+
+			System.exit(0);
+			break;
+
+		}
 		while (Button.waitForAnyPress() != Button.ID_ESCAPE);
 		System.exit(0);	
 

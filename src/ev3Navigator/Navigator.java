@@ -1,5 +1,6 @@
 package ev3Navigator;
 
+import java.util.ArrayList;
 import java.util.Queue;
 
 import ev3ObjectDetector.ObjectDetector;
@@ -7,74 +8,64 @@ import ev3Objects.Motors;
 import ev3Odometer.Odometer;
 import ev3WallFollower.UltrasonicController;
 import ev3WallFollower.UltrasonicPoller;
+import lejos.hardware.Sound;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
 public class Navigator extends Thread{
 
 	private EV3LargeRegulatedMotor leftMotor;
 	private EV3LargeRegulatedMotor rightMotor;
-	private EV3LargeRegulatedMotor neckMotor;
+	private ObjectDetector objectDetector;
 
 	private double wheelRadius;
 	private double axleLength;
 
 	private final double locationError = 1;
 	private final double navigatingAngleError = 1;
+	private static final double  tileLength = 30.9;
 
 	private final int FORWARD_SPEED = 200;
 	private final int ROTATE_SPEED = 100;
 	private final int SMALL_CORRECTION_SPEED =20;
+	private final int SMALL_ROTATION_SPEED = 25;
 
 	private Odometer odometer;
-	private ObjectDetector objectDetector;
 
 
 	private boolean isCheckingForObstacles;
 
 	public static int coordinateCount = 0;
-	private static Queue<Coordinate> coordinates;
+	private static ArrayList<Coordinate> coordinates;
 
 
 
-	public Navigator(Odometer pOdometer, UltrasonicPoller pUltraSonicPoller, UltrasonicController pwallFollowerController, Motors pMotors, ObjectDetector pObjectDetector)
+	public Navigator(Odometer pOdometer, ObjectDetector pObjectDetector, Motors pMotors)
 	{
 		odometer 					= pOdometer;
-		leftMotor 					= pMotors.getRightMotor();
-		rightMotor 					= pMotors.getRightMotor();
-		neckMotor 					= pMotors.getNeckMotor();
-		wheelRadius 				= pMotors.getWheelRadius();
-		axleLength 					= pMotors.getAxleLength();
 		objectDetector 				= pObjectDetector;
-
-		isCheckingForObstacles = true;
-
-
-	}
-
-	public Navigator(Odometer pOdometer, Motors pMotors)
-	{
-		odometer 					= pOdometer;
 		leftMotor 					= pMotors.getRightMotor();
 		rightMotor 					= pMotors.getRightMotor();
-		neckMotor 					= pMotors.getNeckMotor();
 		wheelRadius 				= pMotors.getWheelRadius();
 		axleLength 					= pMotors.getAxleLength();
-		neckMotor 					= null;
 
-		isCheckingForObstacles = false;
+		for (EV3LargeRegulatedMotor motor : new EV3LargeRegulatedMotor[] { leftMotor, rightMotor }) {
+			motor.stop();
+			motor.setAcceleration(2000);
+
+		}
+
+
 	}
 
 	@Override
 	public void run()
 	{
-		resetMotors();
+		Sound.beepSequenceUp();
 
 		//For each coordinate in the queue, 
 		for( Coordinate coordinate : coordinates)
 			travelTo(coordinate.getX(), coordinate.getY());
 
-
-		resetMotors();
 	}
 
 	//This method takes a new x and y location, and moves to it while avoiding obstacles
@@ -84,17 +75,15 @@ public class Navigator extends Thread{
 		//While the robot is not at the objective coordinates, keep moving towards it 
 		while(Math.abs(pX- odometer.getX()) > locationError || Math.abs(pY - odometer.getY()) > locationError)
 		{
-			if(isCheckingForObstacles)
-				objectDetector.checkForObjects(pX, pY);
 
-			navigateToCoordinates(pX, pY);
+			moveToCoordinates(pX, pY);
 
 		}
 
 	}
 
 	//Turns to the absolute value theta
-	public void turnTo(double pTheta)
+	public void turnTo(double pTheta, boolean useSmallRotationSpeed)
 	{
 
 		pTheta = pTheta % Math.toRadians(360);
@@ -109,15 +98,15 @@ public class Navigator extends Thread{
 		if(deltaTheta < -Math.PI)
 			rotationAngle = deltaTheta + 2*Math.PI;
 
-		if(deltaTheta > 2*Math.PI)
+		if(deltaTheta > Math.PI)
 			rotationAngle = deltaTheta - 2*Math.PI;
 
 		//Basic proportional control on turning speed when
 		//making a small angle correction
-		if(Math.abs(deltaTheta)<= Math.toRadians(10))
+		if(Math.abs(deltaTheta)<= Math.toRadians(10) || useSmallRotationSpeed)
 		{
-			leftMotor.setSpeed(SMALL_CORRECTION_SPEED);
-			rightMotor.setSpeed(SMALL_CORRECTION_SPEED);
+			leftMotor.setSpeed(SMALL_ROTATION_SPEED);
+			rightMotor.setSpeed(SMALL_ROTATION_SPEED);
 		}
 		else
 		{
@@ -128,6 +117,7 @@ public class Navigator extends Thread{
 		leftMotor.rotate(-NavigatorUtility.convertAngle(wheelRadius, axleLength, rotationAngle * 180/Math.PI), true);
 		rightMotor.rotate(NavigatorUtility.convertAngle(wheelRadius, axleLength, rotationAngle * 180/Math.PI), false);
 	}
+
 
 	public void turnTo(double pTheta, int speed)
 	{
@@ -159,7 +149,7 @@ public class Navigator extends Thread{
 	/*
 	 * This method simply navigates to the given coordinates
 	 */
-	private void navigateToCoordinates(double pX, double pY)
+	private void moveToCoordinates(double pX, double pY)
 	{
 		double currentX = odometer.getX();
 		double currentY = odometer.getY();
@@ -168,12 +158,12 @@ public class Navigator extends Thread{
 
 
 		if(Math.abs(  Math.toDegrees(NavigatorUtility.calculateShortestTurningAngle(newAngle, odometer.getTheta())))  > navigatingAngleError)
-			turnTo(newAngle);
+			turnTo(newAngle, false);
 		else
 		{
 			//Basic proportional control, when the robot gets close to 
 			//required coordinates, slow down 
-			if(Math.abs(pX - currentX) <= 3 || Math.abs(pY - currentY ) <= 3)
+			if(Math.abs(pX - currentX) <= 3 && Math.abs(pY - currentY ) <= 3)
 			{
 				leftMotor.setSpeed(SMALL_CORRECTION_SPEED);
 				rightMotor.setSpeed(SMALL_CORRECTION_SPEED);
@@ -189,31 +179,34 @@ public class Navigator extends Thread{
 	}
 
 	//Sets the global coordinates for the navigator
-	public void setCoordinates(Queue<Coordinate> pCoordinates)
+	private static ArrayList<Coordinate> createCoordinatesList( double coordinates[][])
 	{
-		coordinates = pCoordinates;
+		ArrayList<Coordinate> coordinatesQueue = new ArrayList<Coordinate>();
+
+		for (int x = 0 ; x < coordinates.length; x++)
+			coordinatesQueue.add(new Coordinate(coordinates[x][0]*tileLength,coordinates[x][1]*tileLength));
+
+		return coordinatesQueue;
 	}
 
-	//Stops and resets the motors
-	private void resetMotors()
+	public void setCoordinates(double pCoordinates[][])
 	{
-		for (EV3LargeRegulatedMotor motor : new EV3LargeRegulatedMotor[] { leftMotor, rightMotor }) {
-			motor.stop();
-			motor.setAcceleration(2000);
-		}
-
-		if(neckMotor != null)
-		{		
-			neckMotor.stop();
-			neckMotor.setAcceleration(2000);
-			neckMotor.setSpeed(50);
-		}
+		coordinates = createCoordinatesList(pCoordinates);
 	}
 
 	public void stopMotors()
 	{
 		leftMotor.stop();
 		rightMotor.stop();
+	}
+
+	public void driveStraight(int speed)
+	{
+		leftMotor.setSpeed(speed);
+		rightMotor.setSpeed(speed);
+
+		leftMotor.forward();
+		rightMotor.forward();
 	}
 
 	public void rotateClockWise(int speed)

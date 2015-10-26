@@ -35,7 +35,7 @@ public class LightLocalizer {
 		double blackLineAngles[] = new double[4];
 
 		navigator.travelTo(calibrationCoordinates[0],calibrationCoordinates[1]);
-		navigator.turnTo(Math.PI/2, ROTATION_SPEED * 2);
+		navigator.turnTo(Math.PI/2, true);
 
 		for( int index = 0 ; index < blackLineAngles.length; index ++)
 		{
@@ -47,7 +47,7 @@ public class LightLocalizer {
 			blackLineAngles[index]= odometer.getTheta();
 
 			//turn off of black line so as not to capture the same line twice
-			navigator.turnTo(odometer.getTheta() + 5*Math.PI/180,ROTATION_SPEED);
+			navigator.turnTo(odometer.getTheta() + 5*Math.PI/180,true);
 		}
 
 		double deltaY = blackLineAngles[2] - blackLineAngles[0];
@@ -78,7 +78,7 @@ public class LightLocalizer {
 
 	private void initiateFinalCalibration()
 	{
-		navigator.turnTo(0);
+		navigator.turnTo(0, true);
 		while(odometer.getTheta() <= Math.toRadians(20) && !blackLineDetected())
 			navigator.rotateCounterClockWise(15);
 
@@ -96,7 +96,7 @@ public class LightLocalizer {
 			}
 		}
 		navigator.stopMotors();
-		navigator.turnTo(0);
+		navigator.turnTo(0, true);
 
 	}
 

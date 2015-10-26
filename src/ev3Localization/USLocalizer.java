@@ -56,7 +56,7 @@ public class USLocalizer {
 
 
 				//quickly turn away from wall, to ensure the same value isn't captured
-				navigator.turnTo(odometer.getTheta() - 30*Math.PI/180, ROTATION_SPEED);
+				navigator.turnTo(odometer.getTheta() - 30*Math.PI/180, true);
 			}
 
 			// keep rotating until the robot sees a wall, then latch the angle
@@ -92,7 +92,7 @@ public class USLocalizer {
 
 			//turn away from wall that we just captured angle from, so as not to 
 			//capture it again
-			navigator.turnTo(odometer.getTheta() + Math.toRadians(45), ROTATION_SPEED);
+			navigator.turnTo(odometer.getTheta() + Math.toRadians(45), true);
 
 			while(getFilteredData(5) >= measuredDistance - 10)
 				navigator.rotateCounterClockWise(ROTATION_SPEED);
@@ -187,7 +187,7 @@ public class USLocalizer {
 
 	}
 
-	private double calculateAngleAverage(double angle1, double angle2)
+	public static double calculateAngleAverage(double angle1, double angle2)
 	{
 		double x = Math.abs(angle1 -angle2);
 
@@ -217,11 +217,11 @@ public class USLocalizer {
 	private void updateOdometerLocation()
 	{
 		//face right wall and record y distance
-		navigator.turnTo(Math.toRadians(270));
+		navigator.turnTo(Math.toRadians(270), false);
 		odometer.setY(getFilteredData(11) - TILE_SIZE + us_SensorDistanceFromOrigin);
 
 		//face back wall and record x distance
-		navigator.turnTo(Math.toRadians(180));
+		navigator.turnTo(Math.toRadians(180), false);
 		odometer.setX(getFilteredData(11) - TILE_SIZE + us_SensorDistanceFromOrigin);
 
 	}

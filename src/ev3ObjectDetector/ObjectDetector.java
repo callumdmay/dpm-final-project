@@ -41,7 +41,7 @@ public class ObjectDetector{
 	{
 
 		// rudimentary filter - checks 5 times to ensure obstacle is really ahead of robot
-		if( ultraSonicPoller.getDistance() < distance)
+		if( ultraSonicPoller.getLeftUltraSoundSensorDistance() < distance)
 		{
 			synchronized(lock)
 			{
@@ -63,7 +63,7 @@ public class ObjectDetector{
 	{
 
 		// rudimentary filter - checks 5 times to ensure obstacle is really ahead of robot
-		if( ultraSonicPoller.getDistance() < defaultObstacleDistance)
+		if( ultraSonicPoller.getLeftUltraSoundSensorDistance() < defaultObstacleDistance)
 		{
 			synchronized(lock)
 			{
@@ -85,7 +85,7 @@ public class ObjectDetector{
 	public void processObject()
 	{
 
-		if(ultraSonicPoller.getDistance() <=8  && getCurrentObject() == null)
+		if(ultraSonicPoller.getLeftUltraSoundSensorDistance() <=8  && getCurrentObject() == null)
 		{
 			colorValue.fetchSample(colorData, 0);
 			if(colorData[0]== 2){
@@ -144,7 +144,7 @@ public class ObjectDetector{
 
 	public double getObjectDistance(){
 
-		return ultraSonicPoller.getDistance();
+		return ultraSonicPoller.getLeftUltraSoundSensorDistance();
 	}
 
 

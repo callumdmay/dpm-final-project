@@ -30,7 +30,8 @@ public class EV3Launcher {
 	private static final EV3LargeRegulatedMotor leftSideUltraSoundMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
 	private static final EV3LargeRegulatedMotor rightSideUltraSoundMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
 	private static final EV3LargeRegulatedMotor liftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
-	private static final Port usPort = LocalEV3.get().getPort("S1");		
+	private static final Port leftUltraSonicPort = LocalEV3.get().getPort("S1");		
+	private static final Port rightUltraSonicPort = LocalEV3.get().getPort("S1");		
 	private static final Port colorPort = LocalEV3.get().getPort("S4");		
 
 
@@ -45,12 +46,17 @@ public class EV3Launcher {
 		// 2. Create a sensor instance and attach to port
 		// 3. Create a sample provider instance for the above and initialize operating mode
 		// 4. Create a buffer for the sensor data
-		@SuppressWarnings("resource")							    	// Because we don't bother to close this resource
-		SensorModes usSensor = new EV3UltrasonicSensor(usPort);
-		SampleProvider usValue = usSensor.getMode("Distance");			// colorValue provides samples from this instance
-		float[] usData = new float[usValue.sampleSize()];				// colorData is the buffer in which data are returned
+		@SuppressWarnings("resource")							    									// Because we don't bother to close this resource
+		SensorModes leftUltraSonicSensor = new EV3UltrasonicSensor(leftUltraSonicPort);
+		SampleProvider leftUltraSonicSampleProvider = leftUltraSonicSensor.getMode("Distance");			// colorValue provides samples from this instance
+		float[] leftUltraSonicData = new float[leftUltraSonicSampleProvider.sampleSize()];				// colorData is the buffer in which data are returned
 
-		UltrasonicPoller usPoller = new UltrasonicPoller(usValue, usData);
+		@SuppressWarnings("resource")							    										// Because we don't bother to close this resource
+		SensorModes rightUltraSonicSensor = new EV3UltrasonicSensor(leftUltraSonicPort);
+		SampleProvider rightUltraSonicSampleProvider = rightUltraSonicSensor.getMode("Distance");			// colorValue provides samples from this instance
+		float[] rightUltraSonicData = new float[rightUltraSonicSampleProvider.sampleSize()];				// colorData is the buffer in which data are returned
+
+		UltrasonicPoller ultraSonicSampleProvider = new UltrasonicPoller(leftUltraSonicSampleProvider, leftUltraSonicData, rightUltraSonicSampleProvider, rightUltraSonicData);
 		//Setup color sensor
 		// 1. Create a port object attached to a physical port (done above)
 		// 2. Create a sensor instance and attach to port
@@ -60,23 +66,24 @@ public class EV3Launcher {
 		SampleProvider colorValue = colorSensor.getMode("Red");			// colorValue provides samples from this instance
 		float[] colorData = new float[colorValue.sampleSize()];			// colorData is the buffer in which data are returned
 
-		// setup the odometer and display
-		Odometer odometer = new Odometer(WHEEL_RADIUS, TRACK, leftMotor, rightMotor);
-		odometer.start();
 		
 		//Create motors object
 		Motors motors = new Motors(leftMotor, rightMotor, leftSideUltraSoundMotor, rightSideUltraSoundMotor, liftMotor, WHEEL_RADIUS, TRACK);
 
+		// setup the odometer and display
+		Odometer odometer = new Odometer(motors);
+		odometer.start();
+		
 		UltrasonicController pController = new PController(motors);
 
-		ObstacleAvoider obstacleAvoider = new ObstacleAvoider(odometer, usPoller, pController, motors);
-		ObjectDetector objectDetector = new ObjectDetector(usPoller,colorValue, colorData, odometer, obstacleAvoider);
+		ObstacleAvoider obstacleAvoider = new ObstacleAvoider(odometer, ultraSonicSampleProvider, pController, motors);
+		ObjectDetector objectDetector = new ObjectDetector(ultraSonicSampleProvider,colorValue, colorData, odometer, obstacleAvoider);
 
 		//Create navigator
 		Navigator navigator = new Navigator(odometer, objectDetector, motors);
 		
 		// perform the ultrasonic localization
-		USLocalizer usl = new USLocalizer(odometer, usValue, usData, USLocalizer.LocalizationType.RISING_EDGE, navigator);
+		USLocalizer usl = new USLocalizer(odometer, leftUltraSonicSampleProvider, rightUltraSonicData, USLocalizer.LocalizationType.RISING_EDGE, navigator);
 
 
 		int buttonChoice;

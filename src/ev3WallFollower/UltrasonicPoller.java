@@ -18,17 +18,25 @@ import lejos.utility.TimerListener;
 
 
 public class UltrasonicPoller implements TimerListener{
-	private SampleProvider ultraSonicSensorSampleProvider;
-	private float[] usData;
+	private SampleProvider leftUltraSonicSensorSampleProvider;
+	private SampleProvider rightUltraSonicSensorSampleProvider;
+	
+	private float[] leftUltraSonicData;
+	private float[] rightUltraSonicData;
 	//set to 30 as we need the distance variable to be initialized above the obstacle detection distance
-	private int distance = 30;
+	private int leftUltraSoundSensorDistance = 30;
+	private int rightUltraSoundSensorDistance = 30;
 	private Object lock;
 	private Timer lcdTimer;
 	public static final int LCD_REFRESH = 10;
 
-	public UltrasonicPoller(SampleProvider us, float[] usData) {
-		this.ultraSonicSensorSampleProvider = us;
-		this.usData = usData;
+	public UltrasonicPoller(SampleProvider pLeftUltraSonicSampleProvider, float[] pLeftUltraSonicData, SampleProvider pRightUltraSonicSampleProvider, float[] pRightUltraSonicData) {
+		leftUltraSonicSensorSampleProvider = pLeftUltraSonicSampleProvider;
+		leftUltraSonicData = pLeftUltraSonicData;
+		
+		rightUltraSonicSensorSampleProvider = pRightUltraSonicSampleProvider;
+		rightUltraSonicData = pRightUltraSonicData;
+		
 		lock = new Object();
 		
 		this.lcdTimer = new Timer(LCD_REFRESH, this);
@@ -40,48 +48,61 @@ public class UltrasonicPoller implements TimerListener{
 
 	public void timedOut() {
 		while (true) {
-			float sampleData[] = new float[7];
+			float leftUltraSonicSampleData[] = new float[7];
+			float rightUltraSonicSampleData[] = new float[7];
 
-			for(int index = 0 ; index < sampleData.length; index++)
+			for(int index = 0 ; index < leftUltraSonicSampleData.length; index++)
 			{
-				ultraSonicSensorSampleProvider.fetchSample(usData, 0);
-
-				sampleData[index] = usData[0]*100;
-				try {
-					Thread.sleep(5);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				leftUltraSonicSensorSampleProvider.fetchSample(leftUltraSonicData, 0);
+				rightUltraSonicSensorSampleProvider.fetchSample(rightUltraSonicData, 0);
+				leftUltraSonicSampleData[index] = leftUltraSonicData[0]*100;
+				rightUltraSonicSampleData[index] = rightUltraSonicData[0]*100;
+				
 			}
 			
-			Arrays.sort(sampleData);
+			Arrays.sort(leftUltraSonicSampleData);
+			Arrays.sort(rightUltraSonicSampleData);
 
 			//The poller now simply updates the distance variable, it does not influence the controller at all
 			synchronized(lock){
-				setDistance((Math.round(sampleData[2])));
+				setLeftUltraSonicDistance((Math.round(leftUltraSonicSampleData[2])));
+				setRightUltraSonicDistance((Math.round(rightUltraSonicSampleData[2])));
+				
 			}
 			
-			
 		}
 	}
 
 
-	private void setDistance(int distance) {
+	private void setRightUltraSonicDistance(int distance) {
 		synchronized (lock) {
-			this.distance = distance;
+			this.rightUltraSoundSensorDistance = distance;
+		}
+	}
+	private void setLeftUltraSonicDistance(int distance) {
+		synchronized (lock) {
+			this.leftUltraSoundSensorDistance = distance;
 		}
 	}
 
 
-	public int getDistance() {
+	public int getLeftUltraSoundSensorDistance() {
 		int result;
 		synchronized (lock) {
-			result = distance;
+			result = leftUltraSoundSensorDistance;
 		}
 
 		return result;
 	}
+	public int getRightUltraSoundSensorDistance() {
+		int result;
+		synchronized (lock) {
+			result = rightUltraSoundSensorDistance;
+		}
+
+		return result;
+	}
+
 
 
 

@@ -4,6 +4,7 @@ s * Odometer.java
 
 package ev3Odometer;
 
+import ev3Objects.Motors;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
 public class Odometer extends Thread {
@@ -12,7 +13,7 @@ public class Odometer extends Thread {
 	private double last_tacho_L;
 	private double last_tacho_R;
 	private double wheelRadius;
-	private double wheelBase;
+	private double axleLength;
 	private static EV3LargeRegulatedMotor leftMotor;
 	private static EV3LargeRegulatedMotor rightMotor;
 
@@ -24,11 +25,11 @@ public class Odometer extends Thread {
 	private Object lock;
 
 	// default constructor
-	public Odometer(double pWheelRadius, double pWheelBase, EV3LargeRegulatedMotor pLeftMotor, EV3LargeRegulatedMotor pRightMotor) {
-		leftMotor = pLeftMotor;
-		rightMotor = pRightMotor;
-		wheelRadius = pWheelRadius;
-		wheelBase = pWheelBase;
+	public Odometer(Motors pMotors) {
+		leftMotor = pMotors.getLeftMotor();
+		rightMotor = pMotors.getRightMotor();
+		wheelRadius = pMotors.getWheelRadius();
+		axleLength = pMotors.getAxleLength();
 		x = 0.0;
 		y = 0.0;
 		//by default the robot is pointing along the positive y axis
@@ -62,7 +63,7 @@ public class Odometer extends Thread {
 			last_tacho_R = current_tacho_R;
 			//calculating the change in angle and change in absolute displacement
 			double deltaD = 0.5*(distanceL +distanceR);
-			double deltaT = (distanceR-distanceL)/wheelBase;
+			double deltaT = (distanceR-distanceL)/axleLength;
 
 
 			synchronized (lock) {

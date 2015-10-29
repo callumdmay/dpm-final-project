@@ -31,9 +31,6 @@ public class Navigator extends Thread{
 
 	private Odometer odometer;
 
-
-	private boolean isCheckingForObstacles;
-
 	public static int coordinateCount = 0;
 	private static ArrayList<Coordinate> coordinates;
 

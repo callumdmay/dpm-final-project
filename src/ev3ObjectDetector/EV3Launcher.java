@@ -25,14 +25,15 @@ public class EV3Launcher {
 	// Right motor connected to output D
 	// Ultrasonic sensor port connected to input S1
 	// Color sensor port connected to input S2
-	private static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("C"));
-	private static final EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
-	private static final EV3LargeRegulatedMotor leftSideUltraSoundMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
-	private static final EV3LargeRegulatedMotor rightSideUltraSoundMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
-	private static final EV3LargeRegulatedMotor liftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
-	private static final Port leftUltraSonicPort = LocalEV3.get().getPort("S1");		
-	private static final Port rightUltraSonicPort = LocalEV3.get().getPort("S1");		
-	private static final Port colorPort = LocalEV3.get().getPort("S4");		
+	private static final EV3LargeRegulatedMotor leftMotor 				= new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
+	private static final EV3LargeRegulatedMotor rightMotor 				= new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B"));
+	private static final EV3LargeRegulatedMotor leftSideUltraSoundMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("C"));
+	private static final EV3LargeRegulatedMotor liftMotor 				= new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
+	
+	private static final Port leftUltraSonicPort 	= LocalEV3.get().getPort("S1");		
+	private static final Port rightUltraSonicPort 	= LocalEV3.get().getPort("S2");		
+	private static final Port rearColorPort 		= LocalEV3.get().getPort("S3");		
+	private static final Port frontColorPort		= LocalEV3.get().getPort("S4");		
 
 
 	public static final double WHEEL_RADIUS = 2.25;
@@ -62,13 +63,13 @@ public class EV3Launcher {
 		// 2. Create a sensor instance and attach to port
 		// 3. Create a sample provider instance for the above and initialize operating mode
 		// 4. Create a buffer for the sensor data
-		SensorModes colorSensor = new EV3ColorSensor(colorPort);
-		SampleProvider colorValue = colorSensor.getMode("Red");			// colorValue provides samples from this instance
-		float[] colorData = new float[colorValue.sampleSize()];			// colorData is the buffer in which data are returned
+		SensorModes colorSensor = new EV3ColorSensor(rearColorPort);
+		SampleProvider rearColorSensorSampleProvider = colorSensor.getMode("Red");			// colorValue provides samples from this instance
+		float[] rearColorSensorData = new float[rearColorSensorSampleProvider.sampleSize()];			// colorData is the buffer in which data are returned
 
 		
 		//Create motors object
-		Motors motors = new Motors(leftMotor, rightMotor, leftSideUltraSoundMotor, rightSideUltraSoundMotor, liftMotor, WHEEL_RADIUS, TRACK);
+		Motors motors = new Motors(leftMotor, rightMotor, leftSideUltraSoundMotor, liftMotor, WHEEL_RADIUS, TRACK);
 
 		// setup the odometer and display
 		Odometer odometer = new Odometer(motors);
@@ -77,15 +78,15 @@ public class EV3Launcher {
 		UltrasonicController pController = new PController(motors);
 
 		ObstacleAvoider obstacleAvoider = new ObstacleAvoider(odometer, ultraSonicSampleProvider, pController, motors);
-		ObjectDetector objectDetector = new ObjectDetector(ultraSonicSampleProvider,colorValue, colorData, odometer, obstacleAvoider);
+		ObjectDetector objectDetector = new ObjectDetector(ultraSonicSampleProvider,rearColorSensorSampleProvider, rearColorSensorData, odometer);
 
 		//Create navigator
-		Navigator navigator = new Navigator(odometer, objectDetector, motors);
+		Navigator navigator = new Navigator(odometer, objectDetector, obstacleAvoider, motors);
 		
-		// perform the ultrasonic localization
+		//create the ultrasonic localizers
 		USLocalizer usl = new USLocalizer(odometer, leftUltraSonicSampleProvider, rightUltraSonicData, USLocalizer.LocalizationType.RISING_EDGE, navigator);
-
-
+		LightLocalizer lightLocalizer = new LightLocalizer(odometer, navigator, rearColorSensorSampleProvider, rearColorSensorData);
+		
 		int buttonChoice;
 		TextLCD t = LocalEV3.get().getTextLCD();
 

@@ -9,7 +9,7 @@ import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
 public class Odometer extends Thread {
 	// robot position
-	private double x, y, theta;
+	private double x, y, theta, distanceTravelled;
 	private double last_tacho_L;
 	private double last_tacho_R;
 	private double wheelRadius;
@@ -32,6 +32,7 @@ public class Odometer extends Thread {
 		axleLength = pMotors.getAxleLength();
 		x = 0.0;
 		y = 0.0;
+		distanceTravelled = 0.0;
 		//by default the robot is pointing along the positive y axis
 		theta = Math.PI/2;
 		lock = new Object();
@@ -40,18 +41,18 @@ public class Odometer extends Thread {
 	// run method (required for Thread)
 	public void run() {
 		long updateStart, updateEnd;
-		
+
 		//reset the tacho count, and set the initial tacho counts to the last_tacho_X variables
-		
+
 		leftMotor.resetTachoCount();
 		rightMotor.resetTachoCount();
-		
+
 		last_tacho_L = leftMotor.getTachoCount();
 		last_tacho_R = rightMotor.getTachoCount();
 
 		while (true) {
 			updateStart = System.currentTimeMillis();
-			
+
 			int current_tacho_L = leftMotor.getTachoCount();
 			int current_tacho_R = rightMotor.getTachoCount();
 
@@ -69,13 +70,15 @@ public class Odometer extends Thread {
 			synchronized (lock) {
 				//updating the locations of the variables
 				theta += deltaT;
-				
+
 				//maintain the bounds of theta
 				if(theta < 0)
 					theta += 2*Math.PI;
 				if(theta > 2*Math.PI)
 					theta -= 2*Math.PI;
-				
+
+				setDistanceTravelled(getDistanceTravelled() + deltaD);
+
 				setX(x + deltaD *Math.cos(theta));
 				setY(y + deltaD *Math.sin(theta));
 			}
@@ -135,6 +138,24 @@ public class Odometer extends Thread {
 		}
 
 		return result;
+	}
+
+
+	public double getDistanceTravelled() {
+
+		double result;
+
+		synchronized (lock) {
+			result = distanceTravelled;
+		}
+
+		return result;
+	}
+
+	public void setDistanceTravelled(double distance) {
+		synchronized(lock){
+			this.distanceTravelled = distance;
+		}
 	}
 
 	// mutators

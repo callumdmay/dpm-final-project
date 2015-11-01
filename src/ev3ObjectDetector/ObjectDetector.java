@@ -13,7 +13,6 @@ public class ObjectDetector{
 	private SampleProvider colorValue;
 	private Odometer odometer;
 	private UltrasonicPoller ultraSonicPoller;
-	public ObstacleAvoider obstacleAvoider;
 
 	public enum OBJECT_TYPE { block, obstacle } 
 
@@ -26,13 +25,12 @@ public class ObjectDetector{
 
 	private Object lock = new Object();
 
-	public ObjectDetector(UltrasonicPoller pUltraSonicPoller, SampleProvider pColorValue, float[] pColorData, Odometer pOdometer, ObstacleAvoider pObstacleAvoider)
+	public ObjectDetector(UltrasonicPoller pUltraSonicPoller, SampleProvider pColorValue, float[] pColorData, Odometer pOdometer)
 	{
 		ultraSonicPoller  = pUltraSonicPoller;
 		colorValue = pColorValue;
 		colorData = pColorData;
 		odometer = pOdometer;
-		obstacleAvoider = pObstacleAvoider;
 	}
 
 
@@ -40,7 +38,6 @@ public class ObjectDetector{
 	public boolean detectedObject(int distance)
 	{
 
-		// rudimentary filter - checks 5 times to ensure obstacle is really ahead of robot
 		if( ultraSonicPoller.getLeftUltraSoundSensorDistance() < distance)
 		{
 			synchronized(lock)
@@ -62,7 +59,6 @@ public class ObjectDetector{
 	public boolean detectedObject()
 	{
 
-		// rudimentary filter - checks 5 times to ensure obstacle is really ahead of robot
 		if( ultraSonicPoller.getLeftUltraSoundSensorDistance() < defaultObstacleDistance)
 		{
 			synchronized(lock)
@@ -126,12 +122,9 @@ public class ObjectDetector{
 		}	
 	}
 
-
-
 	public double getDefaultObstacleDistance() {
 		return defaultObstacleDistance;
 	}
-
 
 	public OBJECT_TYPE getCurrentObject() {
 		OBJECT_TYPE returnedValue;

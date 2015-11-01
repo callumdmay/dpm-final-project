@@ -11,6 +11,7 @@ public class ObstacleAvoider {
 
 	private EV3LargeRegulatedMotor leftMotor;
 	private EV3LargeRegulatedMotor rightMotor;
+	private EV3LargeRegulatedMotor leftUltraSoundMotor;
 
 	private Odometer odometer;
 	private UltrasonicPoller ultraSonicPoller;
@@ -28,8 +29,9 @@ public class ObstacleAvoider {
 		ultraSonicPoller 			= pUltraSonicPoller;
 		wallFollowerController 		= pwallFollowerController;
 		odometer 					= pOdometer;
-		leftMotor 					= pMotors.getRightMotor();
+		leftMotor 					= pMotors.getLeftMotor();
 		rightMotor 					= pMotors.getRightMotor();
+		leftUltraSoundMotor			= pMotors.getLeftUltraSoundMotor();
 		wheelRadius 				= pMotors.getWheelRadius();
 		axleLength 					= pMotors.getAxleLength();
 	}
@@ -46,6 +48,7 @@ public class ObstacleAvoider {
 		rightMotor.stop();
 		leftMotor.stop();
 
+		leftUltraSoundMotor.rotate(50, true);
 		leftMotor.rotate(NavigatorUtility.convertAngle(wheelRadius, axleLength, 90), true);
 		rightMotor.rotate(-NavigatorUtility.convertAngle(wheelRadius, axleLength, 90), false);
 
@@ -57,6 +60,9 @@ public class ObstacleAvoider {
 			currentY = odometer.getY();
 			wallFollowerController.processUSData(ultraSonicPoller.getLeftUltraSoundSensorDistance());
 		} while(Math.abs(NavigatorUtility.calculateAngleError(pX - currentX, pY - currentY, odometer.getTheta())*180/Math.PI) > wallFollowingAngleError);
+		
+		leftUltraSoundMotor.rotate(-50, false);
+
 
 	}
 

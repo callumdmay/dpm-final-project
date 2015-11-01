@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Queue;
 
 import ev3ObjectDetector.ObjectDetector;
+import ev3ObjectDetector.ObstacleAvoider;
 import ev3Objects.Motors;
 import ev3Odometer.Odometer;
 import ev3WallFollower.UltrasonicController;
@@ -16,6 +17,7 @@ public class Navigator extends Thread{
 	private EV3LargeRegulatedMotor leftMotor;
 	private EV3LargeRegulatedMotor rightMotor;
 	private ObjectDetector objectDetector;
+	private ObstacleAvoider obstacleAvoider;
 
 	private double wheelRadius;
 	private double axleLength;
@@ -36,10 +38,11 @@ public class Navigator extends Thread{
 
 
 
-	public Navigator(Odometer pOdometer, ObjectDetector pObjectDetector, Motors pMotors)
+	public Navigator(Odometer pOdometer, ObjectDetector pObjectDetector, ObstacleAvoider pObstacleAvoider, Motors pMotors)
 	{
 		odometer 					= pOdometer;
 		objectDetector 				= pObjectDetector;
+		obstacleAvoider				= pObstacleAvoider;
 		leftMotor 					= pMotors.getRightMotor();
 		rightMotor 					= pMotors.getRightMotor();
 		wheelRadius 				= pMotors.getWheelRadius();
@@ -72,7 +75,10 @@ public class Navigator extends Thread{
 		//While the robot is not at the objective coordinates, keep moving towards it 
 		while(Math.abs(pX- odometer.getX()) > locationError || Math.abs(pY - odometer.getY()) > locationError)
 		{
-
+			if(objectDetector.detectedObject())
+			{
+				obstacleAvoider.avoidObstacle(pX, pY);
+			}
 			moveToCoordinates(pX, pY);
 
 		}
@@ -110,33 +116,6 @@ public class Navigator extends Thread{
 			leftMotor.setSpeed(ROTATE_SPEED);
 			rightMotor.setSpeed(ROTATE_SPEED);
 		}
-
-		leftMotor.rotate(-NavigatorUtility.convertAngle(wheelRadius, axleLength, rotationAngle * 180/Math.PI), true);
-		rightMotor.rotate(NavigatorUtility.convertAngle(wheelRadius, axleLength, rotationAngle * 180/Math.PI), false);
-	}
-
-
-	public void turnTo(double pTheta, int speed)
-	{
-
-		pTheta = pTheta % Math.toRadians(360);
-
-		double deltaTheta = pTheta - odometer.getTheta();
-
-		double rotationAngle = 0;
-
-		if( Math.abs(deltaTheta) <= Math.PI)
-			rotationAngle = deltaTheta;
-
-		if(deltaTheta < -Math.PI)
-			rotationAngle = deltaTheta + 2*Math.PI;
-
-		if(deltaTheta > Math.PI)
-			rotationAngle = deltaTheta - 2*Math.PI;
-
-
-		leftMotor.setSpeed(speed);
-		rightMotor.setSpeed(speed);
 
 		leftMotor.rotate(-NavigatorUtility.convertAngle(wheelRadius, axleLength, rotationAngle * 180/Math.PI), true);
 		rightMotor.rotate(NavigatorUtility.convertAngle(wheelRadius, axleLength, rotationAngle * 180/Math.PI), false);

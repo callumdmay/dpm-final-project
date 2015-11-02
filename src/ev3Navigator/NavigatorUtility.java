@@ -18,16 +18,22 @@ public class NavigatorUtility {
 	public static double calculateNewAngle(double deltaX, double deltaY)
 	{
 
+		double newAngle = 0;
+		
 		if(deltaX >= 0 )
-			return Math.atan(deltaY/deltaX);
+				newAngle = Math.atan(deltaY/deltaX);
 
 		if(deltaX< 0 && deltaY >= 0)
-			return Math.atan(deltaY/deltaX)+ Math.PI;
+			newAngle = Math.atan(deltaY/deltaX)+ Math.PI;
 
 		if(deltaX < 0 && deltaY < 0)
-			return Math.atan(deltaY/deltaX) - Math.PI;
+			newAngle = Math.atan(deltaY/deltaX) - Math.PI;
 
-		throw new ArithmeticException("Cannot calculate new angle");
+		if(newAngle <0)
+			newAngle += Math.toRadians(360);
+		
+		return newAngle;
+		
 	}
 
 	//This method determines how much the robot should turn, it return the smallest turning angle possible
@@ -44,12 +50,16 @@ public class NavigatorUtility {
 		if(deltaTheta > Math.PI)
 			return deltaTheta - 2*Math.PI;
 
-		throw new ArithmeticException("Cannot calculate angle error");
+		throw new ArithmeticException("Cannot calculate shortest turning angle");
 
 	}
 	
 	public static double calculateAngleError(double deltaX, double deltaY, double theta)
 	{
+		//cannot divide by zero
+		if(deltaX == 0 && deltaY == 0)
+			return 0;
+		
 		if(deltaX >= 0 )
 			return calculateShortestTurningAngle(Math.atan(deltaY/deltaX), theta);
 
@@ -59,7 +69,7 @@ public class NavigatorUtility {
 		if(deltaX < 0 && deltaY < 0)
 			return calculateShortestTurningAngle(Math.atan(deltaY/deltaX) - Math.PI, theta);
 
-		throw new ArithmeticException("Cannot calculate new angle");
+		throw new ArithmeticException("Cannot calculate angle error");
 	}
 
 	//Convert radian angle we want into an angle the motor can turn to

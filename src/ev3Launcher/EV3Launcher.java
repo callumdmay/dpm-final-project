@@ -1,10 +1,12 @@
-package ev3ObjectDetector;
+package ev3Launcher;
 
 import ev3Localization.LCDInfo;
 import ev3Localization.LightLocalizer;
 import ev3Localization.USLocalizer;
 import ev3Localization.USLocalizer.LocalizationType;
 import ev3Navigator.Navigator;
+import ev3ObjectDetector.ObjectDetector;
+import ev3ObjectDetector.ObstacleAvoider;
 import ev3Objects.Motors;
 import ev3Odometer.Odometer;
 import ev3WallFollower.PController;
@@ -33,13 +35,14 @@ public class EV3Launcher {
 	private static final Port leftUltraSonicPort 	= LocalEV3.get().getPort("S1");		
 	private static final Port rightUltraSonicPort 	= LocalEV3.get().getPort("S2");		
 	private static final Port rearColorPort 		= LocalEV3.get().getPort("S3");		
-	private static final Port frontColorPort		= LocalEV3.get().getPort("S4");		
+	private static final Port forwardColorPort		= LocalEV3.get().getPort("S4");		
 
 
 	public static final double WHEEL_RADIUS = 2.25;
 	public static final double TRACK = 16.2;
 
 
+	@SuppressWarnings("resource")
 	public static void main(String[] args) {
 
 		//Setup ultrasonic sensor
@@ -53,23 +56,29 @@ public class EV3Launcher {
 		float[] leftUltraSonicData = new float[leftUltraSonicSampleProvider.sampleSize()];				// colorData is the buffer in which data are returned
 
 		@SuppressWarnings("resource")							    										// Because we don't bother to close this resource
-		SensorModes rightUltraSonicSensor = new EV3UltrasonicSensor(leftUltraSonicPort);
+		SensorModes rightUltraSonicSensor = new EV3UltrasonicSensor(rightUltraSonicPort);
 		SampleProvider rightUltraSonicSampleProvider = rightUltraSonicSensor.getMode("Distance");			// colorValue provides samples from this instance
 		float[] rightUltraSonicData = new float[rightUltraSonicSampleProvider.sampleSize()];				// colorData is the buffer in which data are returned
 
-		UltrasonicPoller ultraSonicSampleProvider = new UltrasonicPoller(leftUltraSonicSampleProvider, leftUltraSonicData, rightUltraSonicSampleProvider, rightUltraSonicData);
+		
 		//Setup color sensor
 		// 1. Create a port object attached to a physical port (done above)
 		// 2. Create a sensor instance and attach to port
 		// 3. Create a sample provider instance for the above and initialize operating mode
 		// 4. Create a buffer for the sensor data
-		SensorModes colorSensor = new EV3ColorSensor(rearColorPort);
-		SampleProvider rearColorSensorSampleProvider = colorSensor.getMode("Red");			// colorValue provides samples from this instance
+		SensorModes rearColorSensor = new EV3ColorSensor(rearColorPort);
+		SampleProvider rearColorSensorSampleProvider = rearColorSensor.getMode("Red");			// colorValue provides samples from this instance
 		float[] rearColorSensorData = new float[rearColorSensorSampleProvider.sampleSize()];			// colorData is the buffer in which data are returned
-
+		
+		SensorModes forwardColorSensor = new EV3ColorSensor(forwardColorPort);
+		SampleProvider forwardColorSensorSampleProvider = forwardColorSensor.getMode("Red");			// colorValue provides samples from this instance
+		float[] forwardColorSensorData = new float[forwardColorSensorSampleProvider.sampleSize()];			// colorData is the buffer in which data are returned
 		
 		//Create motors object
 		Motors motors = new Motors(leftMotor, rightMotor, leftSideUltraSoundMotor, liftMotor, WHEEL_RADIUS, TRACK);
+
+		//object that provides ultrasonic distances from sensors
+		UltrasonicPoller ultraSonicSampleProvider = new UltrasonicPoller(leftUltraSonicSampleProvider, leftUltraSonicData, rightUltraSonicSampleProvider, rightUltraSonicData);
 
 		// setup the odometer and display
 		Odometer odometer = new Odometer(motors);
@@ -78,7 +87,7 @@ public class EV3Launcher {
 		UltrasonicController pController = new PController(motors);
 
 		ObstacleAvoider obstacleAvoider = new ObstacleAvoider(odometer, ultraSonicSampleProvider, pController, motors);
-		ObjectDetector objectDetector = new ObjectDetector(ultraSonicSampleProvider,rearColorSensorSampleProvider, rearColorSensorData, odometer);
+		ObjectDetector objectDetector = new ObjectDetector(ultraSonicSampleProvider, forwardColorSensorSampleProvider, forwardColorSensorData, odometer);
 
 		//Create navigator
 		Navigator navigator = new Navigator(odometer, objectDetector, obstacleAvoider, motors);
@@ -109,9 +118,16 @@ public class EV3Launcher {
 		switch(buttonChoice) {
 
 		case Button.ID_LEFT :
+			
+			usl.doLocalization();
+			lightLocalizer.doLocalization();
+			lcd = new LCDInfo(odometer, objectDetector);
 			break;
 
 		case Button.ID_RIGHT:
+			usl.doLocalization();
+			lightLocalizer.doLocalization();
+			lcd = new LCDInfo(odometer, objectDetector);
 			break;
 
 		default:

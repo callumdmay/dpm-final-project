@@ -41,10 +41,8 @@ public class USLocalizer {
 	}
 
 	public void doLocalization() {
-		double [] pos = new double [3];
+	
 		double angleA, angleB;
-
-
 
 		if (locType == LocalizationType.FALLING_EDGE) {
 

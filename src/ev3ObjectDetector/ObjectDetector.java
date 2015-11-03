@@ -38,7 +38,7 @@ public class ObjectDetector{
 	public boolean detectedObject(int distance)
 	{
 
-		if( ultraSonicPoller.getLeftUltraSoundSensorDistance() < distance)
+		if( ultraSonicPoller.getLeftUltraSoundSensorDistance() < distance || ultraSonicPoller.getRightUltraSoundSensorDistance() < distance)
 		{
 			synchronized(lock)
 			{
@@ -59,7 +59,7 @@ public class ObjectDetector{
 	public boolean detectedObject()
 	{
 
-		if( ultraSonicPoller.getLeftUltraSoundSensorDistance() < defaultObstacleDistance)
+		if( ultraSonicPoller.getLeftUltraSoundSensorDistance() < defaultObstacleDistance || ultraSonicPoller.getRightUltraSoundSensorDistance() < defaultObstacleDistance)
 		{
 			synchronized(lock)
 			{

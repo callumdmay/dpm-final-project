@@ -7,5 +7,4 @@ public interface UltrasonicController {
 	
 	public int readUSDistance();
 	
-	public void reverse();
 }

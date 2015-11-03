@@ -46,9 +46,7 @@ public class PController implements UltrasonicController {
 		//calculate error
 		int distanceError = distance - bandCenter;
 
-		//if robot get too close to wall, reverse out 
-		if(distance <10)
-			reverse();
+		
 
 		//Correct distance to wall
 		if(Math.abs(distanceError) <= bandWidth)
@@ -104,17 +102,6 @@ public class PController implements UltrasonicController {
 		return this.distance;
 	}
 
-	//simple reversing method 
-	@Override
-	public void reverse(){
-		leftMotor.stop();
-		rightMotor.stop(); 
-		leftMotor.setSpeed(motorStraight);
-		rightMotor.setSpeed(motorStraight);
-		leftMotor.rotate(-60,true);
-		rightMotor.rotate(-500, false);
-	}
-	
 
 
 

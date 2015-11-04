@@ -20,6 +20,9 @@ import lejos.hardware.port.Port;
 import lejos.hardware.sensor.*;
 import lejos.robotics.SampleProvider;
 
+/**
+ * A class to launch the EV3 program (main).
+ */
 public class EV3Launcher {
 
 	// Static Resources:

@@ -2,7 +2,7 @@ package ev3Navigator;
 
 
 /**
- * Creates creates an object that stores x and y coordinates.
+ * Creates an object that stores x and y coordinates.
  */
 public class Coordinate {
 	

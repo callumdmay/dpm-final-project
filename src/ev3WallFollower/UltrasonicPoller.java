@@ -16,7 +16,10 @@ import lejos.utility.TimerListener;
 //  of 1/70mS or about 33 Hz.
 //
 
-
+/**
+ * Creates an object that gives the distance of an object using the
+ * ultrasonic sensor with a polling rate of 33Hz.
+ */
 public class UltrasonicPoller implements TimerListener{
 	private SampleProvider leftUltraSonicSensorSampleProvider;
 	private SampleProvider rightUltraSonicSensorSampleProvider;
@@ -29,7 +32,13 @@ public class UltrasonicPoller implements TimerListener{
 	private Object lock;
 	private Timer lcdTimer;
 	public static final int LCD_REFRESH = 10;
-
+	/**
+	 * Stores objects essential for the ultrasonic sensor readings.
+	 * @param pLeftUltraSonicSampleProvider The ultrasonic sensor to be used on the left side
+	 * @param pLeftUltraSonicData An array for the left sensor's data
+	 * @param pRightUltraSonicSampleProvider The ultrasonic sensor to be used on the right side
+	 * @param pRightUltraSonicData An array for the right sensor's data
+	 */
 	public UltrasonicPoller(SampleProvider pLeftUltraSonicSampleProvider, float[] pLeftUltraSonicData, SampleProvider pRightUltraSonicSampleProvider, float[] pRightUltraSonicData) {
 		leftUltraSonicSensorSampleProvider = pLeftUltraSonicSampleProvider;
 		leftUltraSonicData = pLeftUltraSonicData;
@@ -43,9 +52,10 @@ public class UltrasonicPoller implements TimerListener{
 		lcdTimer.start();
 	}
 
-	//  Sensors now return floats using a uniform protocol.
-	//  Need to convert US result to an integer [0,255]
-
+	/**
+	 * Sensors now return floats using a uniform protocol.
+	 * Need to convert US result to an integer [0,255]
+	 */
 	public void timedOut() {
 		while (true) {
 			float leftUltraSonicSampleData[] = new float[7];
@@ -73,19 +83,30 @@ public class UltrasonicPoller implements TimerListener{
 		}
 	}
 
-
+	/**
+	 * Set right ultrasonic distance
+	 * @param distance The distance to be set
+	 */
 	private void setRightUltraSonicDistance(int distance) {
 		synchronized (lock) {
 			this.rightUltraSoundSensorDistance = distance;
 		}
 	}
+	
+	/**
+	 * Set left ultrasonic distance
+	 * @param distance The distance to be set
+	 */
 	private void setLeftUltraSonicDistance(int distance) {
 		synchronized (lock) {
 			this.leftUltraSoundSensorDistance = distance;
 		}
 	}
 
-
+	/**
+	 * Get right ultrasonic distance
+	 * @param distance The distance measured by the left ultrasonic
+	 */
 	public int getLeftUltraSoundSensorDistance() {
 		int result;
 		synchronized (lock) {
@@ -94,6 +115,11 @@ public class UltrasonicPoller implements TimerListener{
 
 		return result;
 	}
+	
+	/**
+	 * Get right ultrasonic distance
+	 * @param distance The distance measured by the right ultrasonic
+	 */
 	public int getRightUltraSoundSensorDistance() {
 		int result;
 		synchronized (lock) {

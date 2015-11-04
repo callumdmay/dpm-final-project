@@ -3,6 +3,10 @@ package ev3WallFollower;
 import ev3Objects.Motors;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
+/**
+ * Creates an object that will control the movement of the EV3
+ * while it navigates around objects
+ */
 public class PController implements UltrasonicController {
 
 	private static final int bandCenter = 25; // Offset from the wall (cm)
@@ -12,14 +16,21 @@ public class PController implements UltrasonicController {
 	private EV3LargeRegulatedMotor leftMotor, rightMotor;
 	private int distance;
 	private int filterControl;
-
+	
+	/**
+	 * Store motors essential for navigation
+	 * @param pMotors The motors with wheels attached
+	 */
 	public PController(Motors pMotors) {
 		// Default Constructor
 		this.leftMotor = pMotors.getLeftMotor();
 		this.rightMotor = pMotors.getRightMotor();
 		filterControl = 0;
 	}
-
+	/**
+	 * Move away from the object if it too close to it, and turn the other way
+	 * when facing an empty area.
+	 */
 	@Override
 	public void processUSData(int leftUltraSonicSensor, int rightUltraSonicSensor) {
 
@@ -99,6 +110,9 @@ public class PController implements UltrasonicController {
 
 	}
 
+	/**
+	 * Get the distance recorded by the ultrasonic sensor.
+	 */
 	@Override
 	public int readUSDistance() {
 		return this.distance;

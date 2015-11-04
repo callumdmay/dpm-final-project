@@ -7,6 +7,9 @@ package ev3Odometer;
 import ev3Objects.Motors;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
+/**
+ * Creates an objects to calculate the EV3's position and header.
+ */
 public class Odometer extends Thread {
 	// robot position
 	private double x, y, theta, distanceTravelled;
@@ -24,7 +27,10 @@ public class Odometer extends Thread {
 	// lock object for mutual exclusion
 	private Object lock;
 
-	// default constructor
+	/**
+	 * Stores the motors essential to perform calculations
+	 * @param pMotors The motors attached to wheels
+	 */
 	public Odometer(Motors pMotors) {
 		leftMotor = pMotors.getLeftMotor();
 		rightMotor = pMotors.getRightMotor();
@@ -38,7 +44,9 @@ public class Odometer extends Thread {
 		lock = new Object();
 	}
 
-	// run method (required for Thread)
+	/**
+	 * Runs the odometer (required for thread)
+	 */
 	public void run() {
 		long updateStart, updateEnd;
 
@@ -97,9 +105,13 @@ public class Odometer extends Thread {
 		}
 	}
 
-	// accessors
+	/**
+	 * Update the position
+	 * @param position The array that stores position and heading
+	 * @param update Whether the value should be updated or not
+	 */
 	public void getPosition(double[] position, boolean[] update) {
-		// ensure that the values don't change while the odometer is running
+		// Ensure the value positions don't change while odometer is running
 		synchronized (lock) {
 			if (update[0])
 				position[0] = x;
@@ -110,6 +122,10 @@ public class Odometer extends Thread {
 		}
 	}
 
+	/**
+	 * Get the x coordinate
+	 * @return The x coordinate
+	 */
 	public double getX() {
 		double result;
 
@@ -120,6 +136,10 @@ public class Odometer extends Thread {
 		return result;
 	}
 
+	/**
+	 * Get the y coordinate
+	 * @return The y coordinate
+	 */
 	public double getY() {
 		double result;
 
@@ -130,6 +150,10 @@ public class Odometer extends Thread {
 		return result;
 	}
 
+	/**
+	 * Get the heading angle
+	 * @return The angle the EV3 is facing
+	 */
 	public double getTheta() {
 		double result;
 
@@ -140,7 +164,10 @@ public class Odometer extends Thread {
 		return result;
 	}
 
-
+	/**
+	 * Return the distance traveled by the EV3.
+	 * @return The distance traveled
+	 */
 	public double getDistanceTravelled() {
 
 		double result;
@@ -152,13 +179,21 @@ public class Odometer extends Thread {
 		return result;
 	}
 
+	/**
+	 * Set the distance to be traveled.
+	 * @param distance The distance to be traveled.
+	 */
 	public void setDistanceTravelled(double distance) {
 		synchronized(lock){
 			this.distanceTravelled = distance;
 		}
 	}
 
-	// mutators
+	/**
+	 * Set the position
+	 * @param position The array that stores position and heading
+	 * @param update Whether the value should be updated or not
+	 */
 	public void setPosition(double[] position, boolean[] update) {
 		// ensure that the values don't change while the odometer is running
 		synchronized (lock) {
@@ -171,18 +206,30 @@ public class Odometer extends Thread {
 		}
 	}
 
+	/**
+	 * Set the x coordinate
+	 * @param x The x coordinate
+	 */
 	public void setX(double x) {
 		synchronized (lock) {
 			this.x = x;
 		}
 	}
 
+	/**
+	 * Set the y coordinate
+	 * @param y The y coordinate
+	 */
 	public void setY(double y) {
 		synchronized (lock) {
 			this.y = y;
 		}
 	}
 
+	/**
+	 * Set the heading angle
+	 * @param theta The heading angle 
+	 */
 	public void setTheta(double theta) {
 		synchronized (lock) {
 			this.theta = theta;

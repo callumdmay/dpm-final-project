@@ -11,6 +11,9 @@ import lejos.hardware.Sound;
 import lejos.hardware.lcd.LCD;
 import lejos.robotics.SampleProvider;
 
+/**
+ * Creates an object to self-localize using the ultra-sonic sensor.
+ */
 public class USLocalizer {
 	public enum LocalizationType { FALLING_EDGE, RISING_EDGE };
 
@@ -31,7 +34,15 @@ public class USLocalizer {
 
 
 
-
+	/**
+	 * Stores an Odometer, a SampleProvider, a data array of floats, 
+	 * a LocalizationType, and a Navigator to be used by the USLocalizer.
+	 * @param odo The odometer to be used
+	 * @param usSensor The SampleProvider to be used
+	 * @param usData The array of float data to be used
+	 * @param locType The localization type to be performed
+	 * @param navigator The navigator to be used
+	 */
 	public USLocalizer(Odometer odo,  SampleProvider usSensor, float[] usData, LocalizationType locType, Navigator navigator) {
 		this.odometer = odo;
 		this.usSensor = usSensor;
@@ -40,6 +51,9 @@ public class USLocalizer {
 		this.navigator = navigator;
 	}
 
+	/**
+	 * Perform the ultrasonic localization.
+	 */
 	public void doLocalization() {
 	
 		double angleA, angleB;
@@ -111,7 +125,11 @@ public class USLocalizer {
 		updateOdometerLocation();	
 	}
 
-
+	/**
+	 * Latch the falling edge angles to be used to localization calculations.
+	 * @param clockWise Whether the EV3 should turn clockwise
+	 * @return The latched angle
+	 */
 	private double latchFallingEdgeAngle(boolean clockWise)
 	{
 		double fallingEdgeAngle1;
@@ -149,7 +167,11 @@ public class USLocalizer {
 
 		}
 	}
-
+	/**
+	 * Latch the rising edge angles to be used to localization calculations.
+	 * @param clockWise Whether the EV3 should turn clockwise
+	 * @return The latched angle
+	 */
 	private double latchRisingEdgeAngle(boolean clockWise)
 	{
 		double risingEdgeAngle1;
@@ -184,7 +206,12 @@ public class USLocalizer {
 		}
 
 	}
-
+	/**
+	 * Returns the average of two input angles
+	 * @param angle1 The first angle
+	 * @param angle2 The second angle
+	 * @return The average of the first and second angles
+	 */
 	public static double calculateAngleAverage(double angle1, double angle2)
 	{
 		double x = Math.abs(angle1 -angle2);
@@ -197,7 +224,12 @@ public class USLocalizer {
 		throw new ArithmeticException("Could not calculate angle average of numbers");
 
 	}
-
+	/**
+	 * Returns the angle to adjust to.
+	 * @param angleA The first angle
+	 * @param angleB The second angle
+	 * @return The angle to adjust to
+	 */
 	private double calculateOdometerAngleAdjustment(double angleA, double angleB)
 	{
 		double angle1 = 45;
@@ -211,7 +243,9 @@ public class USLocalizer {
 		throw new ArithmeticException("Could not calculate odometer angle adjustment");
 
 	}
-
+	/**
+	 * Update the x and y coordinates using the ultrasonic sensor.
+	 */
 	private void updateOdometerLocation()
 	{
 		//face right wall and record y distance
@@ -224,7 +258,7 @@ public class USLocalizer {
 
 	}
 
-	/*
+	/**
 	 * Overload of getFilteredData that takes a sample size, then performs median filtering
 	 */
 	private float getFilteredData(int sampleSize){

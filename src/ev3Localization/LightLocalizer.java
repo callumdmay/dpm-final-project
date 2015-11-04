@@ -5,6 +5,9 @@ import ev3Odometer.Odometer;
 import lejos.hardware.Sound;
 import lejos.robotics.SampleProvider;
 
+/**
+ * Creates an object to localize the EV3 using the light sensor.
+ */
 public class LightLocalizer {
 
 	public static int 		ROTATION_SPEED 		= 25;
@@ -17,14 +20,23 @@ public class LightLocalizer {
 	private final double[]		calibrationCoordinates = {-3,-3};
 	private Navigator 			navigator;
 
-
+	/**
+	 * Store an Odometer, a Navigator, a SampleProvider, and an array of floats
+	 * to be used by the LightLocalizer
+	 * @param odo The Odometer to be used
+	 * @param navigator The Navigator to be used
+	 * @param colorSensor The SampleProvider to be used
+	 * @param colorData The data array to be used.
+	 */
 	public LightLocalizer(Odometer odo, Navigator navigator, SampleProvider colorSensor, float[] colorData) {
 		this.odometer = odo;
 		this.colorSensor = colorSensor;
 		this.colorData = colorData;
 		this.navigator = navigator;
 	}
-
+	/**
+	 * Travel to an intersection and self-localize using the light sensor.
+	 */
 	public void doLocalization() {
 		// drive to location listed in tutorial
 		// start rotating and clock all 4 gridlines
@@ -62,7 +74,10 @@ public class LightLocalizer {
 		initiateFinalCalibration();
 
 	}
-
+	/**
+	 * Return true if a black line is detected by the color sensor.
+	 * @return A boolean representing if the light sensor detects a line or not.
+	 */
 	private boolean blackLineDetected()
 	{
 		colorSensor.fetchSample(colorData, 0);
@@ -75,7 +90,9 @@ public class LightLocalizer {
 	}
 
 
-
+	/**
+	 * Final calibration required to finish light localization
+	 */
 	private void initiateFinalCalibration()
 	{
 		navigator.turnTo(0, true);

@@ -7,6 +7,9 @@ import lejos.hardware.lcd.TextLCD;
 import lejos.utility.Timer;
 import lejos.utility.TimerListener;
 
+/**
+ * Creates and object responsible for the LCD display on the EV3.
+ */
 public class LCDInfo implements TimerListener{
 	public static final int LCD_REFRESH = 100;
 	private Odometer odo;
@@ -17,6 +20,11 @@ public class LCDInfo implements TimerListener{
 	// arrays for displaying data
 	private double [] pos;
 	
+	/**
+	 * Object stores an Odometer and an ObjectDetector to update values
+	 * @param odo The Odometer to be used
+	 * @param objectDetector The ObjectDetector to be used
+	 */
 	public LCDInfo(Odometer odo, ObjectDetector objectDetector) {
 		this.odo = odo;
 		this.objectDetector = objectDetector;
@@ -29,7 +37,9 @@ public class LCDInfo implements TimerListener{
 		// start the timer
 		lcdTimer.start();
 	}
-	
+	/**
+	 * Draw the desired values on the EV3 display.
+	 */
 	public void timedOut() { 
 		odo.getPosition(pos, new boolean[] { true, true, true });
 		LCD.clear();
@@ -47,7 +57,12 @@ public class LCDInfo implements TimerListener{
 			LCD.drawString("Type:"+ objectDetector.getCurrentObject(), 0, 5);
 
 	}
-	
+	/**
+	 * Returns a formatted String from a double
+	 * @param x The input double
+	 * @param places The position on the LCD
+	 * @return The formatted string
+	 */
 	private static String formattedDoubleToString(double x, int places) {
 		String result = "";
 		String stack = "";

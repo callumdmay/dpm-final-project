@@ -21,14 +21,14 @@ public class Coordinate {
 	}
 	/**
 	 * Get the x coordinate
-	 * @return the x coordinate
+	 * @return The x coordinate
 	 */
 	public double getX() {
 		return X;
 	}
 	/**
 	 * Get the y coordinate
-	 * @return the y coordinate
+	 * @return The y coordinate
 	 */
 	public double getY() {
 		return Y;

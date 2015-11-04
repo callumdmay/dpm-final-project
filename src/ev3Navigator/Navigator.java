@@ -12,6 +12,9 @@ import ev3WallFollower.UltrasonicPoller;
 import lejos.hardware.Sound;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
+/**
+ * Creates an object used to Navigate through the environment
+ */
 public class Navigator extends Thread{
 
 	private EV3LargeRegulatedMotor leftMotor;
@@ -37,7 +40,13 @@ public class Navigator extends Thread{
 	private static ArrayList<Coordinate> coordinates;
 
 
-
+/**
+ * Store useful objects to be used by the Navigator
+ * @param pOdometer The Odometer to be used by the navigator
+ * @param pObjectDetector The ObjectDetector to be used by the navigator
+ * @param pObstacleAvoider The Obstacle avoider to be used by the navigator
+ * @param pMotors The Motors to be used by the navigator
+ */
 	public Navigator(Odometer pOdometer, ObjectDetector pObjectDetector, ObstacleAvoider pObstacleAvoider, Motors pMotors)
 	{
 		odometer 					= pOdometer;
@@ -67,8 +76,11 @@ public class Navigator extends Thread{
 			travelTo(coordinate.getX(), coordinate.getY());
 
 	}
-
-	//This method takes a new x and y location, and moves to it while avoiding obstacles
+	/**
+	 * Travel to a coordinate while avoiding objects
+	 * @param pX The x coordinate to travel to
+	 * @param pY The y coordinate to travel to
+	 */
 	public void travelTo(double pX, double pY)
 	{
 
@@ -84,8 +96,11 @@ public class Navigator extends Thread{
 		}
 
 	}
-
-	//Turns to the absolute value theta
+	/**
+	 * Turns to absolute value theta
+	 * @param pTheta The angle to turn to
+	 * @param useSmallRotationSpeed Whether to turn slowly or not
+	 */
 	public void turnTo(double pTheta, boolean useSmallRotationSpeed)
 	{
 
@@ -122,8 +137,10 @@ public class Navigator extends Thread{
 	}
 
 
-	/*
-	 * This method simply navigates to the given coordinates
+	/**
+	 * Navigates to given coordinates
+	 * @param pX The x coordinate to travel to
+	 * @param pY The y coordinate to travel to
 	 */
 	private void moveToCoordinates(double pX, double pY)
 	{
@@ -153,8 +170,11 @@ public class Navigator extends Thread{
 			rightMotor.forward();
 		}
 	}
-
-	//Sets the global coordinates for the navigator
+	/**
+	 * Set the global coordinates for the navigator and return the coordinates Queue
+	 * @param Coordinates to be set
+	 * @return The coordinatesQueue
+	 */
 	private static ArrayList<Coordinate> createCoordinatesList( double coordinates[][])
 	{
 		ArrayList<Coordinate> coordinatesQueue = new ArrayList<Coordinate>();
@@ -164,18 +184,28 @@ public class Navigator extends Thread{
 
 		return coordinatesQueue;
 	}
-
+	/**
+	 * Set the coordinates of the navigator
+	 * @param pCoordinates The coordinates to be set
+	 */
 	public void setCoordinates(double pCoordinates[][])
 	{
 		coordinates = createCoordinatesList(pCoordinates);
 	}
 
+	/**
+	 *  Stops the motors
+	 */
 	public void stopMotors()
 	{
 		leftMotor.stop();
 		rightMotor.stop();
 	}
 
+	/**
+	 * Set the navigator to a certain speed
+	 * @param speed The speed to be set
+	 */
 	public void driveStraight(int speed)
 	{
 		leftMotor.setSpeed(speed);
@@ -184,7 +214,11 @@ public class Navigator extends Thread{
 		leftMotor.forward();
 		rightMotor.forward();
 	}
-
+	
+	/**
+	 * Rotate clockwise at a certain speed
+	 * @param speed The speed to be set
+	 */
 	public void rotateClockWise(int speed)
 	{
 		leftMotor.setSpeed(speed);
@@ -194,6 +228,10 @@ public class Navigator extends Thread{
 		rightMotor.backward();
 	}
 
+	/**
+	 * Rotate counter-clockwise at a certain speed
+	 * @param speed The speed to be set
+	 */
 	public void rotateCounterClockWise(int speed)
 	{
 		leftMotor.setSpeed(speed);

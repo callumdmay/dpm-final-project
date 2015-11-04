@@ -7,6 +7,9 @@ import ev3WallFollower.UltrasonicController;
 import ev3WallFollower.UltrasonicPoller;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
+/**
+ *  Creates an object to allow the EV3 to avoid objects
+ */
 public class ObstacleAvoider {
 
 	private EV3LargeRegulatedMotor leftMotor;
@@ -23,7 +26,13 @@ public class ObstacleAvoider {
 	private final int neckMotor_OFFSET = 60;
 	private final double wallFollowingAngleError = 4 ;
 
-
+	/**
+	 * Stores objects essential to allow the EV3 to avoid objects
+	 * @param pOdometer The Odometer to be used.
+	 * @param pUltraSonicPoller The Ultrasonic sensor to be used.
+	 * @param pwallFollowerController The Wall Follower controller to be used.
+	 * @param pMotors The motors to be used.
+	 */
 	public ObstacleAvoider(Odometer pOdometer, UltrasonicPoller pUltraSonicPoller, UltrasonicController pwallFollowerController, Motors pMotors)
 	{
 		ultraSonicPoller 			= pUltraSonicPoller;
@@ -37,11 +46,11 @@ public class ObstacleAvoider {
 	}
 
 
-	/*
-	 * This method basically runs the p-type wall-following algorithm
-	 *until the robot is facing back at towards coordinates. It then tries to move towards them again
+	/**
+	 * This method runs the p-type wall-following algorithm
+	 * until the robot is facing back at towards coordinates.
+	 * It then tries to move towards them again
 	 */
-
 	public void avoidObstacle(double pX, double pY) {
 
 

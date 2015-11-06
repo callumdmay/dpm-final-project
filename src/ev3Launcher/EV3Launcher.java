@@ -111,9 +111,9 @@ public class EV3Launcher {
 			// ask the user whether the motors should drive in a square or float
 			t.drawString("< Left | Right > ", 0, 0);
 			t.drawString("       |         ", 0, 1);
-			t.drawString("TODO   |TODO     ", 0, 2);
-			t.drawString("       |         ", 0, 3);
-			t.drawString("		 |         ", 0, 4);
+			t.drawString("Capture|Run      ", 0, 2);
+			t.drawString("the    |a Test   ", 0, 3);
+			t.drawString("flag   |         ", 0, 4);
 
 			buttonChoice = Button.waitForAnyPress();
 		} while (buttonChoice == 0 );
@@ -125,11 +125,10 @@ public class EV3Launcher {
 			usl.doLocalization();
 			lightLocalizer.doLocalization();
 			lcd = new LCDInfo(odometer, objectDetector);
+			navigator.start();
 			break;
 
 		case Button.ID_RIGHT:
-			usl.doLocalization();
-			lightLocalizer.doLocalization();
 			lcd = new LCDInfo(odometer, objectDetector);
 			break;
 

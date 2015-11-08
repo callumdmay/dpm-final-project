@@ -30,19 +30,22 @@ public class EV3Launcher {
 	// Right motor connected to output D
 	// Ultrasonic sensor port connected to input S1
 	// Color sensor port connected to input S2
-	private static final EV3LargeRegulatedMotor leftMotor 				= new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
-	private static final EV3LargeRegulatedMotor rightMotor 				= new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B"));
-	private static final EV3LargeRegulatedMotor leftSideUltraSoundMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("C"));
-	private static final EV3LargeRegulatedMotor liftMotor 				= new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
 	
-	private static final Port leftUltraSonicPort 	= LocalEV3.get().getPort("S1");		
-	private static final Port rightUltraSonicPort 	= LocalEV3.get().getPort("S2");		
-	private static final Port rearColorPort 		= LocalEV3.get().getPort("S3");		
-	private static final Port forwardColorPort		= LocalEV3.get().getPort("S4");		
+	
+	private static final EV3LargeRegulatedMotor rightMotor 				= new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
+	private static final EV3LargeRegulatedMotor leftSideUltraSoundMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B"));
+	private static final EV3LargeRegulatedMotor liftMotor 				= new EV3LargeRegulatedMotor(LocalEV3.get().getPort("C"));
+	private static final EV3LargeRegulatedMotor leftMotor 				= new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
+	
+	private static final Port rearColorPort 		= LocalEV3.get().getPort("S1");		
+	private static final Port forwardColorPort		= LocalEV3.get().getPort("S2");
+	private static final Port leftUltraSonicPort 	= LocalEV3.get().getPort("S4");		
+	private static final Port rightUltraSonicPort 	= LocalEV3.get().getPort("S3");		
+		
 
 
-	public static final double WHEEL_RADIUS = 2.25;
-	public static final double TRACK = 16.2;
+	public static final double WHEEL_RADIUS = 2.1;
+	public static final double TRACK = 13.4;
 
 
 	@SuppressWarnings("resource")
@@ -73,9 +76,11 @@ public class EV3Launcher {
 		SampleProvider rearColorSensorSampleProvider = rearColorSensor.getMode("Red");			// colorValue provides samples from this instance
 		float[] rearColorSensorData = new float[rearColorSensorSampleProvider.sampleSize()];			// colorData is the buffer in which data are returned
 		
-		SensorModes forwardColorSensor = new EV3ColorSensor(forwardColorPort);
-		SampleProvider forwardColorSensorSampleProvider = forwardColorSensor.getMode("Red");			// colorValue provides samples from this instance
+		EV3ColorSensor forwardColorSensor = new EV3ColorSensor(forwardColorPort);
+		forwardColorSensor.setFloodlight(true);
+		SampleProvider forwardColorSensorSampleProvider = forwardColorSensor.getColorIDMode();			// colorValue provides samples from this instance
 		float[] forwardColorSensorData = new float[forwardColorSensorSampleProvider.sampleSize()];			// colorData is the buffer in which data are returned
+		
 		
 		//Create motors object
 		Motors motors = new Motors(leftMotor, rightMotor, leftSideUltraSoundMotor, liftMotor, WHEEL_RADIUS, TRACK);

@@ -12,7 +12,7 @@ public class LightLocalizer {
 
 	public static int 		ROTATION_SPEED 		= 25;
 	private final int 		lineDetectionValue = 40;
-	private final double	light_SensorDistanceFromOrigin = 13.3;
+	private final double	light_SensorDistanceFromOrigin = 14;
 
 	private Odometer 			odometer;
 	private SampleProvider 		colorSensor;

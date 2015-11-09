@@ -45,7 +45,7 @@ public class EV3Launcher {
 
 
 	public static final double WHEEL_RADIUS = 2.1;
-	public static final double TRACK = 13.4;
+	public static final double TRACK = 11.35;
 
 
 	@SuppressWarnings("resource")
@@ -126,10 +126,18 @@ public class EV3Launcher {
 		switch(buttonChoice) {
 
 		case Button.ID_LEFT :
+			navigator.driveStraight(100);
 			
-			usl.doLocalization();
-			lightLocalizer.doLocalization();
+		//	usl.doLocalization();
+		//	lightLocalizer.doLocalization();
+			
+			
 			lcd = new LCDInfo(odometer, objectDetector);
+			
+			
+			double [][] pCoordinates = {{2,2}}; 
+			navigator.setCoordinates(pCoordinates);
+			
 			navigator.start();
 			break;
 

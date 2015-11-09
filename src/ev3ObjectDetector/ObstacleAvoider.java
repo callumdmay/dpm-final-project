@@ -57,7 +57,7 @@ public class ObstacleAvoider {
 		rightMotor.stop();
 		leftMotor.stop();
 
-		leftUltraSoundMotor.rotate(50, true);
+		leftUltraSoundMotor.rotate(-50, true);
 		leftMotor.rotate(NavigatorUtility.convertAngle(wheelRadius, axleLength, 90), true);
 		rightMotor.rotate(-NavigatorUtility.convertAngle(wheelRadius, axleLength, 90), false);
 
@@ -70,7 +70,7 @@ public class ObstacleAvoider {
 			wallFollowerController.processUSData(ultraSonicPoller.getLeftUltraSoundSensorDistance(),ultraSonicPoller.getRightUltraSoundSensorDistance());
 		} while(Math.abs(NavigatorUtility.calculateAngleError(pX - currentX, pY - currentY, odometer.getTheta())*180/Math.PI) > wallFollowingAngleError);
 		
-		leftUltraSoundMotor.rotate(-50, false);
+		leftUltraSoundMotor.rotate(50, false);
 
 
 	}

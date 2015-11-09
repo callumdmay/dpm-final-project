@@ -27,7 +27,7 @@ public class Navigator extends Thread{
 
 	private final double locationError = 1;
 	private final double navigatingAngleError = 1;
-	private static final double  tileLength = 30.9;
+	private static final double  tileLength = 30.48;
 
 	private final int FORWARD_SPEED = 200;
 	private final int ROTATE_SPEED = 100;
@@ -52,7 +52,7 @@ public class Navigator extends Thread{
 		odometer 					= pOdometer;
 		objectDetector 				= pObjectDetector;
 		obstacleAvoider				= pObstacleAvoider;
-		leftMotor 					= pMotors.getRightMotor();
+		leftMotor 					= pMotors.getLeftMotor();
 		rightMotor 					= pMotors.getRightMotor();
 		wheelRadius 				= pMotors.getWheelRadius();
 		axleLength 					= pMotors.getAxleLength();
@@ -75,6 +75,7 @@ public class Navigator extends Thread{
 		for( Coordinate coordinate : coordinates)
 			travelTo(coordinate.getX(), coordinate.getY());
 
+		stopMotors();
 	}
 	/**
 	 * Travel to a coordinate while avoiding objects

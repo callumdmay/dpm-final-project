@@ -6,8 +6,9 @@ package ev3WallFollower;
  */
 public interface UltrasonicController {
 	
-	public void processUSData(int leftUltraSonicDistance , int rightUltraSonicDistance);
+	public void processUSData(int leftUltraSonicDistance);
 	
 	public int readUSDistance();
 	
 }
+

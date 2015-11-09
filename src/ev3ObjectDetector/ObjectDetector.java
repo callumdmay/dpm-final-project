@@ -22,7 +22,7 @@ public class ObjectDetector{
 	private float[] colorData;
 	private final int FILTER_OUT = 5;
 	private int filterControl;
-	private final double defaultObstacleDistance = 20;
+	private final double defaultObstacleDistance = 25;
 	private OBJECT_TYPE currentObject;
 	private boolean objectDetected;
 

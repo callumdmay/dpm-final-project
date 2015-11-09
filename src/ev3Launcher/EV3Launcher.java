@@ -101,7 +101,7 @@ public class EV3Launcher {
 		Navigator navigator = new Navigator(odometer, objectDetector, obstacleAvoider, motors);
 		
 		//create the ultrasonic localizers
-		USLocalizer usl = new USLocalizer(odometer, leftUltraSonicSampleProvider, rightUltraSonicData, USLocalizer.LocalizationType.RISING_EDGE, navigator);
+		USLocalizer usl = new USLocalizer(odometer, rightUltraSonicSampleProvider, rightUltraSonicData, USLocalizer.LocalizationType.RISING_EDGE, navigator);
 		LightLocalizer lightLocalizer = new LightLocalizer(odometer, navigator, rearColorSensorSampleProvider, rearColorSensorData);
 		
 		int buttonChoice;
@@ -126,19 +126,17 @@ public class EV3Launcher {
 		switch(buttonChoice) {
 
 		case Button.ID_LEFT :
-			navigator.driveStraight(100);
+		lcd = new LCDInfo(odometer, objectDetector);
+		usl.doLocalization();
+//	        lightLocalizer.doLocalization();
+	
+//			double [][] pCoordinates = {{2,2}}; 
+//			navigator.setCoordinates(pCoordinates);
+//			
+//			navigator.start();
+//			
 			
-		//	usl.doLocalization();
-		//	lightLocalizer.doLocalization();
 			
-			
-			lcd = new LCDInfo(odometer, objectDetector);
-			
-			
-			double [][] pCoordinates = {{2,2}}; 
-			navigator.setCoordinates(pCoordinates);
-			
-			navigator.start();
 			break;
 
 		case Button.ID_RIGHT:

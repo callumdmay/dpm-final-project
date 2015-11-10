@@ -14,7 +14,7 @@ public class CaptureTheFlagGameObject {
 		homeBaseCoordinate1 	= new Coordinate(pInputArray[1], pInputArray[2]);
 		homeBaseCoordinate2 	= new Coordinate(pInputArray[3], pInputArray[4]);
 		opponentBaseCoordinate1 = new Coordinate(pInputArray[5], pInputArray[6]);
-		opponentBaseCoordinate1 = new Coordinate(pInputArray[7], pInputArray[8]);
+		opponentBaseCoordinate2 = new Coordinate(pInputArray[7], pInputArray[8]);
 		homeFlagDropCoordinate	= new Coordinate(pInputArray[9], pInputArray[10]);
 		
 		homeFlagColour = pInputArray[11];

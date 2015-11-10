@@ -31,23 +31,23 @@ public class EV3Launcher {
 	// Right motor connected to output D
 	// Ultrasonic sensor port connected to input S1
 	// Color sensor port connected to input S2
-	
-	
+
+
 	private static final EV3LargeRegulatedMotor rightMotor 				= new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
 	private static final EV3LargeRegulatedMotor leftSideUltraSoundMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("B"));
 	private static final EV3LargeRegulatedMotor liftMotor 				= new EV3LargeRegulatedMotor(LocalEV3.get().getPort("C"));
 	private static final EV3LargeRegulatedMotor leftMotor 				= new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
-	
+
 	private static final Port rearColorPort 		= LocalEV3.get().getPort("S1");		
 	private static final Port forwardColorPort		= LocalEV3.get().getPort("S2");
 	private static final Port leftUltraSonicPort 	= LocalEV3.get().getPort("S4");		
 	private static final Port rightUltraSonicPort 	= LocalEV3.get().getPort("S3");		
-		
+
 
 
 	public static final double WHEEL_RADIUS = 2.1;
 	public static final double TRACK = 11.35;
-	
+
 	private static final int wifiInputString[] = {1, 2, -1, 4, 2, 6, 8, 8, 11, 1, 3, 2, 3};
 
 
@@ -70,7 +70,7 @@ public class EV3Launcher {
 		SampleProvider rightUltraSonicSampleProvider = rightUltraSonicSensor.getMode("Distance");			// colorValue provides samples from this instance
 		float[] rightUltraSonicData = new float[rightUltraSonicSampleProvider.sampleSize()];				// colorData is the buffer in which data are returned
 
-		
+
 		//Setup color sensor
 		// 1. Create a port object attached to a physical port (done above)
 		// 2. Create a sensor instance and attach to port
@@ -79,13 +79,13 @@ public class EV3Launcher {
 		SensorModes rearColorSensor = new EV3ColorSensor(rearColorPort);
 		SampleProvider rearColorSensorSampleProvider = rearColorSensor.getMode("Red");			// colorValue provides samples from this instance
 		float[] rearColorSensorData = new float[rearColorSensorSampleProvider.sampleSize()];			// colorData is the buffer in which data are returned
-		
+
 		EV3ColorSensor forwardColorSensor = new EV3ColorSensor(forwardColorPort);
 		forwardColorSensor.setFloodlight(true);
 		SampleProvider forwardColorSensorSampleProvider = forwardColorSensor.getColorIDMode();			// colorValue provides samples from this instance
 		float[] forwardColorSensorData = new float[forwardColorSensorSampleProvider.sampleSize()];			// colorData is the buffer in which data are returned
-		
-		
+
+
 		//Create motors object
 		Motors motors = new Motors(leftMotor, rightMotor, leftSideUltraSoundMotor, liftMotor, WHEEL_RADIUS, TRACK);
 
@@ -95,7 +95,7 @@ public class EV3Launcher {
 		// setup the odometer and display
 		Odometer odometer = new Odometer(motors);
 		odometer.start();
-		
+
 		UltrasonicController pController = new PController(motors);
 
 		ObstacleAvoider obstacleAvoider = new ObstacleAvoider(odometer, ultraSonicSampleProvider, pController, motors);
@@ -103,11 +103,11 @@ public class EV3Launcher {
 
 		//Create navigator
 		Navigator navigator = new Navigator(odometer, objectDetector, obstacleAvoider, motors);
-		
+
 		//create the ultrasonic localizers
 		USLocalizer usl = new USLocalizer(odometer, rightUltraSonicSampleProvider, rightUltraSonicData, USLocalizer.LocalizationType.RISING_EDGE, navigator);
 		LightLocalizer lightLocalizer = new LightLocalizer(odometer, navigator, rearColorSensorSampleProvider, rearColorSensorData);
-		
+
 		int buttonChoice;
 		TextLCD t = LocalEV3.get().getTextLCD();
 
@@ -131,11 +131,12 @@ public class EV3Launcher {
 
 		case Button.ID_LEFT :
 			lcd = new LCDInfo(odometer, objectDetector);
-			usl.doLocalization();
-	        lightLocalizer.doLocalization();
-	        
-	        navigator.setGameObject(new CaptureTheFlagGameObject(wifiInputString));
 			
+			usl.doLocalization();
+			lightLocalizer.doLocalization();
+
+			navigator.setGameObject(new CaptureTheFlagGameObject(wifiInputString));
+			navigator.start();
 			break;
 
 		case Button.ID_RIGHT:

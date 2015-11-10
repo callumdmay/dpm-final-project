@@ -21,6 +21,8 @@ public class Navigator extends Thread{
 	private EV3LargeRegulatedMotor rightMotor;
 	private ObjectDetector objectDetector;
 	private ObstacleAvoider obstacleAvoider;
+	private Odometer odometer;
+	private CaptureTheFlagGameObject captureTheFlagGameObject;
 
 	private double wheelRadius;
 	private double axleLength;
@@ -34,19 +36,18 @@ public class Navigator extends Thread{
 	private final int SMALL_CORRECTION_SPEED =20;
 	private final int SMALL_ROTATION_SPEED = 25;
 
-	private Odometer odometer;
 
 	public static int coordinateCount = 0;
 	private static ArrayList<Coordinate> coordinates;
 
 
-/**
- * Store useful objects to be used by the Navigator
- * @param pOdometer The Odometer to be used by the navigator
- * @param pObjectDetector The ObjectDetector to be used by the navigator
- * @param pObstacleAvoider The Obstacle avoider to be used by the navigator
- * @param pMotors The Motors to be used by the navigator
- */
+	/**
+	 * Store useful objects to be used by the Navigator
+	 * @param pOdometer The Odometer to be used by the navigator
+	 * @param pObjectDetector The ObjectDetector to be used by the navigator
+	 * @param pObstacleAvoider The Obstacle avoider to be used by the navigator
+	 * @param pMotors The Motors to be used by the navigator
+	 */
 	public Navigator(Odometer pOdometer, ObjectDetector pObjectDetector, ObstacleAvoider pObstacleAvoider, Motors pMotors)
 	{
 		odometer 					= pOdometer;
@@ -63,17 +64,28 @@ public class Navigator extends Thread{
 
 		}
 
-
 	}
 
 	@Override
 	public void run()
 	{
 		Sound.beepSequenceUp();
+		switch(captureTheFlagGameObject.getStartingCorner()){
 
-		//For each coordinate in the queue, 
-		for( Coordinate coordinate : coordinates)
-			travelTo(coordinate.getX(), coordinate.getY());
+		case 1:
+
+		case 2:
+			odometer.setX(10*tileLength);
+		case 3:
+			odometer.setX(10*tileLength);
+			odometer.setY(10*tileLength);
+		case 4:
+			odometer.setY(10*tileLength);
+
+
+			travelTo(captureTheFlagGameObject.getOpponentBaseCoordinate1().getX(), captureTheFlagGameObject.getOpponentBaseCoordinate1().getY());
+
+		}
 
 		stopMotors();
 	}
@@ -193,6 +205,15 @@ public class Navigator extends Thread{
 	{
 		coordinates = createCoordinatesList(pCoordinates);
 	}
+	/**
+	 * Sets the game object for the capture the flag game 
+	 * @param pCaptureTheFlagGameObject
+	 */
+
+	public void setGameObject(CaptureTheFlagGameObject pCaptureTheFlagGameObject)
+	{
+		captureTheFlagGameObject = pCaptureTheFlagGameObject;
+	}
 
 	/**
 	 *  Stops the motors
@@ -215,7 +236,7 @@ public class Navigator extends Thread{
 		leftMotor.forward();
 		rightMotor.forward();
 	}
-	
+
 	/**
 	 * Rotate clockwise at a certain speed
 	 * @param speed The speed to be set

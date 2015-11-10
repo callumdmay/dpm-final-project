@@ -4,6 +4,7 @@ import ev3Localization.LCDInfo;
 import ev3Localization.LightLocalizer;
 import ev3Localization.USLocalizer;
 import ev3Localization.USLocalizer.LocalizationType;
+import ev3Navigator.CaptureTheFlagGameObject;
 import ev3Navigator.Navigator;
 import ev3ObjectDetector.ObjectDetector;
 import ev3ObjectDetector.ObstacleAvoider;
@@ -46,6 +47,9 @@ public class EV3Launcher {
 
 	public static final double WHEEL_RADIUS = 2.1;
 	public static final double TRACK = 11.35;
+	
+	private static final int wifiInputString[] = {1, 2, -1, 4, 2, 6, 8, 8, 11, 1, 3, 2, 3};
+
 
 
 	@SuppressWarnings("resource")
@@ -126,16 +130,11 @@ public class EV3Launcher {
 		switch(buttonChoice) {
 
 		case Button.ID_LEFT :
-		lcd = new LCDInfo(odometer, objectDetector);
-		usl.doLocalization();
-//	        lightLocalizer.doLocalization();
-	
-//			double [][] pCoordinates = {{2,2}}; 
-//			navigator.setCoordinates(pCoordinates);
-//			
-//			navigator.start();
-//			
-			
+			lcd = new LCDInfo(odometer, objectDetector);
+			usl.doLocalization();
+	        lightLocalizer.doLocalization();
+	        
+	        navigator.setGameObject(new CaptureTheFlagGameObject(wifiInputString));
 			
 			break;
 

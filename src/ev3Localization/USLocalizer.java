@@ -18,12 +18,12 @@ public class USLocalizer {
 	public enum LocalizationType { FALLING_EDGE, RISING_EDGE };
 
 
-	public static int 		ROTATION_SPEED 		= 25;
+	public static int 		ROTATION_SPEED 		= 75;
 	private final int 		distanceNoiseMargin = 1;
 	private final int 		measuredDistance 	= 30;
 	private final int 		usSensorMaxDistance = 40;
 	private final double 	TILE_SIZE 			= 30.48;
-	private final double	us_SensorDistanceFromOrigin = 4.1;
+	private final double	us_SensorDistanceFromOrigin = 4.3;
 
 	private Odometer 			odometer;
 	private SampleProvider		usSensor;
@@ -255,7 +255,8 @@ public class USLocalizer {
 		//face back wall and record x distance
 		navigator.turnTo(Math.toRadians(180), false);
 		odometer.setX(getFilteredData(11) - TILE_SIZE + us_SensorDistanceFromOrigin);
-
+		
+		navigator.turnTo(Math.toRadians(0), false);
 	}
 
 	/**

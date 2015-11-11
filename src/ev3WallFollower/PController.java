@@ -9,9 +9,9 @@ import lejos.hardware.motor.EV3LargeRegulatedMotor;
  */
 public class PController implements UltrasonicController {
 
-	private static final int bandCenter = 25; // Offset from the wall (cm)
+	private static final int bandCenter = 28; // Offset from the wall (cm)
 	private static final int bandWidth = 3; // Width of dead band (cm)
-	private final int motorStraight = 100, FILTER_OUT = 20;
+	private final int motorStraight = 100, FILTER_OUT = 20, motorVeryHigh = 300,motorVeryLow = 50,motorHigh =200;
 	private final int offset = 20;
 	private EV3LargeRegulatedMotor leftMotor, rightMotor;
 	private int distance;
@@ -32,7 +32,7 @@ public class PController implements UltrasonicController {
 	 * when facing an empty area.
 	 */
 	@Override
-	public void processUSData(int pDistance) {
+	public void processUSData(int pDistance, int rightUltraSonicDistance) {
 
 
 		// rudimentary filter - toss out invalid samples corresponding to null signal.
@@ -55,10 +55,6 @@ public class PController implements UltrasonicController {
 		//calculate error
 		int distanceError = distance - bandCenter;
 
-		
-		
-	
-
 		//Correct distance to wall
 		if(Math.abs(distanceError) <= bandWidth)
 		{
@@ -67,19 +63,50 @@ public class PController implements UltrasonicController {
 			leftMotor.forward();
 			rightMotor.forward();
 		}
+		
+		
+		//Too close to wall
+				else if (distanceError < bandWidth*(-1) || rightUltraSonicDistance < 25)
+				{
+					int leftSpeed =0;
+					int rightSpeed =0;
+					
+					if ( distanceError <=10)
+					{
+						
+						leftMotor.setSpeed(motorVeryHigh);		
+						rightMotor.setSpeed(motorVeryLow);
+						//start moving
+						leftMotor.forward();
+						rightMotor.forward();
+						
+					}
+					
+					else {
+					//Change speed according to error size, the offset is used to tweak the turning radius
+					 leftSpeed = motorStraight + scaledSpeedDelta(distanceError) +2*offset;
+					rightSpeed = motorStraight - scaledSpeedDelta(distanceError) - offset;
+						
+					leftMotor.setSpeed(leftSpeed);		
+					rightMotor.setSpeed(rightSpeed);
+					//start moving
+					leftMotor.forward();
+					rightMotor.forward();
+					}
+				}
+		
+		
 		//Too far from wall
 		else if (distanceError > bandWidth)
 		{
 			int leftSpeed =0;
 			int rightSpeed =0;
 			
-			if (distance > 70)
+			// way too far from the wall/object 
+			if (distanceError >= 30)
 			{
-				leftSpeed = 150;
-				rightSpeed= 150;
-				leftMotor.setSpeed(leftSpeed - 50);
-				rightMotor.setSpeed(rightSpeed + 150);
-				
+				leftMotor.setSpeed(motorStraight);
+				rightMotor.setSpeed(motorHigh);
 				leftMotor.forward();
 				rightMotor.forward();
 			}
@@ -96,36 +123,7 @@ public class PController implements UltrasonicController {
 			rightMotor.forward();
 		}
 		}
-		//Too close to wall
-		else if (distanceError < bandWidth*(-1))
-		{
-			int leftSpeed =0;
-			int rightSpeed =0;
-			
-			if ( distanceError <=10)
-			{
-				leftSpeed = 150;
-				rightSpeed = 150;
-				leftMotor.setSpeed(leftSpeed + 150);		
-				rightMotor.setSpeed(rightSpeed - 100);
-				//start moving
-				leftMotor.forward();
-				rightMotor.forward();
-				
-			}
-			
-			else {
-			//Change speed according to error size, the offset is used to tweak the turning radius
-			 leftSpeed = motorStraight + scaledSpeedDelta(distanceError) +2*offset;
-			rightSpeed = motorStraight - scaledSpeedDelta(distanceError) - offset;
-				
-			leftMotor.setSpeed(leftSpeed);		
-			rightMotor.setSpeed(rightSpeed);
-			//start moving
-			leftMotor.forward();
-			rightMotor.forward();
-			}
-		}
+		
 
 
 	}

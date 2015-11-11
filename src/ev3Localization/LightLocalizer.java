@@ -10,14 +10,14 @@ import lejos.robotics.SampleProvider;
  */
 public class LightLocalizer {
 
-	public static int 		ROTATION_SPEED 		= 25;
+	public static int 		ROTATION_SPEED 		= 80;
 	private final int 		lineDetectionValue = 40;
-	private final double	light_SensorDistanceFromOrigin = 14;
+	private final double	light_SensorDistanceFromOrigin = 13.85;
 
 	private Odometer 			odometer;
 	private SampleProvider 		colorSensor;
 	private float[] 			colorData;	
-	private final double[]		calibrationCoordinates = {-3,-3};
+	private double[]		calibrationCoordinates = {-3,-3};
 	private Navigator 			navigator;
 
 	/**
@@ -35,7 +35,43 @@ public class LightLocalizer {
 		this.navigator = navigator;
 	}
 	/**
-	 * Travel to an intersection and self-localize using the light sensor.
+	 * Go navigate to unoccupied corner closest to destination
+	 */
+	public void localizeDynamically() {
+
+		double blackLineAngles[] = new double[4];
+
+		navigator.travelTo(calibrationCoordinates[0],calibrationCoordinates[1]);
+		navigator.turnTo(Math.PI/4, true);
+
+		for( int index = 0 ; index < blackLineAngles.length; index ++)
+		{
+			//Capture the angle when we first encounter the black line
+			while(!blackLineDetected())
+				navigator.rotateCounterClockWise(ROTATION_SPEED);
+
+			Sound.beep();
+			blackLineAngles[index]= odometer.getTheta();
+
+			//turn off of black line so as not to capture the same line twice
+			navigator.turnTo(odometer.getTheta() + 5*Math.PI/180,true);
+		}
+
+		double deltaY = blackLineAngles[2] - blackLineAngles[0];
+		double deltaX = blackLineAngles[3] - blackLineAngles[1];
+
+		odometer.setX(-light_SensorDistanceFromOrigin * Math.cos(deltaY/2));
+		odometer.setY(-light_SensorDistanceFromOrigin * Math.cos(deltaX/2));
+
+		odometer.setTheta(odometer.getTheta() + blackLineAngles[0]+Math.toRadians(180) +deltaY/2);
+		navigator.travelTo(0, 0);
+
+		initiateFinalCalibration();
+
+	}
+	
+	/**
+	 * Travel to an intersection and self-localize using the light sensor only after US localization.
 	 */
 	public void doLocalization() {
 		// drive to location listed in tutorial
@@ -115,6 +151,27 @@ public class LightLocalizer {
 		navigator.stopMotors();
 		navigator.turnTo(0, true);
 
+	}
+	/**
+	 * Set the coordinates for the robot to head to for dynamic light localization
+	 * @param position The intersection coordinates used for light localization
+	 */
+	public void setCalibrationCoordinates(double[] intersectionCoordinates) {
+		this.calibrationCoordinates = intersectionCoordinates;
+	}
+	
+	/**
+	 * Returns the corrected angle of the EV3
+	 * @param angleA The first angle used to correct x
+	 * @param angleB The second angle used to correct y
+	 * @param currentAngle The current heading of the EV3
+	 * @return The corrected heading of the EV3
+	 */
+	public double fixAngle (double angleA, double angleB, double currentAngle){
+		double deltaTheta;
+		deltaTheta = 180 - (angleA-angleB)/2 - angleB;
+		currentAngle += deltaTheta;
+		return currentAngle;
 	}
 
 

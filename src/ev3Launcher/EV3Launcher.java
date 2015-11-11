@@ -142,13 +142,9 @@ public class EV3Launcher {
 		case Button.ID_RIGHT:
 			lcd = new LCDInfo(odometer, objectDetector);
 			
-//			navigator.travelTo(2*30.48,2*30.48);
-//			navigator.stopMotors();
-			usl.doLocalization();
-			
-			lightLocalizer.doLocalization();
-			
-			
+			navigator.travelTo(1*30.48,8*30.48);
+			navigator.stopMotors();
+	
 			break;
 
 		default:

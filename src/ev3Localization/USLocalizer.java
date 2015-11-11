@@ -18,7 +18,7 @@ public class USLocalizer {
 	public enum LocalizationType { FALLING_EDGE, RISING_EDGE };
 
 
-	public static int 		ROTATION_SPEED 		= 75;
+	public static int 		ROTATION_SPEED 		= 85;
 	private final int 		distanceNoiseMargin = 1;
 	private final int 		measuredDistance 	= 30;
 	private final int 		usSensorMaxDistance = 40;

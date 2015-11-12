@@ -1,4 +1,6 @@
-package ev3Navigator;
+package ev3Objects;
+
+import ev3Navigator.Coordinate;
 
 public class CaptureTheFlagGameObject {
 

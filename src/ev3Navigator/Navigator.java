@@ -5,6 +5,7 @@ import java.util.Queue;
 
 import ev3ObjectDetector.ObjectDetector;
 import ev3ObjectDetector.ObstacleAvoider;
+import ev3Objects.CaptureTheFlagGameObject;
 import ev3Objects.Motors;
 import ev3Odometer.Odometer;
 import ev3WallFollower.UltrasonicController;

@@ -1,7 +1,6 @@
-package ev3Localization;
+package ev3Odometer;
 
 import ev3ObjectDetector.ObjectDetector;
-import ev3Odometer.Odometer;
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.lcd.TextLCD;
 import lejos.utility.Timer;

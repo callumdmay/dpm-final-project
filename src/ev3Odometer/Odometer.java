@@ -47,6 +47,7 @@ public class Odometer extends Thread {
 	/**
 	 * Runs the odometer (required for thread)
 	 */
+	@Override
 	public void run() {
 		long updateStart, updateEnd;
 

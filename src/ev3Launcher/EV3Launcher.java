@@ -2,7 +2,6 @@ package ev3Launcher;
 
 import ev3Localization.LightLocalizer;
 import ev3Localization.USLocalizer;
-import ev3Localization.USLocalizer.LocalizationType;
 import ev3Navigator.Navigator;
 import ev3ObjectDetector.ObjectDetector;
 import ev3ObjectDetector.ObstacleAvoider;
@@ -13,12 +12,14 @@ import ev3Odometer.Odometer;
 import ev3WallFollower.PController;
 import ev3WallFollower.UltrasonicController;
 import ev3WallFollower.UltrasonicPoller;
-import lejos.hardware.*;
+import lejos.hardware.Button;
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.lcd.TextLCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.port.Port;
-import lejos.hardware.sensor.*;
+import lejos.hardware.sensor.EV3ColorSensor;
+import lejos.hardware.sensor.EV3UltrasonicSensor;
+import lejos.hardware.sensor.SensorModes;
 import lejos.robotics.SampleProvider;
 
 /**

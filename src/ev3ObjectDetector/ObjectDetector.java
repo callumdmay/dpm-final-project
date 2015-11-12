@@ -1,8 +1,6 @@
 package ev3ObjectDetector;
 
 
-import java.util.Arrays;
-
 import ev3Odometer.Odometer;
 import ev3WallFollower.UltrasonicPoller;
 import lejos.hardware.Sound;

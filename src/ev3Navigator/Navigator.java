@@ -1,15 +1,10 @@
 package ev3Navigator;
 
-import java.util.ArrayList;
-import java.util.Queue;
-
 import ev3ObjectDetector.ObjectDetector;
 import ev3ObjectDetector.ObstacleAvoider;
 import ev3Objects.CaptureTheFlagGameObject;
 import ev3Objects.Motors;
 import ev3Odometer.Odometer;
-import ev3WallFollower.UltrasonicController;
-import ev3WallFollower.UltrasonicPoller;
 import lejos.hardware.Sound;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 

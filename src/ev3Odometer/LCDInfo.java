@@ -39,6 +39,7 @@ public class LCDInfo implements TimerListener{
 	/**
 	 * Draw the desired values on the EV3 display.
 	 */
+	@Override
 	public void timedOut() { 
 		odo.getPosition(pos, new boolean[] { true, true, true });
 		LCD.clear();

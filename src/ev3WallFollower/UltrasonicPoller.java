@@ -56,6 +56,7 @@ public class UltrasonicPoller implements TimerListener{
 	 * Sensors now return floats using a uniform protocol.
 	 * Need to convert US result to an integer [0,255]
 	 */
+	@Override
 	public void timedOut() {
 		while (true) {
 			float leftUltraSonicSampleData[] = new float[7];

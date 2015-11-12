@@ -38,7 +38,6 @@ public class Navigator extends Thread{
 
 
 	public static int coordinateCount = 0;
-	private static ArrayList<Coordinate> coordinates;
 
 
 	/**
@@ -70,22 +69,11 @@ public class Navigator extends Thread{
 	public void run()
 	{
 		Sound.beepSequenceUp();
-		switch(captureTheFlagGameObject.getStartingCorner()){
-
-		case 1:
-
-		case 2:
-			odometer.setX(10*tileLength);
-		case 3:
-			odometer.setX(10*tileLength);
-			odometer.setY(10*tileLength);
-		case 4:
-			odometer.setY(10*tileLength);
-
-
-			travelTo(captureTheFlagGameObject.getOpponentBaseCoordinate1().getX(), captureTheFlagGameObject.getOpponentBaseCoordinate1().getY());
-
-		}
+		
+		odometer.setX(captureTheFlagGameObject.getStartingCoordinate().getX());
+		odometer.setY(captureTheFlagGameObject.getStartingCoordinate().getY());
+		
+		travelTo(captureTheFlagGameObject.getClosestOpponentBaseCoordinate().getX(), captureTheFlagGameObject.getClosestOpponentBaseCoordinate().getY());
 
 		stopMotors();
 	}
@@ -183,28 +171,7 @@ public class Navigator extends Thread{
 			rightMotor.forward();
 		}
 	}
-	/**
-	 * Set the global coordinates for the navigator and return the coordinates Queue
-	 * @param Coordinates to be set
-	 * @return The coordinatesQueue
-	 */
-	private static ArrayList<Coordinate> createCoordinatesList( double coordinates[][])
-	{
-		ArrayList<Coordinate> coordinatesQueue = new ArrayList<Coordinate>();
 
-		for (int x = 0 ; x < coordinates.length; x++)
-			coordinatesQueue.add(new Coordinate(coordinates[x][0]*tileLength,coordinates[x][1]*tileLength));
-
-		return coordinatesQueue;
-	}
-	/**
-	 * Set the coordinates of the navigator
-	 * @param pCoordinates The coordinates to be set
-	 */
-	public void setCoordinates(double pCoordinates[][])
-	{
-		coordinates = createCoordinatesList(pCoordinates);
-	}
 	/**
 	 * Sets the game object for the capture the flag game 
 	 * @param pCaptureTheFlagGameObject

@@ -1,32 +1,87 @@
 package ev3Navigator;
 
 public class CaptureTheFlagGameObject {
-	
+
 	/**
 	 * Creates an object to handle the coordinates received by wifi.
 	 */
 	private int startingCorner;
 	private Coordinate homeBaseCoordinate1, homeBaseCoordinate2;
-	private Coordinate opponentBaseCoordinate1, opponentBaseCoordinate2;
+	private Coordinate startingCoordinate;
+	private Coordinate opponentBaseCoordinate1, opponentBaseCoordinate2, opponentBaseCoordinate3, opponentBaseCoordinate4, closestOpponentBaseCoordinate;
 	private Coordinate homeFlagDropCoordinate;
 	private int homeFlagColour, opponentFlagColour;
-	
+	private static final double tileLength = 30.48;
+
+
 	/**
 	 * Stores an input array of coordinates to be used to navigate to different locations
+	 * Also determines the robots starting location and the closest opponent base coordinate to the 
+	 * robots starting position
 	 * @param pInputArray The array of coordinates essential for navigating in the grid.
 	 */
 	public CaptureTheFlagGameObject(int pInputArray[])
 	{
 		startingCorner = pInputArray[0];
-		homeBaseCoordinate1 	= new Coordinate(pInputArray[1], pInputArray[2]);
-		homeBaseCoordinate2 	= new Coordinate(pInputArray[3], pInputArray[4]);
-		opponentBaseCoordinate1 = new Coordinate(pInputArray[5], pInputArray[6]);
-		opponentBaseCoordinate2 = new Coordinate(pInputArray[7], pInputArray[8]);
-		homeFlagDropCoordinate	= new Coordinate(pInputArray[9], pInputArray[10]);
-		
+
+		homeBaseCoordinate1 	= new Coordinate(pInputArray[1] * tileLength, pInputArray[2]*tileLength);
+		homeBaseCoordinate2 	= new Coordinate(pInputArray[3]* tileLength, pInputArray[4]*tileLength);
+		opponentBaseCoordinate1 = new Coordinate(pInputArray[5]*tileLength, pInputArray[6]*tileLength);
+		opponentBaseCoordinate2 = new Coordinate(pInputArray[7]*tileLength, pInputArray[8]*tileLength);
+		homeFlagDropCoordinate	= new Coordinate(pInputArray[9]*tileLength, pInputArray[10]*tileLength);
+
 		homeFlagColour = pInputArray[11];
 		opponentFlagColour = pInputArray[12];
-		
+
+
+		opponentBaseCoordinate3 = new Coordinate(opponentBaseCoordinate1.getX(), opponentBaseCoordinate2.getY());
+		opponentBaseCoordinate4 = new Coordinate(opponentBaseCoordinate2.getX(), opponentBaseCoordinate1.getY());
+
+		switch(startingCorner){
+
+		case 1:
+			startingCoordinate = new Coordinate(0,0);
+		case 2:
+			startingCoordinate = new Coordinate(10*tileLength,0);
+		case 3:
+			startingCoordinate = new Coordinate(10*tileLength,10*tileLength);
+		case 4:
+			startingCoordinate = new Coordinate(10*tileLength,10*tileLength);
+
+		}
+
+		closestOpponentBaseCoordinate = determineClosestOpponentBaseCoordinate();
+
+	}
+
+	/**
+	 * Determine the closest coordinate of the opponents base that the robot should travel to, 
+	 * @return closest opponent base coordinate to robot starting location
+	 */
+	private Coordinate determineClosestOpponentBaseCoordinate() {
+
+		double currentDistance	=1000;
+		Coordinate currentCoordinate= null;
+		for(Coordinate coordinate : new Coordinate[] {opponentBaseCoordinate1,opponentBaseCoordinate2,opponentBaseCoordinate3,opponentBaseCoordinate4})
+		{
+			//added this so the algorithm doesn't consider the coordinates against the wall
+			if(coordinate.getX()<0 ||coordinate.getX()>10*tileLength || coordinate.getY() < 0 ||coordinate.getY()>10*tileLength)
+				continue;
+
+			double deltaX = Math.abs(startingCoordinate.getX() - coordinate.getX());
+			double deltaY = Math.abs(startingCoordinate.getY() - coordinate.getY());
+
+			double distance = Math.sqrt(deltaX*deltaX + deltaY*deltaY);
+			if(distance < currentDistance){
+				currentDistance = distance;
+				currentCoordinate = coordinate;
+			}
+		}
+
+		if(currentCoordinate == null)
+			throw new NullPointerException("Could not determine closest opponent base coordinate");
+
+		return currentCoordinate;
 	}
 	/**
 	 * Get the corner of the starting position, a number from 1 to 4
@@ -35,7 +90,25 @@ public class CaptureTheFlagGameObject {
 	public int getStartingCorner() {
 		return startingCorner;
 	}
-	
+
+
+	/**
+	 *  Get the robots starting coordinates
+	 * @return the starting coordinate of the robot
+	 */
+	public Coordinate getStartingCoordinate() {
+		return startingCoordinate;
+	}
+
+	/**
+	 * Get the closest opponent base coordinate
+	 * @return the closest opponent base coordinate
+	 */
+	public Coordinate getClosestOpponentBaseCoordinate() {
+		return closestOpponentBaseCoordinate;
+	}
+
+
 	/**
 	 * Get the coordinate of the bottom left corner of the home base area
 	 * @return The coordinate of the bottom left corner of the home base area
@@ -43,7 +116,7 @@ public class CaptureTheFlagGameObject {
 	public Coordinate getHomeBaseCoordinate1() {
 		return homeBaseCoordinate1;
 	}
-	
+
 	/**
 	 * Get the coordinate of the top right corner of the home base area
 	 * @return The coordinate of the top right corner of the home base area
@@ -51,7 +124,7 @@ public class CaptureTheFlagGameObject {
 	public Coordinate getHomeBaseCoordinate2() {
 		return homeBaseCoordinate2;
 	}
-	
+
 	/**
 	 * Get the coordinate of the bottom left corner of the enemy base area
 	 * @return The coordinate of the bottom left corner of the enemy base area
@@ -66,6 +139,22 @@ public class CaptureTheFlagGameObject {
 	 */
 	public Coordinate getOpponentBaseCoordinate2() {
 		return opponentBaseCoordinate2;
+	}
+
+	/**
+	 * Get the coordinate of the top left corner of the enemy base area
+	 * @return The coordinate of the top left corner of the enemy base area
+	 */
+	public Coordinate getOpponentBaseCoordinate3() {
+		return opponentBaseCoordinate3;
+	}
+
+	/**
+	 * Get the coordinate of the bottom right corner of the enemy base area
+	 * @return The coordinate of the bottom right corner of the enemy base area
+	 */
+	public Coordinate getOpponentBaseCoordinate4() {
+		return opponentBaseCoordinate4;
 	}
 
 	/**
@@ -91,5 +180,5 @@ public class CaptureTheFlagGameObject {
 	public int getOpponentFlagColour() {
 		return opponentFlagColour;
 	}
-	
+
 }

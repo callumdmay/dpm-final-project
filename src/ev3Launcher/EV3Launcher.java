@@ -13,6 +13,7 @@ import ev3WallFollower.PController;
 import ev3WallFollower.UltrasonicController;
 import ev3WallFollower.UltrasonicPoller;
 import lejos.hardware.Button;
+import lejos.hardware.Sound;
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.lcd.TextLCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
@@ -128,22 +129,27 @@ public class EV3Launcher {
 
 		switch(buttonChoice) {
 
+		// Capture the Flag case
 		case Button.ID_LEFT :
 			lcd = new LCDInfo(odometer, objectDetector);
 			
 			usl.doLocalization();
-			lightLocalizer.doLocalization();
+			double[] destination = {-3, -3};
+			lightLocalizer.setCalibrationCoordinates(destination);
+			lightLocalizer.localizeDynamically();
 
 			navigator.setGameObject(new CaptureTheFlagGameObject(wifiInputString));
 			navigator.start();
 			break;
-
+		
+		// Test case
 		case Button.ID_RIGHT:
 			lcd = new LCDInfo(odometer, objectDetector);
 			
-			navigator.travelTo(1*30.48,8*30.48);
-			navigator.stopMotors();
-	
+			double[] destination2 = {30.48, 30.48};
+			lightLocalizer.setCalibrationCoordinates(destination2);
+			lightLocalizer.localizeDynamically();
+			Sound.beepSequence();
 			break;
 
 		default:

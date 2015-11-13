@@ -2,11 +2,10 @@ package ev3Objects;
 
 import ev3Navigator.Coordinate;
 
+/**
+ * Creates an object to handle the coordinates received by wifi.
+ */
 public class CaptureTheFlagGameObject {
-
-	/**
-	 * Creates an object to handle the coordinates received by wifi.
-	 */
 	private int startingCorner;
 	private Coordinate homeBaseCoordinate1, homeBaseCoordinate2;
 	private Coordinate startingCoordinate;

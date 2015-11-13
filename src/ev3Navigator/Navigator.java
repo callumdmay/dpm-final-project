@@ -91,6 +91,8 @@ public class Navigator extends Thread{
 			moveToCoordinates(pX, pY);
 
 		}
+		
+		stopMotors();
 
 	}
 	/**

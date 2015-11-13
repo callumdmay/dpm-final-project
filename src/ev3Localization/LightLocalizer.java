@@ -12,7 +12,7 @@ public class LightLocalizer {
 
 	public static int 		ROTATION_SPEED 		= 80;
 	private final int 		lineDetectionValue = 40;
-	private final double	light_SensorDistanceFromOrigin = 13.85;
+	private final double	light_SensorDistanceFromOrigin = 13.9;
 
 	private Odometer 			odometer;
 	private SampleProvider 		colorSensor;
@@ -42,7 +42,6 @@ public class LightLocalizer {
 		double blackLineAngles[] = new double[4];
 
 		navigator.travelTo(calibrationCoordinates[0],calibrationCoordinates[1]);
-		navigator.turnTo(Math.PI/4, true);
 
 		for( int index = 0 ; index < blackLineAngles.length; index ++)
 		{
@@ -52,64 +51,20 @@ public class LightLocalizer {
 
 			Sound.beep();
 			blackLineAngles[index]= odometer.getTheta();
+			
+		}
+		navigator.stopMotors();
+		Sound.beepSequence();
 
-			//turn off of black line so as not to capture the same line twice
-			navigator.turnTo(odometer.getTheta() + 5*Math.PI/180,true);
+		if (blackLineAngles[1]<180){										// takes care of 360 wraparound
+			blackLineAngles[1] += 360;
 		}
 
-		double deltaY = blackLineAngles[2] - blackLineAngles[0];
-		double deltaX = blackLineAngles[3] - blackLineAngles[1];
-
-		odometer.setX(-light_SensorDistanceFromOrigin * Math.cos(deltaY/2));
-		odometer.setY(-light_SensorDistanceFromOrigin * Math.cos(deltaX/2));
-
-		odometer.setTheta(odometer.getTheta() + blackLineAngles[0]+Math.toRadians(180) +deltaY/2);
-		navigator.travelTo(0, 0);
-
-		initiateFinalCalibration();
-
+		odometer.setX(fixDisplacement(blackLineAngles[0], blackLineAngles[2]));
+		odometer.setY(fixDisplacement(blackLineAngles[1], blackLineAngles[3]));
+		odometer.setTheta(fixAngle(blackLineAngles[0], blackLineAngles[2], odometer.getTheta()));
 	}
 	
-	/**
-	 * Travel to an intersection and self-localize using the light sensor only after US localization.
-	 */
-	public void doLocalization() {
-		// drive to location listed in tutorial
-		// start rotating and clock all 4 gridlines
-		// do trig to compute (0,0) and 0 degrees
-		// when done travel to (0,0) and turn to 0 degrees
-
-
-		double blackLineAngles[] = new double[4];
-
-		navigator.travelTo(calibrationCoordinates[0],calibrationCoordinates[1]);
-		navigator.turnTo(Math.PI/2, true);
-
-		for( int index = 0 ; index < blackLineAngles.length; index ++)
-		{
-			//Capture the angle when we first encounter the black line
-			while(!blackLineDetected())
-				navigator.rotateCounterClockWise(ROTATION_SPEED);
-
-			Sound.beep();
-			blackLineAngles[index]= odometer.getTheta();
-
-			//turn off of black line so as not to capture the same line twice
-			navigator.turnTo(odometer.getTheta() + 5*Math.PI/180,true);
-		}
-
-		double deltaY = blackLineAngles[2] - blackLineAngles[0];
-		double deltaX = blackLineAngles[3] - blackLineAngles[1];
-
-		odometer.setX(-light_SensorDistanceFromOrigin * Math.cos(deltaY/2));
-		odometer.setY(-light_SensorDistanceFromOrigin * Math.cos(deltaX/2));
-
-		odometer.setTheta(odometer.getTheta() + blackLineAngles[0]+Math.toRadians(180) +deltaY/2);
-		navigator.travelTo(0, 0);
-
-		initiateFinalCalibration();
-
-	}
 	/**
 	 * Return true if a black line is detected by the color sensor.
 	 * @return A boolean representing if the light sensor detects a line or not.
@@ -124,34 +79,7 @@ public class LightLocalizer {
 		else 
 			return false;
 	}
-
-
-	/**
-	 * Final calibration required to finish light localization
-	 */
-	private void initiateFinalCalibration()
-	{
-		navigator.turnTo(0, true);
-		while(odometer.getTheta() <= Math.toRadians(20) && !blackLineDetected())
-			navigator.rotateCounterClockWise(15);
-
-		if(blackLineDetected()){
-			Sound.beep();
-			odometer.setTheta(0);
-		}
-		else{
-			while(odometer.getTheta() >= -Math.toRadians(20) && !blackLineDetected())
-				navigator.rotateClockWise(10);
-
-			if(blackLineDetected()){
-				Sound.beep();
-				odometer.setTheta(0);
-			}
-		}
-		navigator.stopMotors();
-		navigator.turnTo(0, true);
-
-	}
+	
 	/**
 	 * Set the coordinates for the robot to head to for dynamic light localization
 	 * @param position The intersection coordinates used for light localization
@@ -169,9 +97,20 @@ public class LightLocalizer {
 	 */
 	public double fixAngle (double angleA, double angleB, double currentAngle){
 		double deltaTheta;
-		deltaTheta = 180 - (angleA-angleB)/2 - angleB;
+		deltaTheta = Math.PI - (angleA-angleB)/2 - angleB;
 		currentAngle += deltaTheta;
 		return currentAngle;
+	}
+	/**
+	 * Returns the corrected displacement of the EV3
+	 * @param angleA
+	 * @param angleB
+	 * @return
+	 */
+	public double fixDisplacement (double angleA, double angleB){
+		double z;
+		z = -1 * light_SensorDistanceFromOrigin * Math.cos((angleA-angleB)/2); 
+		return z;
 	}
 
 

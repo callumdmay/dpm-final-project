@@ -1,6 +1,7 @@
 package ev3Objects;
 
-import ev3Navigator.Coordinate;
+import java.util.ArrayList;
+
 import ev3Wifi.Transmission;
 
 /**
@@ -10,8 +11,10 @@ public class CaptureTheFlagGameObject {
 	private int startingCorner;
 	private Coordinate homeBaseCoordinate1, homeBaseCoordinate2;
 	private Coordinate startingCoordinate;
-	private Coordinate opponentBaseCoordinate1, opponentBaseCoordinate2, opponentBaseCoordinate3, opponentBaseCoordinate4, closestOpponentBaseCoordinate;
+	private Coordinate opponentBaseCoordinate_BL, opponentBaseCoordinate_TR, opponentBaseCoordinate_TL, opponentBaseCoordinate_BR, closestOpponentBaseCoordinate;
 	private Coordinate homeFlagDropCoordinate;
+
+	private ArrayList<Coordinate> preSearchLocalizationCoordinates; 
 	private int homeFlagColour, opponentFlagColour;
 	private static final double tileLength = 30.48;
 
@@ -28,17 +31,15 @@ public class CaptureTheFlagGameObject {
 
 		homeBaseCoordinate1 	= new Coordinate(pInputArray[1] * tileLength, pInputArray[2]*tileLength);
 		homeBaseCoordinate2 	= new Coordinate(pInputArray[3]* tileLength, pInputArray[4]*tileLength);
-		opponentBaseCoordinate1 = new Coordinate(pInputArray[5]*tileLength, pInputArray[6]*tileLength);
-		opponentBaseCoordinate2 = new Coordinate(pInputArray[7]*tileLength, pInputArray[8]*tileLength);
-		opponentBaseCoordinate3 = new Coordinate(opponentBaseCoordinate1.getX(), opponentBaseCoordinate2.getY());
-		opponentBaseCoordinate4 = new Coordinate(opponentBaseCoordinate2.getX(), opponentBaseCoordinate1.getY());
+		opponentBaseCoordinate_BL = new Coordinate(pInputArray[5]*tileLength, pInputArray[6]*tileLength);
+		opponentBaseCoordinate_TR = new Coordinate(pInputArray[7]*tileLength, pInputArray[8]*tileLength);
+		opponentBaseCoordinate_TL = new Coordinate(opponentBaseCoordinate_BL.getX(), opponentBaseCoordinate_TR.getY());
+		opponentBaseCoordinate_BR = new Coordinate(opponentBaseCoordinate_TR.getX(), opponentBaseCoordinate_BL.getY());
 		homeFlagDropCoordinate	= new Coordinate(pInputArray[9]*tileLength, pInputArray[10]*tileLength);
 
 		homeFlagColour = pInputArray[11];
 		opponentFlagColour = pInputArray[12];
 
-
-		
 		switch(startingCorner){
 
 		case 1:
@@ -53,9 +54,13 @@ public class CaptureTheFlagGameObject {
 		}
 
 		determineClosestOpponentBaseCoordinate();
-
+		createPreSearchLocalizationCoordinatesArray();
 	}
-	
+
+	/**
+	 * Alternative constructor, takes in Transmission object from wifi class, will be used for final game 
+	 * @param pT Transmission object from wifi package, contains necessary game parameters
+	 */
 	public CaptureTheFlagGameObject(Transmission pT)
 	{
 		this( new int[] {pT.startingCorner.getId(), pT.homeZoneBL_X, pT.homeZoneBL_Y, pT.homeZoneTR_X, pT.homeZoneTR_Y, 
@@ -70,10 +75,10 @@ public class CaptureTheFlagGameObject {
 
 		double currentDistance	=1000;
 		closestOpponentBaseCoordinate= null;
-		for(Coordinate coordinate : new Coordinate[] {opponentBaseCoordinate1,opponentBaseCoordinate2,opponentBaseCoordinate3,opponentBaseCoordinate4})
+		for(Coordinate coordinate : new Coordinate[] {opponentBaseCoordinate_BL,opponentBaseCoordinate_TR,opponentBaseCoordinate_TL,opponentBaseCoordinate_BR})
 		{
-			//added this so the algorithm doesn't consider the coordinates against the wall
-			if(coordinate.getX()<0 ||coordinate.getX()>10*tileLength || coordinate.getY() < 0 ||coordinate.getY()>10*tileLength)
+			//added this so the algorithm doesn't consider the coordinates close to the wall (close meaning 1 tile or less away from wall)
+			if(coordinate.getX()<1 ||coordinate.getX()>9*tileLength || coordinate.getY() < 1 ||coordinate.getY()>9*tileLength)
 				continue;
 
 			double deltaX = Math.abs(startingCoordinate.getX() - coordinate.getX());
@@ -90,6 +95,54 @@ public class CaptureTheFlagGameObject {
 			throw new NullPointerException("Could not determine closest opponent base coordinate");
 
 	}
+
+	private void createPreSearchLocalizationCoordinatesArray()
+	{
+
+		Coordinate temp1;
+		Coordinate temp2;
+		Coordinate temp3;
+		
+		if(closestOpponentBaseCoordinate.equals(opponentBaseCoordinate_BL))
+		{
+			temp1 = new Coordinate(closestOpponentBaseCoordinate.getX() -1, closestOpponentBaseCoordinate.getY());
+			temp2 = new Coordinate(closestOpponentBaseCoordinate.getX() -1, closestOpponentBaseCoordinate.getY()-1);
+			temp3 = new Coordinate(closestOpponentBaseCoordinate.getX() , closestOpponentBaseCoordinate.getY()-1);
+		}
+
+		else if(closestOpponentBaseCoordinate.equals(opponentBaseCoordinate_TL))
+		{
+			temp1 = new Coordinate(closestOpponentBaseCoordinate.getX() -1, closestOpponentBaseCoordinate.getY());
+			temp2 = new Coordinate(closestOpponentBaseCoordinate.getX() -1, closestOpponentBaseCoordinate.getY()+1);
+			temp3 = new Coordinate(closestOpponentBaseCoordinate.getX() , closestOpponentBaseCoordinate.getY()+1);
+		}
+
+		else if(closestOpponentBaseCoordinate.equals(opponentBaseCoordinate_BR))
+		{
+			temp1 = new Coordinate(closestOpponentBaseCoordinate.getX() +1, closestOpponentBaseCoordinate.getY());
+			temp2 = new Coordinate(closestOpponentBaseCoordinate.getX() +1, closestOpponentBaseCoordinate.getY()-1);
+			temp3 = new Coordinate(closestOpponentBaseCoordinate.getX() , closestOpponentBaseCoordinate.getY()-1);
+		}
+
+		else if(closestOpponentBaseCoordinate.equals(opponentBaseCoordinate_TR))
+		{
+			temp1 = new Coordinate(closestOpponentBaseCoordinate.getX() +1, closestOpponentBaseCoordinate.getY());
+			temp2 = new Coordinate(closestOpponentBaseCoordinate.getX() +1, closestOpponentBaseCoordinate.getY()+1);
+			temp3 = new Coordinate(closestOpponentBaseCoordinate.getX() , closestOpponentBaseCoordinate.getY()+1);
+		}
+		else
+		{
+			throw new NullPointerException("closestOpponentBaseCoordinate did not equal any of the opponent base coordinates");
+		}
+
+		preSearchLocalizationCoordinates = new ArrayList<Coordinate>();
+		preSearchLocalizationCoordinates.add(temp1);
+		preSearchLocalizationCoordinates.add(temp2);
+		preSearchLocalizationCoordinates.add(temp3);
+
+	}
+
+
 	/**
 	 * Get the corner of the starting position, a number from 1 to 4
 	 * @return The starting corner of the square grid
@@ -136,32 +189,32 @@ public class CaptureTheFlagGameObject {
 	 * Get the coordinate of the bottom left corner of the enemy base area
 	 * @return The coordinate of the bottom left corner of the enemy base area
 	 */
-	public Coordinate getOpponentBaseCoordinate1() {
-		return opponentBaseCoordinate1;
+	public Coordinate getOpponentBaseCoordinate_BL() {
+		return opponentBaseCoordinate_BL;
 	}
 
 	/**
 	 * Get the coordinate of the top right corner of the enemy base area
 	 * @return The coordinate of the top right corner of the enemy base area
 	 */
-	public Coordinate getOpponentBaseCoordinate2() {
-		return opponentBaseCoordinate2;
+	public Coordinate getOpponentBaseCoordinate_TR() {
+		return opponentBaseCoordinate_TR;
 	}
 
 	/**
 	 * Get the coordinate of the top left corner of the enemy base area
 	 * @return The coordinate of the top left corner of the enemy base area
 	 */
-	public Coordinate getOpponentBaseCoordinate3() {
-		return opponentBaseCoordinate3;
+	public Coordinate getOpponentBaseCoordinate_TL() {
+		return opponentBaseCoordinate_TL;
 	}
 
 	/**
 	 * Get the coordinate of the bottom right corner of the enemy base area
 	 * @return The coordinate of the bottom right corner of the enemy base area
 	 */
-	public Coordinate getOpponentBaseCoordinate4() {
-		return opponentBaseCoordinate4;
+	public Coordinate getOpponentBaseCoordinate_BR() {
+		return opponentBaseCoordinate_BR;
 	}
 
 	/**

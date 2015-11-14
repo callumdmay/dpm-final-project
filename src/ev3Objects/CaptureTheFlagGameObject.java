@@ -40,6 +40,27 @@ public class CaptureTheFlagGameObject {
 		homeFlagColour = pInputArray[11];
 		opponentFlagColour = pInputArray[12];
 
+		determineStartingCoordinate();
+		determineClosestOpponentBaseCoordinate();
+		createPreSearchLocalizationCoordinatesArray();
+	}
+
+
+
+	/**
+	 * Alternative constructor, takes in Transmission object from wifi class, will be used for final game 
+	 * @param pT Transmission object from wifi package, contains necessary game parameters
+	 */
+	public CaptureTheFlagGameObject(Transmission pT)
+	{
+		this( new int[] {pT.startingCorner.getId(), pT.homeZoneBL_X, pT.homeZoneBL_Y, pT.homeZoneTR_X, pT.homeZoneTR_Y, 
+				pT.opponentHomeZoneBL_X, pT.opponentHomeZoneBL_Y, pT.opponentHomeZoneTR_X, pT.opponentHomeZoneTR_Y, pT.dropZone_X, pT.dropZone_Y, pT.flagType, pT.opponentFlagType });
+	}
+
+	/**
+	 * Determines the starting coordinate of the robot based on the inputted starting corner
+	 */
+	private void determineStartingCoordinate() {
 		switch(startingCorner){
 
 		case 1:
@@ -52,19 +73,6 @@ public class CaptureTheFlagGameObject {
 			startingCoordinate = new Coordinate(10*tileLength,10*tileLength);
 
 		}
-
-		determineClosestOpponentBaseCoordinate();
-		createPreSearchLocalizationCoordinatesArray();
-	}
-
-	/**
-	 * Alternative constructor, takes in Transmission object from wifi class, will be used for final game 
-	 * @param pT Transmission object from wifi package, contains necessary game parameters
-	 */
-	public CaptureTheFlagGameObject(Transmission pT)
-	{
-		this( new int[] {pT.startingCorner.getId(), pT.homeZoneBL_X, pT.homeZoneBL_Y, pT.homeZoneTR_X, pT.homeZoneTR_Y, 
-				pT.opponentHomeZoneBL_X, pT.opponentHomeZoneBL_Y, pT.opponentHomeZoneTR_X, pT.opponentHomeZoneTR_Y, pT.dropZone_X, pT.dropZone_Y, pT.flagType, pT.opponentFlagType });
 	}
 
 	/**
@@ -78,7 +86,7 @@ public class CaptureTheFlagGameObject {
 		for(Coordinate coordinate : new Coordinate[] {opponentBaseCoordinate_BL,opponentBaseCoordinate_TR,opponentBaseCoordinate_TL,opponentBaseCoordinate_BR})
 		{
 			//added this so the algorithm doesn't consider the coordinates close to the wall (close meaning 1 tile or less away from wall)
-			if(coordinate.getX()<1 ||coordinate.getX()>9*tileLength || coordinate.getY() < 1 ||coordinate.getY()>9*tileLength)
+			if(coordinate.getX()<1*tileLength ||coordinate.getX()>9*tileLength || coordinate.getY() < 1*tileLength ||coordinate.getY()>9*tileLength)
 				continue;
 
 			double deltaX = Math.abs(startingCoordinate.getX() - coordinate.getX());
@@ -96,13 +104,19 @@ public class CaptureTheFlagGameObject {
 
 	}
 
+
+
+	/**
+	 * Fills the preSearchLocalizationCoordinates Arraylist with a list of coordinates that surround the closestOpponentBaseCoordinate
+	 * These coordinates are navigated to by the wall follower to localize before searching begins
+	 */
 	private void createPreSearchLocalizationCoordinatesArray()
 	{
 
 		Coordinate temp1;
 		Coordinate temp2;
 		Coordinate temp3;
-		
+
 		if(closestOpponentBaseCoordinate.equals(opponentBaseCoordinate_BL))
 		{
 			temp1 = new Coordinate(closestOpponentBaseCoordinate.getX() -1, closestOpponentBaseCoordinate.getY());

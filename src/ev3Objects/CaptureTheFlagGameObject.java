@@ -29,15 +29,15 @@ public class CaptureTheFlagGameObject {
 		homeBaseCoordinate2 	= new Coordinate(pInputArray[3]* tileLength, pInputArray[4]*tileLength);
 		opponentBaseCoordinate1 = new Coordinate(pInputArray[5]*tileLength, pInputArray[6]*tileLength);
 		opponentBaseCoordinate2 = new Coordinate(pInputArray[7]*tileLength, pInputArray[8]*tileLength);
+		opponentBaseCoordinate3 = new Coordinate(opponentBaseCoordinate1.getX(), opponentBaseCoordinate2.getY());
+		opponentBaseCoordinate4 = new Coordinate(opponentBaseCoordinate2.getX(), opponentBaseCoordinate1.getY());
 		homeFlagDropCoordinate	= new Coordinate(pInputArray[9]*tileLength, pInputArray[10]*tileLength);
 
 		homeFlagColour = pInputArray[11];
 		opponentFlagColour = pInputArray[12];
 
 
-		opponentBaseCoordinate3 = new Coordinate(opponentBaseCoordinate1.getX(), opponentBaseCoordinate2.getY());
-		opponentBaseCoordinate4 = new Coordinate(opponentBaseCoordinate2.getX(), opponentBaseCoordinate1.getY());
-
+		
 		switch(startingCorner){
 
 		case 1:
@@ -51,7 +51,7 @@ public class CaptureTheFlagGameObject {
 
 		}
 
-		closestOpponentBaseCoordinate = determineClosestOpponentBaseCoordinate();
+		determineClosestOpponentBaseCoordinate();
 
 	}
 
@@ -59,10 +59,10 @@ public class CaptureTheFlagGameObject {
 	 * Determine the closest coordinate of the opponents base that the robot should travel to, 
 	 * @return closest opponent base coordinate to robot starting location
 	 */
-	private Coordinate determineClosestOpponentBaseCoordinate() {
+	private void determineClosestOpponentBaseCoordinate() {
 
 		double currentDistance	=1000;
-		Coordinate currentCoordinate= null;
+		closestOpponentBaseCoordinate= null;
 		for(Coordinate coordinate : new Coordinate[] {opponentBaseCoordinate1,opponentBaseCoordinate2,opponentBaseCoordinate3,opponentBaseCoordinate4})
 		{
 			//added this so the algorithm doesn't consider the coordinates against the wall
@@ -75,14 +75,13 @@ public class CaptureTheFlagGameObject {
 			double distance = Math.sqrt(deltaX*deltaX + deltaY*deltaY);
 			if(distance < currentDistance){
 				currentDistance = distance;
-				currentCoordinate = coordinate;
+				closestOpponentBaseCoordinate = coordinate;
 			}
 		}
 
-		if(currentCoordinate == null)
+		if(closestOpponentBaseCoordinate == null)
 			throw new NullPointerException("Could not determine closest opponent base coordinate");
 
-		return currentCoordinate;
 	}
 	/**
 	 * Get the corner of the starting position, a number from 1 to 4

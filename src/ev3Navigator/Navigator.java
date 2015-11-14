@@ -31,6 +31,7 @@ public class Navigator extends Thread{
 	private final int ROTATE_SPEED = 100;
 	private final int SMALL_CORRECTION_SPEED =20;
 	private final int SMALL_ROTATION_SPEED = 25;
+	public NavigatorMotorCommands navigatorMotorCommands;
 
 
 	public static int coordinateCount = 0;
@@ -58,6 +59,8 @@ public class Navigator extends Thread{
 			motor.setAcceleration(2000);
 
 		}
+		
+		navigatorMotorCommands = new NavigatorMotorCommands(leftMotor, rightMotor);
 
 	}
 
@@ -71,7 +74,7 @@ public class Navigator extends Thread{
 		
 		travelTo(captureTheFlagGameObject.getClosestOpponentBaseCoordinate().getX(), captureTheFlagGameObject.getClosestOpponentBaseCoordinate().getY());
 
-		stopMotors();
+		navigatorMotorCommands.stopMotors();
 	}
 	/**
 	 * Travel to a coordinate while avoiding objects
@@ -92,7 +95,7 @@ public class Navigator extends Thread{
 
 		}
 		
-		stopMotors();
+		navigatorMotorCommands.stopMotors();
 
 	}
 	/**
@@ -180,54 +183,7 @@ public class Navigator extends Thread{
 		captureTheFlagGameObject = pCaptureTheFlagGameObject;
 	}
 
-	/**
-	 *  Stops the motors
-	 */
-	public void stopMotors()
-	{
-		leftMotor.stop();
-		rightMotor.stop();
-	}
-
-	/**
-	 * Set the navigator to a certain speed
-	 * @param speed The speed to be set
-	 */
-	public void driveStraight(int speed)
-	{
-		leftMotor.setSpeed(speed);
-		rightMotor.setSpeed(speed);
-
-		leftMotor.forward();
-		rightMotor.forward();
-	}
-
-	/**
-	 * Rotate clockwise at a certain speed
-	 * @param speed The speed to be set
-	 */
-	public void rotateClockWise(int speed)
-	{
-		leftMotor.setSpeed(speed);
-		rightMotor.setSpeed(speed);
-
-		leftMotor.forward();
-		rightMotor.backward();
-	}
-
-	/**
-	 * Rotate counter-clockwise at a certain speed
-	 * @param speed The speed to be set
-	 */
-	public void rotateCounterClockWise(int speed)
-	{
-		leftMotor.setSpeed(speed);
-		rightMotor.setSpeed(speed);
-
-		leftMotor.backward();
-		rightMotor.forward();
-	}
-
+	
 
 }
 

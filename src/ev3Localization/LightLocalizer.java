@@ -47,13 +47,13 @@ public class LightLocalizer {
 		{
 			//Capture the angle when we first encounter the black line
 			while(!blackLineDetected())
-				navigator.rotateCounterClockWise(ROTATION_SPEED);
+				navigator.navigatorMotorCommands.rotateCounterClockWise(ROTATION_SPEED);
 
 			Sound.beep();
 			blackLineAngles[index]= odometer.getTheta();
 			
 		}
-		navigator.stopMotors();
+		navigator.navigatorMotorCommands.stopMotors();
 		Sound.beepSequence();
 
 		if (blackLineAngles[1]<180){										// takes care of 360 wraparound

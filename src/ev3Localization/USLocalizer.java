@@ -63,7 +63,7 @@ public class USLocalizer {
 			if(getFilteredData(7) <= usSensorMaxDistance-3){
 				// rotate the robot until it sees no wall
 				while(getFilteredData(7) <= usSensorMaxDistance-3)
-					navigator.rotateClockWise(ROTATION_SPEED);
+					navigator.navigatorMotorCommands.rotateClockWise(ROTATION_SPEED);
 
 
 				//quickly turn away from wall, to ensure the same value isn't captured
@@ -77,7 +77,7 @@ public class USLocalizer {
 
 			// switch direction and wait until it sees no wall
 			while(getFilteredData(5) <= usSensorMaxDistance-3)
-				navigator.rotateCounterClockWise(ROTATION_SPEED);
+				navigator.navigatorMotorCommands.rotateCounterClockWise(ROTATION_SPEED);
 
 
 			// keep rotating until the robot sees a wall, then latch the angle
@@ -96,7 +96,7 @@ public class USLocalizer {
 			 */
 
 			while(getFilteredData(5) >= measuredDistance - 10)
-				navigator.rotateCounterClockWise(ROTATION_SPEED+10);
+				navigator.navigatorMotorCommands.rotateCounterClockWise(ROTATION_SPEED+10);
 
 			angleA = latchRisingEdgeAngle(true);
 			Sound.beep();
@@ -106,7 +106,7 @@ public class USLocalizer {
 			navigator.turnTo(odometer.getTheta() + Math.toRadians(45), true);
 
 			while(getFilteredData(5) >= measuredDistance - 10)
-				navigator.rotateCounterClockWise(ROTATION_SPEED);
+				navigator.navigatorMotorCommands.rotateCounterClockWise(ROTATION_SPEED);
 
 			angleB = latchRisingEdgeAngle(false);
 			Sound.beep();
@@ -136,12 +136,12 @@ public class USLocalizer {
 		if(clockWise){
 			// keep rotating until the robot sees a wall, then latch the angle
 			while(getFilteredData(7)> measuredDistance+distanceNoiseMargin)
-				navigator.rotateClockWise(ROTATION_SPEED);
+				navigator.navigatorMotorCommands.rotateClockWise(ROTATION_SPEED);
 
 			fallingEdgeAngle1 = odometer.getTheta();
 
 			while(getFilteredData(5)> measuredDistance-distanceNoiseMargin)
-				navigator.rotateClockWise(ROTATION_SPEED);
+				navigator.navigatorMotorCommands.rotateClockWise(ROTATION_SPEED);
 
 			fallingEdgeAngle2 = odometer.getTheta();
 
@@ -153,12 +153,12 @@ public class USLocalizer {
 
 			// keep rotating until the robot sees a wall, then latch the angle
 			while(getFilteredData(7)> measuredDistance+distanceNoiseMargin)
-				navigator.rotateCounterClockWise(ROTATION_SPEED);
+				navigator.navigatorMotorCommands.rotateCounterClockWise(ROTATION_SPEED);
 
 			fallingEdgeAngle1 = odometer.getTheta();
 
 			while(getFilteredData(5)> measuredDistance-distanceNoiseMargin)
-				navigator.rotateCounterClockWise(ROTATION_SPEED);
+				navigator.navigatorMotorCommands.rotateCounterClockWise(ROTATION_SPEED);
 
 			fallingEdgeAngle2 = odometer.getTheta();
 
@@ -179,12 +179,12 @@ public class USLocalizer {
 		if(clockWise)
 		{
 			while(getFilteredData(5) <=measuredDistance - distanceNoiseMargin)
-				navigator.rotateClockWise(ROTATION_SPEED);
+				navigator.navigatorMotorCommands.rotateClockWise(ROTATION_SPEED);
 
 			risingEdgeAngle1 = odometer.getTheta();
 
 			while(getFilteredData(5) <= measuredDistance + distanceNoiseMargin)
-				navigator.rotateClockWise(ROTATION_SPEED);
+				navigator.navigatorMotorCommands.rotateClockWise(ROTATION_SPEED);
 
 			risingEdgeAngle2 = odometer.getTheta();
 
@@ -193,12 +193,12 @@ public class USLocalizer {
 		else
 		{
 			while(getFilteredData(5) <=measuredDistance - distanceNoiseMargin)
-				navigator.rotateCounterClockWise(ROTATION_SPEED);
+				navigator.navigatorMotorCommands.rotateCounterClockWise(ROTATION_SPEED);
 
 			risingEdgeAngle1 = odometer.getTheta();
 
 			while(getFilteredData(5) <= measuredDistance + distanceNoiseMargin)
-				navigator.rotateCounterClockWise(ROTATION_SPEED);
+				navigator.navigatorMotorCommands.rotateCounterClockWise(ROTATION_SPEED);
 
 			risingEdgeAngle2 = odometer.getTheta();
 			return calculateAngleAverage(risingEdgeAngle1, risingEdgeAngle2);

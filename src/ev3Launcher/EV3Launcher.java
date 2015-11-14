@@ -1,5 +1,7 @@
 package ev3Launcher;
 
+import java.io.IOException;
+
 import ev3Localization.LightLocalizer;
 import ev3Localization.USLocalizer;
 import ev3Navigator.Navigator;
@@ -12,6 +14,8 @@ import ev3Odometer.Odometer;
 import ev3WallFollower.PController;
 import ev3WallFollower.UltrasonicController;
 import ev3WallFollower.UltrasonicPoller;
+import ev3Wifi.Transmission;
+import ev3Wifi.WifiConnection;
 import lejos.hardware.Button;
 import lejos.hardware.Sound;
 import lejos.hardware.ev3.LocalEV3;
@@ -49,6 +53,8 @@ public class EV3Launcher {
 
 	public static final double WHEEL_RADIUS = 2.1;
 	public static final double TRACK = 11.35;
+	private static final String SERVER_IP = "localhost";
+	private static final int TEAM_NUMBER = 12;
 
 	private static final int wifiInputString[] = {1, 2, -1, 4, 2, 6, 8, 8, 11, 1, 3, 2, 3};
 
@@ -109,20 +115,20 @@ public class EV3Launcher {
 		LightLocalizer lightLocalizer = new LightLocalizer(odometer, navigator, rearColorSensorSampleProvider, rearColorSensorData);
 
 		int buttonChoice;
-		TextLCD t = LocalEV3.get().getTextLCD();
+		TextLCD textLCD = LocalEV3.get().getTextLCD();
 
 		LCDInfo lcd;
 
 		do {
 			// clear the display
-			t.clear();
+			textLCD.clear();
 
 			// ask the user whether the motors should drive in a square or float
-			t.drawString("< Left | Right > ", 0, 0);
-			t.drawString("       |         ", 0, 1);
-			t.drawString("Capture|Run      ", 0, 2);
-			t.drawString("the    |a Test   ", 0, 3);
-			t.drawString("flag   |         ", 0, 4);
+			textLCD.drawString("< Left | Right > ", 0, 0);
+			textLCD.drawString("       |         ", 0, 1);
+			textLCD.drawString("Capture|Run      ", 0, 2);
+			textLCD.drawString("the    |a Test   ", 0, 3);
+			textLCD.drawString("flag   |         ", 0, 4);
 
 			buttonChoice = Button.waitForAnyPress();
 		} while (buttonChoice == 0 );
@@ -132,20 +138,30 @@ public class EV3Launcher {
 		// Capture the Flag case
 		case Button.ID_LEFT :
 			lcd = new LCDInfo(odometer, objectDetector);
-			
+
 			usl.doLocalization();
 			double[] destination = {-3, -3};
 			lightLocalizer.setCalibrationCoordinates(destination);
 			lightLocalizer.localizeDynamically();
 
+			try {
+				Transmission transmission = getWifiTransmission();
+			} catch (IOException e) {
+				textLCD.drawString("Connection Failed", 0, 5);
+			} catch (NullPointerException e )
+			{
+				textLCD.drawString("Failed to read transmission", 0, 5);
+			}
+
+			//change parameter from wifiInputString to "transmission" when using real wifi input
 			navigator.setGameObject(new CaptureTheFlagGameObject(wifiInputString));
 			navigator.start();
 			break;
-		
-		// Test case
+
+			// Test case
 		case Button.ID_RIGHT:
 			lcd = new LCDInfo(odometer, objectDetector);
-			
+
 			double[] destination2 = {30.48, 30.48};
 			lightLocalizer.setCalibrationCoordinates(destination2);
 			lightLocalizer.localizeDynamically();
@@ -162,5 +178,23 @@ public class EV3Launcher {
 		System.exit(0);	
 
 	}
+
+	public static Transmission getWifiTransmission() throws IOException
+	{
+
+		WifiConnection conn = null;
+		try {
+			conn = new WifiConnection(SERVER_IP, TEAM_NUMBER);
+		} catch (IOException e) {
+			throw new IOException();
+		}
+
+		if(conn.getTransmission() == null)
+			throw new NullPointerException();
+		
+		return conn.getTransmission();
+	}
+
+
 
 }

@@ -1,6 +1,7 @@
 package ev3Objects;
 
 import ev3Navigator.Coordinate;
+import ev3Wifi.Transmission;
 
 /**
  * Creates an object to handle the coordinates received by wifi.
@@ -53,6 +54,12 @@ public class CaptureTheFlagGameObject {
 
 		determineClosestOpponentBaseCoordinate();
 
+	}
+	
+	public CaptureTheFlagGameObject(Transmission pT)
+	{
+		this( new int[] {pT.startingCorner.getId(), pT.homeZoneBL_X, pT.homeZoneBL_Y, pT.homeZoneTR_X, pT.homeZoneTR_Y, 
+				pT.opponentHomeZoneBL_X, pT.opponentHomeZoneBL_Y, pT.opponentHomeZoneTR_X, pT.opponentHomeZoneTR_Y, pT.dropZone_X, pT.dropZone_Y, pT.flagType, pT.opponentFlagType });
 	}
 
 	/**

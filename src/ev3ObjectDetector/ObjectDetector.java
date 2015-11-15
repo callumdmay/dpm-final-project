@@ -172,7 +172,14 @@ public class ObjectDetector{
 	 */
 	public double getObjectDistance(){
 
-		return ultraSonicPoller.getLeftUltraSoundSensorDistance();
+		
+		if(ultraSonicPoller.getRightUltraSoundSensorDistance() < defaultObstacleDistance)
+			return ultraSonicPoller.getRightUltraSoundSensorDistance();
+		
+		if(ultraSonicPoller.getLeftUltraSoundSensorDistance() < defaultObstacleDistance)
+			return ultraSonicPoller.getLeftUltraSoundSensorDistance();
+		
+		return 100;
 	}
 
 

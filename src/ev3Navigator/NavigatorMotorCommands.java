@@ -3,45 +3,46 @@ package ev3Navigator;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
 /**
- * Helper class to refactor out the basic motor commands of the navigator,
- * to shorten the navigator class size
+ * Helper class to refactor out the basic motor commands of the navigator, to
+ * shorten the navigator class size
+ * 
  * @author Callum
  *
  */
 public class NavigatorMotorCommands {
-	
+
 	EV3LargeRegulatedMotor leftMotor;
 	EV3LargeRegulatedMotor rightMotor;
-	
+
 	/**
-	 * Accepts the left motor and right motor, needed for the basic motor commands
+	 * Accepts the left motor and right motor, needed for the basic motor
+	 * commands
+	 * 
 	 * @param pLeftMotor
 	 * @param pRightMotor
 	 */
-	
-	public NavigatorMotorCommands(EV3LargeRegulatedMotor pLeftMotor, EV3LargeRegulatedMotor pRightMotor){
+
+	public NavigatorMotorCommands(EV3LargeRegulatedMotor pLeftMotor, EV3LargeRegulatedMotor pRightMotor) {
 		leftMotor = pLeftMotor;
 		rightMotor = pRightMotor;
-		
-		
-		
+
 	}
-	
+
 	/**
-	 *  Stops the motors
+	 * Stops the motors
 	 */
-	public void stopMotors()
-	{
-		leftMotor.stop();
-		rightMotor.stop();
+	public void stopMotors() {
+		leftMotor.stop(true);
+		rightMotor.stop(false);
 	}
 
 	/**
 	 * Set the navigator to a certain speed
-	 * @param speed The speed to be set
+	 * 
+	 * @param speed
+	 *            The speed to be set
 	 */
-	public void driveStraight(int speed)
-	{
+	public void driveStraight(int speed) {
 		leftMotor.setSpeed(speed);
 		rightMotor.setSpeed(speed);
 
@@ -51,10 +52,11 @@ public class NavigatorMotorCommands {
 
 	/**
 	 * Rotate clockwise at a certain speed
-	 * @param speed The speed to be set
+	 * 
+	 * @param speed
+	 *            The speed to be set
 	 */
-	public void rotateClockWise(int speed)
-	{
+	public void rotateClockWise(int speed) {
 		leftMotor.setSpeed(speed);
 		rightMotor.setSpeed(speed);
 
@@ -64,10 +66,11 @@ public class NavigatorMotorCommands {
 
 	/**
 	 * Rotate counter-clockwise at a certain speed
-	 * @param speed The speed to be set
+	 * 
+	 * @param speed
+	 *            The speed to be set
 	 */
-	public void rotateCounterClockWise(int speed)
-	{
+	public void rotateCounterClockWise(int speed) {
 		leftMotor.setSpeed(speed);
 		rightMotor.setSpeed(speed);
 
@@ -75,5 +78,15 @@ public class NavigatorMotorCommands {
 		rightMotor.forward();
 	}
 
+	/**
+	 * Set speed of motors to a value
+	 * 
+	 * @param speed
+	 *            The speed to be set
+	 */
+	public void setSpeed(int speed) {
+		leftMotor.setSpeed(speed);
+		rightMotor.setSpeed(speed);
+	}
 
 }

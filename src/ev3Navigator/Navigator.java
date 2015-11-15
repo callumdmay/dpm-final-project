@@ -28,6 +28,8 @@ public class Navigator extends Thread{
 
 	private double wheelRadius;
 	private double axleLength;
+	private boolean isAvoiding = false;
+	private boolean hasAvoided = false;
 
 	private final double locationError = 1;
 	private final double navigatingAngleError = 1;
@@ -106,9 +108,11 @@ public class Navigator extends Thread{
 		{
 			if(objectDetector.detectedObject())
 			{
+				isAvoiding = true;
 				determineIfObjectIsOnDestinationCoordinate(pX, pY);
 				obstacleAvoider.avoidObstacle(pX, pY);
-
+				isAvoiding = false;
+				hasAvoided = true;
 			}
 			moveToCoordinates(pX, pY);
 
@@ -124,7 +128,9 @@ public class Navigator extends Thread{
 	 */
 	public void turnTo(double pTheta, boolean useSmallRotationSpeed)
 	{
-
+		
+		navigatorMotorCommands.stopMotors();
+		
 		pTheta = pTheta % Math.toRadians(360);
 
 		double deltaTheta = pTheta - odometer.getTheta();
@@ -285,6 +291,9 @@ public class Navigator extends Thread{
 			}
 	}
 
+	/**
+	 * Determine what the object is when in range
+	 */
 	private void investigateObject()
 	{
 		while(objectDetector.getObjectDistance() >=6 )
@@ -307,8 +316,13 @@ public class Navigator extends Thread{
 		captureTheFlagGameObject = pCaptureTheFlagGameObject;
 	}
 
-
-
-
+	/**
+	 * Sets whether or not the EV3 has recently avoided an object
+	 * @param update The boolean representing whether or not the EV3 has recently avoided an object
+	 */
+	public void setHasAvoided(boolean update)
+	{
+		this.hasAvoided = update;
+	}
 }
 

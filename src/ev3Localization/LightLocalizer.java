@@ -53,6 +53,7 @@ public class LightLocalizer {
 			blackLineAngles[index]= odometer.getTheta();
 			
 		}
+		
 		navigator.navigatorMotorCommands.stopMotors();
 		Sound.beepSequence();
 

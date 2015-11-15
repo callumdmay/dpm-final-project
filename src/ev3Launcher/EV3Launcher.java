@@ -45,9 +45,11 @@ public class EV3Launcher {
 	private static final EV3LargeRegulatedMotor leftMotor 				= new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
 
 	private static final Port rearColorPort 		= LocalEV3.get().getPort("S1");		
-	private static final Port forwardColorPort		= LocalEV3.get().getPort("S2");
+	private static final Port forwardColorPort		= LocalEV3.get().getPort("S3");
+	
+	private static final Port rightUltraSonicPort 	= LocalEV3.get().getPort("S2");
 	private static final Port leftUltraSonicPort 	= LocalEV3.get().getPort("S4");		
-	private static final Port rightUltraSonicPort 	= LocalEV3.get().getPort("S3");		
+			
 
 
 
@@ -162,10 +164,11 @@ public class EV3Launcher {
 		case Button.ID_RIGHT:
 			lcd = new LCDInfo(odometer, objectDetector);
 
-			double[] destination2 = {30.48, 30.48};
-			lightLocalizer.setCalibrationCoordinates(destination2);
-			lightLocalizer.localizeDynamically();
-			Sound.beepSequence();
+			usl.doLocalization();
+			//double[] destination2 = {30.48, 30.48};
+			//lightLocalizer.setCalibrationCoordinates(destination2);
+			//lightLocalizer.localizeDynamically();
+			//Sound.beepSequence();
 			break;
 
 		default:

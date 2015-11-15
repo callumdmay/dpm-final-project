@@ -17,7 +17,7 @@ public class USLocalizer {
 	public enum LocalizationType { FALLING_EDGE, RISING_EDGE };
 
 
-	public static int 		ROTATION_SPEED 		= 85;
+	public static int 		ROTATION_SPEED 		= 200;
 	private final int 		distanceNoiseMargin = 1;
 	private final int 		measuredDistance 	= 30;
 	private final int 		usSensorMaxDistance = 40;
@@ -100,11 +100,7 @@ public class USLocalizer {
 
 			angleA = latchRisingEdgeAngle(true);
 			Sound.beep();
-
-			//turn away from wall that we just captured angle from, so as not to 
-			//capture it again
-			navigator.turnTo(odometer.getTheta() + Math.toRadians(45), true);
-
+			
 			while(getFilteredData(5) >= measuredDistance - 10)
 				navigator.navigatorMotorCommands.rotateCounterClockWise(ROTATION_SPEED);
 
@@ -113,15 +109,16 @@ public class USLocalizer {
 
 
 		}
-
 		// angleA is clockwise from angleB, so assume the average of the
 		// angles to the right of angleB is 45 degrees past 'north'
 		double newTheta = odometer.getTheta() + calculateOdometerAngleAdjustment(angleA, angleB) + Math.toRadians(90);
 
+		
 		// update the odometer position (example to follow:)
 		odometer.setPosition(new double [] {0.0, 0.0, newTheta}, new boolean [] {true, true, true});
 
 		updateOdometerLocation();	
+		
 	}
 
 	/**
@@ -246,15 +243,7 @@ public class USLocalizer {
 	 * Update the x and y coordinates using the ultrasonic sensor.
 	 */
 	private void updateOdometerLocation()
-	{
-		//face right wall and record y distance
-		navigator.turnTo(Math.toRadians(270), false);
-		odometer.setY(getFilteredData(11) - TILE_SIZE + us_SensorDistanceFromOrigin);
-
-		//face back wall and record x distance
-		navigator.turnTo(Math.toRadians(180), false);
-		odometer.setX(getFilteredData(11) - TILE_SIZE + us_SensorDistanceFromOrigin);
-		
+	{	
 		navigator.turnTo(Math.toRadians(0), false);
 	}
 

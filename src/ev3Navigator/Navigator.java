@@ -1,5 +1,9 @@
 package ev3Navigator;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+
 import ev3ObjectDetector.ObjectDetector;
 import ev3ObjectDetector.ObstacleAvoider;
 import ev3Objects.CaptureTheFlagGameObject;
@@ -82,11 +86,11 @@ public class Navigator extends Thread{
 			catch (ObstacleOnCoordinateException e){
 				continue;
 			}
-			
+
 			break;
 		}
-		
-		
+
+
 		navigatorMotorCommands.stopMotors();
 	}
 	/**
@@ -187,15 +191,110 @@ public class Navigator extends Thread{
 			rightMotor.forward();
 		}
 	}
-	
-	
+
+
 	private void determineIfObjectIsOnDestinationCoordinate(double pX, double pY){
 		double objectX = odometer.getX() + Math.cos(odometer.getTheta()) * objectDetector.getObjectDistance();
 		double objectY = odometer.getY() + Math.sin(odometer.getTheta()) * objectDetector.getObjectDistance();
 		if(Math.abs(objectX-pX)<6 &&Math.abs(objectY-pY)<6)
 			throw new ObstacleOnCoordinateException();
-		
-		
+
+	}
+
+
+	private void searchForFlag(Coordinate startPoint, Coordinate endPoint)
+	{
+		Queue<Coordinate> searchCoordinateQueue = new LinkedList<Coordinate>();
+
+		if(Math.abs(endPoint.getY() - startPoint.getY())> Math.abs(endPoint.getY() - startPoint.getY())){
+
+			double deltaX = endPoint.getX() - startPoint.getX();
+
+			int coordinateCount =1;
+			boolean useStartPoint = true;
+			for(int count = 1; count < 9; count++){
+
+				double xMultiplier = count;
+				Coordinate coordinate;
+				if(count % 2 ==0)
+					xMultiplier = count -1;
+
+				if(useStartPoint)
+				{
+					coordinate = new Coordinate(startPoint.getX() +deltaX * (xMultiplier/8), startPoint.getY());
+				}
+				else
+				{
+					coordinate = new Coordinate(startPoint.getX() +deltaX * (xMultiplier/8), endPoint.getY());
+				}
+
+				coordinateCount++;
+
+				if(coordinateCount > 1)
+				{
+					coordinateCount = 0;
+					useStartPoint =! useStartPoint;
+				}
+				searchCoordinateQueue.add(coordinate);
+			}
+
+		}
+		else
+		{
+
+			double deltaY = endPoint.getY() - startPoint.getY();
+
+			int coordinateCount =1;
+			boolean useStartPoint = true;
+			for(int count = 1; count < 9; count++){
+
+				double yMultiplier = count;
+				Coordinate coordinate;
+				if(count % 2 ==0)
+					yMultiplier = count - 1;
+
+				if(useStartPoint)
+				{
+					coordinate = new Coordinate(startPoint.getX(), startPoint.getY() + deltaY * (yMultiplier/8));
+				}
+				else
+				{
+					coordinate = new Coordinate(startPoint.getX() , endPoint.getY() + deltaY * (yMultiplier/8));
+				}
+
+				coordinateCount++;
+
+				if(coordinateCount > 1)
+				{
+					coordinateCount = 0;
+					useStartPoint =! useStartPoint;
+				}
+				searchCoordinateQueue.add(coordinate);
+			}
+		}
+
+		for(Coordinate coordinate : searchCoordinateQueue)
+			while(Math.abs(coordinate.getX()- odometer.getX()) > locationError || Math.abs(coordinate.getY() - odometer.getY()) > locationError)
+			{
+				if(objectDetector.detectedObject())
+				{
+					Sound.beep();
+					investigateObject();
+				}
+				moveToCoordinates(coordinate.getX(), coordinate.getY());
+			}
+	}
+
+	private void investigateObject()
+	{
+		while(objectDetector.getObjectDistance() >=6 )
+		{
+			if(objectDetector.getObjectDistance()> objectDetector.getDefaultObstacleDistance())
+				break;
+			navigatorMotorCommands.driveStraight(30);
+		}
+
+		objectDetector.processObject();
 	}
 
 	/**
@@ -207,6 +306,7 @@ public class Navigator extends Thread{
 	{
 		captureTheFlagGameObject = pCaptureTheFlagGameObject;
 	}
+
 
 
 

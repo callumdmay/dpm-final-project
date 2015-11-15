@@ -10,7 +10,7 @@ import lejos.robotics.SampleProvider;
  */
 public class LightLocalizer {
 
-	public static int ROTATION_SPEED = 80;
+	public static int ROTATION_SPEED = 150;
 	private final int lineDetectionValue = 45;
 	private final double light_SensorDistanceFromOrigin = 14.1;
 
@@ -58,6 +58,7 @@ public class LightLocalizer {
 			blackLineAngles[index] = odometer.getTheta();
 
 		}
+		
 		navigator.navigatorMotorCommands.stopMotors();
 		Sound.beepSequence();
 		

@@ -46,8 +46,8 @@ public class EV3Launcher {
 
 	private static final Port rearColorPort 		= LocalEV3.get().getPort("S1");		
 	private static final Port forwardColorPort		= LocalEV3.get().getPort("S3");
+	private static final Port rightUltraSonicPort 	= LocalEV3.get().getPort("S2");
 	private static final Port leftUltraSonicPort 	= LocalEV3.get().getPort("S4");		
-	private static final Port rightUltraSonicPort 	= LocalEV3.get().getPort("S2");		
 
 
 
@@ -167,9 +167,10 @@ public class EV3Launcher {
 			lightLocalizer.setCalibrationCoordinates(destination2);
 			lightLocalizer.localizeDynamically();
 			Sound.beepSequence();
-//			navigator.travelTo(0, 0);
+			navigator.travelTo(6*30.48, 6*30.48);
 //			navigator.turnTo(0, false);
-//			navigator.navigatorMotorCommands.stopMotors();
+			navigator.navigatorMotorCommands.stopMotors();
+
 			break;
 
 		default:

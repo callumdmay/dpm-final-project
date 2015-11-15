@@ -37,8 +37,8 @@ public class Navigator extends Thread{
 
 	private final int FORWARD_SPEED = 200;
 	private final int ROTATE_SPEED = 100;
-	private final int SMALL_CORRECTION_SPEED =20;
-	private final int SMALL_ROTATION_SPEED = 25;
+	private final int SMALL_CORRECTION_SPEED =100;
+	private final int SMALL_ROTATION_SPEED = 50;
 	public NavigatorMotorCommands navigatorMotorCommands;
 
 
@@ -106,14 +106,14 @@ public class Navigator extends Thread{
 		//While the robot is not at the objective coordinates, keep moving towards it 
 		while(Math.abs(pX- odometer.getX()) > locationError || Math.abs(pY - odometer.getY()) > locationError)
 		{
-			if(objectDetector.detectedObject())
-			{
-				isAvoiding = true;
-				determineIfObjectIsOnDestinationCoordinate(pX, pY);
-				obstacleAvoider.avoidObstacle(pX, pY);
-				isAvoiding = false;
-				hasAvoided = true;
-			}
+//			if(objectDetector.detectedObject())
+//			{
+//				isAvoiding = true;
+//				determineIfObjectIsOnDestinationCoordinate(pX, pY);
+//				obstacleAvoider.avoidObstacle(pX, pY);
+//				isAvoiding = false;
+//				hasAvoided = true;
+//			}
 			moveToCoordinates(pX, pY);
 
 		}
@@ -128,8 +128,6 @@ public class Navigator extends Thread{
 	 */
 	public void turnTo(double pTheta, boolean useSmallRotationSpeed)
 	{
-		
-		navigatorMotorCommands.stopMotors();
 		
 		pTheta = pTheta % Math.toRadians(360);
 

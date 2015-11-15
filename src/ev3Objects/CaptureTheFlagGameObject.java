@@ -164,6 +164,12 @@ public class CaptureTheFlagGameObject {
 	public int getStartingCorner() {
 		return startingCorner;
 	}
+	
+
+	public ArrayList<Coordinate> getPreSearchLocalizationCoordinates() {
+		return preSearchLocalizationCoordinates;
+	}
+
 
 
 	/**

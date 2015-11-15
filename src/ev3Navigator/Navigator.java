@@ -3,7 +3,9 @@ package ev3Navigator;
 import ev3ObjectDetector.ObjectDetector;
 import ev3ObjectDetector.ObstacleAvoider;
 import ev3Objects.CaptureTheFlagGameObject;
+import ev3Objects.Coordinate;
 import ev3Objects.Motors;
+import ev3Objects.ObstacleOnCoordinateException;
 import ev3Odometer.Odometer;
 import lejos.hardware.Sound;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
@@ -59,7 +61,7 @@ public class Navigator extends Thread{
 			motor.setAcceleration(2000);
 
 		}
-		
+
 		navigatorMotorCommands = new NavigatorMotorCommands(leftMotor, rightMotor);
 
 	}
@@ -68,12 +70,23 @@ public class Navigator extends Thread{
 	public void run()
 	{
 		Sound.beepSequenceUp();
-		
+
 		odometer.setX(captureTheFlagGameObject.getStartingCoordinate().getX());
 		odometer.setY(captureTheFlagGameObject.getStartingCoordinate().getY());
-		
-		travelTo(captureTheFlagGameObject.getClosestOpponentBaseCoordinate().getX(), captureTheFlagGameObject.getClosestOpponentBaseCoordinate().getY());
 
+		for(Coordinate coordinate : captureTheFlagGameObject.getPreSearchLocalizationCoordinates())
+		{
+			try{
+				travelTo(coordinate.getX(), coordinate.getY());
+			}
+			catch (ObstacleOnCoordinateException e){
+				continue;
+			}
+			
+			break;
+		}
+		
+		
 		navigatorMotorCommands.stopMotors();
 	}
 	/**
@@ -89,12 +102,14 @@ public class Navigator extends Thread{
 		{
 			if(objectDetector.detectedObject())
 			{
+				determineIfObjectIsOnDestinationCoordinate(pX, pY);
 				obstacleAvoider.avoidObstacle(pX, pY);
+
 			}
 			moveToCoordinates(pX, pY);
 
 		}
-		
+
 		navigatorMotorCommands.stopMotors();
 
 	}
@@ -172,6 +187,16 @@ public class Navigator extends Thread{
 			rightMotor.forward();
 		}
 	}
+	
+	
+	private void determineIfObjectIsOnDestinationCoordinate(double pX, double pY){
+		double objectX = odometer.getX() + Math.cos(odometer.getTheta()) * objectDetector.getObjectDistance();
+		double objectY = odometer.getY() + Math.sin(odometer.getTheta()) * objectDetector.getObjectDistance();
+		if(Math.abs(objectX-pX)<6 &&Math.abs(objectY-pY)<6)
+			throw new ObstacleOnCoordinateException();
+		
+		
+	}
 
 	/**
 	 * Sets the game object for the capture the flag game 
@@ -183,7 +208,7 @@ public class Navigator extends Thread{
 		captureTheFlagGameObject = pCaptureTheFlagGameObject;
 	}
 
-	
+
 
 }
 

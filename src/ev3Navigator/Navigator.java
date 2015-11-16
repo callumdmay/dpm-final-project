@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+import ev3Localization.LightLocalizer;
 import ev3ObjectDetector.ObjectDetector;
 import ev3ObjectDetector.ObstacleAvoider;
 import ev3Objects.CaptureTheFlagGameObject;
@@ -25,20 +26,21 @@ public class Navigator extends Thread{
 	private ObstacleAvoider obstacleAvoider;
 	private Odometer odometer;
 	private CaptureTheFlagGameObject captureTheFlagGameObject;
+	
+	private LightLocalizer lightLocalizer;
 
 	private double wheelRadius;
 	private double axleLength;
-	private boolean isAvoiding = false;
-	private boolean hasAvoided = false;
 
 	private final double locationError = 1;
 	private final double navigatingAngleError = 1;
 	private static final double  tileLength = 30.48;
 
-	private final int FORWARD_SPEED = 200;
+	private final int FORWARD_SPEED = 300;
 	private final int ROTATE_SPEED = 100;
 	private final int SMALL_CORRECTION_SPEED =100;
 	private final int SMALL_ROTATION_SPEED = 50;
+	private final double CORRECTION_DIST = 100;
 	public NavigatorMotorCommands navigatorMotorCommands;
 
 
@@ -106,21 +108,45 @@ public class Navigator extends Thread{
 		//While the robot is not at the objective coordinates, keep moving towards it 
 		while(Math.abs(pX- odometer.getX()) > locationError || Math.abs(pY - odometer.getY()) > locationError)
 		{
-//			if(objectDetector.detectedObject())
-//			{
-//				isAvoiding = true;
-//				determineIfObjectIsOnDestinationCoordinate(pX, pY);
-//				obstacleAvoider.avoidObstacle(pX, pY);
-//				isAvoiding = false;
-//				hasAvoided = true;
-//			}
+			if(objectDetector.detectedObject())
+			{
+				determineIfObjectIsOnDestinationCoordinate(pX, pY);
+				obstacleAvoider.avoidObstacle(pX, pY);
+				Coordinate destinationn = new Coordinate(pX,pY);
+				lightLocalizer.localizeDynamically(findOptimalCorner(destinationn));
+				odometer.setDistanceTravelled(0);
+			}
 			moveToCoordinates(pX, pY);
+			if (odometer.getDistanceTravelled() > CORRECTION_DIST){
+				Coordinate destination = new Coordinate(pX,pY);
+				lightLocalizer.localizeDynamically(findOptimalCorner(destination));
+				odometer.setDistanceTravelled(0);
+			}
 
 		}
 
 		navigatorMotorCommands.stopMotors();
 
 	}
+	
+	/**
+	 * Travel to a coordinate without avoiding objects or dynamic localization
+	 * @param pX The x coordinate to travel to
+	 * @param pY The y coordinate to travel to
+	 */
+	public void simpleTravelTo(double pX, double pY)
+	{
+
+		//While the robot is not at the objective coordinates, keep moving towards it 
+		while(Math.abs(pX- odometer.getX()) > locationError || Math.abs(pY - odometer.getY()) > locationError)
+		{
+			moveToCoordinates(pX, pY);
+		}
+
+		navigatorMotorCommands.stopMotors();
+
+	}
+	
 	/**
 	 * Turns to absolute value theta
 	 * @param pTheta The angle to turn to
@@ -303,6 +329,47 @@ public class Navigator extends Thread{
 
 		objectDetector.processObject();
 	}
+	
+	/**
+	 * Returns a list of coordinates for the corners of the tile the robot is in.
+	 */
+	public Coordinate[] findCorners(){
+		double bottomLeftX = odometer.getX() - odometer.getX() % tileLength;
+		double bottomLeftY = odometer.getY() - odometer.getY() % tileLength;
+		Coordinate bottomLeft = new Coordinate(bottomLeftX, bottomLeftY);
+		Coordinate bottomRight = new Coordinate((bottomLeft.getX() + tileLength), bottomLeft.getY());
+		Coordinate topLeft = new Coordinate(bottomLeft.getX(), (bottomLeft.getY() + tileLength));
+		Coordinate topRight = new Coordinate((bottomLeft.getX() + tileLength), (bottomLeft.getY() + tileLength));
+		Coordinate[] corners = {bottomLeft, bottomRight, topLeft, topRight};
+		return corners;
+	}
+	
+	/**
+	 * Returns the coordinate of the corner closest to destination coordinate
+	 * @param corners The array of corners to choose from
+	 * @param destination The destination
+	 * @return
+	 */
+	public Coordinate findOptimalCorner(Coordinate destination){
+		Coordinate[] corners = findCorners();
+		Coordinate optimalCorner = corners[0];
+		for (Coordinate corner : corners){
+			if (calculateEuclidianDist(corner, destination) < calculateEuclidianDist(optimalCorner, destination)){
+				optimalCorner = corner;
+			}
+		}
+		return optimalCorner;
+	}
+	
+	/**
+	 * Returns the euclidian distance in cm between two coordinate
+	 * @param coord1 The first coordinate
+	 * @param coord2 The second coordinate
+	 * @return
+	 */
+	private double calculateEuclidianDist(Coordinate coord1, Coordinate coord2){
+		return Math.pow( Math.pow(coord1.getX()-coord2.getX(),2) + Math.pow(coord1.getY()-coord2.getY(),2), 0.5);
+	}
 
 	/**
 	 * Sets the game object for the capture the flag game 
@@ -313,14 +380,14 @@ public class Navigator extends Thread{
 	{
 		captureTheFlagGameObject = pCaptureTheFlagGameObject;
 	}
-
+	
 	/**
-	 * Sets whether or not the EV3 has recently avoided an object
-	 * @param update The boolean representing whether or not the EV3 has recently avoided an object
+	 * Sets the light localizer to be used by the navigator
+	 * @param lightLocalizer The navigator to be used
 	 */
-	public void setHasAvoided(boolean update)
+	public void setLightLocalizer(LightLocalizer LSLocalizer)
 	{
-		this.hasAvoided = update;
+		this.lightLocalizer = LSLocalizer;
 	}
 }
 

@@ -8,6 +8,7 @@ import ev3Navigator.Navigator;
 import ev3ObjectDetector.ObjectDetector;
 import ev3ObjectDetector.ObstacleAvoider;
 import ev3Objects.CaptureTheFlagGameObject;
+import ev3Objects.Coordinate;
 import ev3Objects.Motors;
 import ev3Odometer.LCDInfo;
 import ev3Odometer.Odometer;
@@ -114,6 +115,8 @@ public class EV3Launcher {
 		USLocalizer usl = new USLocalizer(odometer, rightUltraSonicSampleProvider, rightUltraSonicData, USLocalizer.LocalizationType.RISING_EDGE, navigator);
 		LightLocalizer lightLocalizer = new LightLocalizer(odometer, navigator, rearColorSensorSampleProvider, rearColorSensorData);
 
+		navigator.setLightLocalizer(lightLocalizer);
+		
 		int buttonChoice;
 		TextLCD textLCD = LocalEV3.get().getTextLCD();
 
@@ -140,9 +143,10 @@ public class EV3Launcher {
 			lcd = new LCDInfo(odometer, objectDetector);
 
 			usl.doLocalization();
-			double[] destination = {-3, -3};
-			lightLocalizer.setCalibrationCoordinates(destination);
-			lightLocalizer.localizeDynamically();
+			odometer.setX(-8);
+			odometer.setY(-8);
+			Coordinate initialIntersection = new Coordinate(0,0);
+			lightLocalizer.localizeDynamically(initialIntersection);
 
 			try {
 				Transmission transmission = getWifiTransmission();
@@ -161,14 +165,17 @@ public class EV3Launcher {
 			// Test case
 		case Button.ID_RIGHT:
 			lcd = new LCDInfo(odometer, objectDetector);
-
+		
 			usl.doLocalization();
-			double[] destination2 = {8, 8};
-			lightLocalizer.setCalibrationCoordinates(destination2);
-			lightLocalizer.localizeDynamically();
+			odometer.setX(-8);
+			odometer.setY(-8);
+			Coordinate firstIntersection = new Coordinate(0,0);
+			lightLocalizer.localizeDynamically(firstIntersection);
 			Sound.beepSequence();
+			navigator.travelTo(3*30.48, 2*30.48);
+			navigator.travelTo(4*30.48, 4*30.48);
 			navigator.travelTo(6*30.48, 6*30.48);
-//			navigator.turnTo(0, false);
+			navigator.turnTo(0, true);
 			navigator.navigatorMotorCommands.stopMotors();
 
 			break;

@@ -1,6 +1,7 @@
 package ev3Localization;
 
 import ev3Navigator.Navigator;
+import ev3Objects.Coordinate;
 import ev3Odometer.Odometer;
 import lejos.hardware.Sound;
 import lejos.robotics.SampleProvider;
@@ -10,14 +11,13 @@ import lejos.robotics.SampleProvider;
  */
 public class LightLocalizer {
 
-	public static int ROTATION_SPEED = 150;
-	private final int lineDetectionValue = 45;
+	public static int ROTATION_SPEED = 175;
+	private final int lineDetectionValue = 42;
 	private final double light_SensorDistanceFromOrigin = 14.1;
 
 	private Odometer odometer;
 	private SampleProvider colorSensor;
 	private float[] colorData;
-	private double[] calibrationCoordinates;
 	private Navigator navigator;
 
 	/**
@@ -43,11 +43,13 @@ public class LightLocalizer {
 	/**
 	 * Go navigate to unoccupied corner closest to destination
 	 */
-	public void localizeDynamically() {
+	public void localizeDynamically(Coordinate calibrationCoordinate) {
 
+		odometer.setDistanceTravelled(0);
+		
 		double blackLineAngles[] = new double[4];
 
-		navigator.travelTo(calibrationCoordinates[0], calibrationCoordinates[1]);
+		navigator.simpleTravelTo(calibrationCoordinate.getX(), calibrationCoordinate.getY());
 
 		for (int index = 0; index < blackLineAngles.length; index++) {
 			// Capture the angle when we first encounter the black line
@@ -67,8 +69,8 @@ public class LightLocalizer {
 			blackLineAngles[0] += Math.PI*2;
 		}
 
-		odometer.setX(fixDisplacement(blackLineAngles[1], blackLineAngles[3]));
-		odometer.setY(fixDisplacement(blackLineAngles[0], blackLineAngles[2]));
+		odometer.setX(calibrationCoordinate.getX() + fixDisplacement(blackLineAngles[1], blackLineAngles[3]));
+		odometer.setY(calibrationCoordinate.getY() + fixDisplacement(blackLineAngles[0], blackLineAngles[2]));
 		odometer.setTheta(fixAngle(blackLineAngles[1], blackLineAngles[3], odometer.getTheta()));
 	}
 
@@ -87,16 +89,6 @@ public class LightLocalizer {
 			return false;
 	}
 
-	/**
-	 * Set the coordinates for the robot to head to for dynamic light
-	 * localization
-	 * 
-	 * @param position
-	 *            The intersection coordinates used for light localization
-	 */
-	public void setCalibrationCoordinates(double[] intersectionCoordinates) {
-		this.calibrationCoordinates = intersectionCoordinates;
-	}
 
 	/**
 	 * Returns the corrected angle of the EV3
@@ -113,7 +105,7 @@ public class LightLocalizer {
 		double deltaTheta;
 		deltaTheta = Math.PI - (angleA - angleB) / 2 - angleB;
 		currentAngle += deltaTheta;
-		return currentAngle;
+		return currentAngle - Math.toRadians(6);
 	}
 
 	/**

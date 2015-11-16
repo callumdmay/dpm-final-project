@@ -18,6 +18,7 @@ public class LCDInfo implements TimerListener{
 	
 	// arrays for displaying data
 	private double [] pos;
+	private double distTravelled;
 	
 	/**
 	 * Object stores an Odometer and an ObjectDetector to update values
@@ -32,6 +33,7 @@ public class LCDInfo implements TimerListener{
 		
 		// initialise the arrays for displaying data
 		pos = new double [3];
+		distTravelled = 0;
 		
 		// start the timer
 		lcdTimer.start();
@@ -42,6 +44,7 @@ public class LCDInfo implements TimerListener{
 	@Override
 	public void timedOut() { 
 		odo.getPosition(pos, new boolean[] { true, true, true });
+		distTravelled = odo.getDistanceTravelled();
 		LCD.clear();
 		LCD.drawString("X: ", 0, 0);
 		LCD.drawString("Y: ", 0, 1);
@@ -49,9 +52,13 @@ public class LCDInfo implements TimerListener{
 		LCD.drawString((formattedDoubleToString(pos[0], 2)), 3, 0);
 		LCD.drawString(formattedDoubleToString(pos[1], 2), 3, 1);
 		LCD.drawString(formattedDoubleToString(pos[2], 2), 3, 2);
+		
 
 		LCD.drawString("Obj Distance:"+ objectDetector.getObjectDistance(), 0, 3);
 		LCD.drawString("Obj Detect:"+ objectDetector.isObjectDetected(), 0, 4);
+		
+		LCD.drawString("D: ", 0, 5);
+		LCD.drawString(formattedDoubleToString(distTravelled, 2), 3, 5);
 		
 		if(objectDetector.getCurrentObject() != null)
 			LCD.drawString("Type:"+ objectDetector.getCurrentObject(), 0, 5);

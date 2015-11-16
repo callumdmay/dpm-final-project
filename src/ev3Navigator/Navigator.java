@@ -26,7 +26,7 @@ public class Navigator extends Thread{
 	private ObstacleAvoider obstacleAvoider;
 	private Odometer odometer;
 	private CaptureTheFlagGameObject captureTheFlagGameObject;
-	
+
 	private LightLocalizer lightLocalizer;
 
 	private double wheelRadius;
@@ -111,15 +111,15 @@ public class Navigator extends Thread{
 			if(objectDetector.detectedObject())
 			{
 				determineIfObjectIsOnDestinationCoordinate(pX, pY);
-				obstacleAvoider.avoidObstacle(pX, pY);
-				Coordinate destinationn = new Coordinate(pX,pY);
-				lightLocalizer.localizeDynamically(findOptimalCorner(destinationn));
+				if(objectIsInTheWay(pX, pY))
+					obstacleAvoider.avoidObstacle(pX, pY);
+				
+				lightLocalizer.localizeDynamically(findOptimalCorner( new Coordinate(pX,pY)));
 				odometer.setDistanceTravelled(0);
 			}
 			moveToCoordinates(pX, pY);
 			if (odometer.getDistanceTravelled() > CORRECTION_DIST){
-				Coordinate destination = new Coordinate(pX,pY);
-				lightLocalizer.localizeDynamically(findOptimalCorner(destination));
+				lightLocalizer.localizeDynamically(findOptimalCorner( new Coordinate(pX,pY)));
 				odometer.setDistanceTravelled(0);
 			}
 
@@ -128,7 +128,7 @@ public class Navigator extends Thread{
 		navigatorMotorCommands.stopMotors();
 
 	}
-	
+
 	/**
 	 * Travel to a coordinate without avoiding objects or dynamic localization
 	 * @param pX The x coordinate to travel to
@@ -144,9 +144,8 @@ public class Navigator extends Thread{
 		}
 
 		navigatorMotorCommands.stopMotors();
-
 	}
-	
+
 	/**
 	 * Turns to absolute value theta
 	 * @param pTheta The angle to turn to
@@ -154,7 +153,7 @@ public class Navigator extends Thread{
 	 */
 	public void turnTo(double pTheta, boolean useSmallRotationSpeed)
 	{
-		
+
 		pTheta = pTheta % Math.toRadians(360);
 
 		double deltaTheta = pTheta - odometer.getTheta();
@@ -222,6 +221,12 @@ public class Navigator extends Thread{
 		}
 	}
 
+	/**
+	 *  Method that determines if there is an object where the robot is trying to go. If so, 
+	 *  throws an exception that must be handled by calling method
+	 * @param pX The target location x coordinate
+	 * @param pY The target location y coordinate
+	 */
 
 	private void determineIfObjectIsOnDestinationCoordinate(double pX, double pY){
 		double objectX = odometer.getX() + Math.cos(odometer.getTheta()) * objectDetector.getObjectDistance();
@@ -230,6 +235,27 @@ public class Navigator extends Thread{
 			throw new ObstacleOnCoordinateException();
 
 	}
+
+	/**
+	 * Determines if the detected object is between the robot and the 
+	 * coordinate it is trying to travel to
+	 * @param pX The target location x coordinate
+	 * @param pY The target location y coordinate
+	 * @return
+	 */
+
+	private boolean objectIsInTheWay(double pX, double pY) {
+		double deltaX = pX - odometer.getX();
+		double deltaY = pY - odometer.getY();
+		double distanceToCoordinate = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+		if(distanceToCoordinate > objectDetector.getObjectDistance())
+			return true;
+		else
+			return false;
+	}
+
+
 
 
 	private void searchForFlag(Coordinate startPoint, Coordinate endPoint)
@@ -329,7 +355,7 @@ public class Navigator extends Thread{
 
 		objectDetector.processObject();
 	}
-	
+
 	/**
 	 * Returns a list of coordinates for the corners of the tile the robot is in.
 	 */
@@ -343,7 +369,7 @@ public class Navigator extends Thread{
 		Coordinate[] corners = {bottomLeft, bottomRight, topLeft, topRight};
 		return corners;
 	}
-	
+
 	/**
 	 * Returns the coordinate of the corner closest to destination coordinate
 	 * @param corners The array of corners to choose from
@@ -360,7 +386,7 @@ public class Navigator extends Thread{
 		}
 		return optimalCorner;
 	}
-	
+
 	/**
 	 * Returns the euclidian distance in cm between two coordinate
 	 * @param coord1 The first coordinate
@@ -380,7 +406,7 @@ public class Navigator extends Thread{
 	{
 		captureTheFlagGameObject = pCaptureTheFlagGameObject;
 	}
-	
+
 	/**
 	 * Sets the light localizer to be used by the navigator
 	 * @param lightLocalizer The navigator to be used

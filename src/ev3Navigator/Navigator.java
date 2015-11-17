@@ -113,7 +113,7 @@ public class Navigator extends Thread{
 				determineIfObjectIsOnDestinationCoordinate(pX, pY);
 				if(objectIsInTheWay(pX, pY))
 					obstacleAvoider.avoidObstacle(pX, pY);
-				
+
 				lightLocalizer.localizeDynamically(findOptimalCorner( new Coordinate(pX,pY)));
 				odometer.setDistanceTravelled(0);
 			}
@@ -262,7 +262,7 @@ public class Navigator extends Thread{
 	{
 		Queue<Coordinate> searchCoordinateQueue = new LinkedList<Coordinate>();
 
-		if(Math.abs(endPoint.getY() - startPoint.getY())> Math.abs(endPoint.getY() - startPoint.getY())){
+		if(Math.abs(endPoint.getY() - startPoint.getY())>= Math.abs(endPoint.getX() - startPoint.getX())){
 
 			double deltaX = endPoint.getX() - startPoint.getX();
 
@@ -297,7 +297,7 @@ public class Navigator extends Thread{
 		}
 		else
 		{
-
+			Sound.beep();
 			double deltaY = endPoint.getY() - startPoint.getY();
 
 			int coordinateCount =1;

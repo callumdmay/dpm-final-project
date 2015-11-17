@@ -53,11 +53,12 @@ public class EV3Launcher {
 
 
 	public static final double WHEEL_RADIUS = 2.1;
-	public static final double TRACK = 11.35;
+	public static final double TRACK = 12.05;
 	private static final String SERVER_IP = "localhost";
 	private static final int TEAM_NUMBER = 12;
 
 	private static final int wifiInputString[] = {1, 2, -1, 4, 2, 6, 8, 8, 11, 1, 3, 2, 3};
+	private static final int betaWifiInputString[] = {1,0,0,0,0,4,4,6,6,6,6,0,0};
 
 
 
@@ -147,7 +148,8 @@ public class EV3Launcher {
 			odometer.setY(-8);
 			Coordinate initialIntersection = new Coordinate(0,0);
 			lightLocalizer.localizeDynamically(initialIntersection);
-
+			navigator.travelTo(0, 0);
+			/*
 			try {
 				Transmission transmission = getWifiTransmission();
 			} catch (IOException e) {
@@ -156,28 +158,17 @@ public class EV3Launcher {
 			{
 				textLCD.drawString("Failed to read transmission", 0, 5);
 			}
-
+			*/
 			//change parameter from wifiInputString to "transmission" when using real wifi input
-			navigator.setGameObject(new CaptureTheFlagGameObject(wifiInputString));
+			navigator.setGameObject(new CaptureTheFlagGameObject(betaWifiInputString));
 			navigator.start();
 			break;
 
 			// Test case
 		case Button.ID_RIGHT:
 			lcd = new LCDInfo(odometer, objectDetector);
-		
-			usl.doLocalization();
-			odometer.setX(-8);
-			odometer.setY(-8);
-			Coordinate firstIntersection = new Coordinate(0,0);
-			lightLocalizer.localizeDynamically(firstIntersection);
-			Sound.beepSequence();
-			navigator.travelTo(3*30.48, 2*30.48);
-			navigator.travelTo(4*30.48, 4*30.48);
-			navigator.travelTo(6*30.48, 6*30.48);
-			navigator.turnTo(0, true);
-			navigator.navigatorMotorCommands.stopMotors();
-
+			
+			
 			break;
 
 		default:

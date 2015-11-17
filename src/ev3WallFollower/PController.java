@@ -11,7 +11,7 @@ public class PController implements UltrasonicController {
 
 	private static final int bandCenter = 28; // Offset from the wall (cm)
 	private static final int bandWidth = 3; // Width of dead band (cm)
-	private final int motorStraight = 100, FILTER_OUT = 20, motorVeryHigh = 300,motorVeryLow = 50,motorHigh =200;
+	private final int motorStraight = 100, FILTER_OUT = 20, motorVeryHigh = 200,motorVeryLow = 50,motorHigh =150;
 	private final int offset = 20;
 	private EV3LargeRegulatedMotor leftMotor, rightMotor;
 	private int distance;

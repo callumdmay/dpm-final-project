@@ -62,7 +62,6 @@ public class LightLocalizer {
 		}
 		
 		navigator.navigatorMotorCommands.stopMotors();
-		Sound.beepSequence();
 		
 		// takes care of 360 wraparound
 		if (blackLineAngles[0] < Math.PI) {

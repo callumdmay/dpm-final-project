@@ -65,13 +65,16 @@ public class CaptureTheFlagGameObject {
 
 		case 1:
 			startingCoordinate = new Coordinate(0,0);
+			break;
 		case 2:
 			startingCoordinate = new Coordinate(10*tileLength,0);
+			break;
 		case 3:
 			startingCoordinate = new Coordinate(10*tileLength,10*tileLength);
+			break;
 		case 4:
 			startingCoordinate = new Coordinate(10*tileLength,10*tileLength);
-
+			break;
 		}
 	}
 
@@ -119,30 +122,30 @@ public class CaptureTheFlagGameObject {
 
 		if(closestOpponentBaseCoordinate.equals(opponentBaseCoordinate_BL))
 		{
-			temp1 = new Coordinate(closestOpponentBaseCoordinate.getX() -1, closestOpponentBaseCoordinate.getY());
-			temp2 = new Coordinate(closestOpponentBaseCoordinate.getX() -1, closestOpponentBaseCoordinate.getY()-1);
-			temp3 = new Coordinate(closestOpponentBaseCoordinate.getX() , closestOpponentBaseCoordinate.getY()-1);
+			temp1 = new Coordinate(closestOpponentBaseCoordinate.getX() -tileLength, closestOpponentBaseCoordinate.getY());
+			temp2 = new Coordinate(closestOpponentBaseCoordinate.getX() -tileLength, closestOpponentBaseCoordinate.getY()-tileLength);
+			temp3 = new Coordinate(closestOpponentBaseCoordinate.getX() , closestOpponentBaseCoordinate.getY()-tileLength);
 		}
 
 		else if(closestOpponentBaseCoordinate.equals(opponentBaseCoordinate_TL))
 		{
-			temp1 = new Coordinate(closestOpponentBaseCoordinate.getX() -1, closestOpponentBaseCoordinate.getY());
-			temp2 = new Coordinate(closestOpponentBaseCoordinate.getX() -1, closestOpponentBaseCoordinate.getY()+1);
-			temp3 = new Coordinate(closestOpponentBaseCoordinate.getX() , closestOpponentBaseCoordinate.getY()+1);
+			temp1 = new Coordinate(closestOpponentBaseCoordinate.getX() -tileLength, closestOpponentBaseCoordinate.getY());
+			temp2 = new Coordinate(closestOpponentBaseCoordinate.getX() -tileLength, closestOpponentBaseCoordinate.getY()+tileLength);
+			temp3 = new Coordinate(closestOpponentBaseCoordinate.getX() , closestOpponentBaseCoordinate.getY()+tileLength);
 		}
 
 		else if(closestOpponentBaseCoordinate.equals(opponentBaseCoordinate_BR))
 		{
-			temp1 = new Coordinate(closestOpponentBaseCoordinate.getX() +1, closestOpponentBaseCoordinate.getY());
-			temp2 = new Coordinate(closestOpponentBaseCoordinate.getX() +1, closestOpponentBaseCoordinate.getY()-1);
-			temp3 = new Coordinate(closestOpponentBaseCoordinate.getX() , closestOpponentBaseCoordinate.getY()-1);
+			temp1 = new Coordinate(closestOpponentBaseCoordinate.getX() +tileLength, closestOpponentBaseCoordinate.getY());
+			temp2 = new Coordinate(closestOpponentBaseCoordinate.getX() +tileLength, closestOpponentBaseCoordinate.getY()-tileLength);
+			temp3 = new Coordinate(closestOpponentBaseCoordinate.getX() , closestOpponentBaseCoordinate.getY()-tileLength);
 		}
 
 		else if(closestOpponentBaseCoordinate.equals(opponentBaseCoordinate_TR))
 		{
-			temp1 = new Coordinate(closestOpponentBaseCoordinate.getX() +1, closestOpponentBaseCoordinate.getY());
-			temp2 = new Coordinate(closestOpponentBaseCoordinate.getX() +1, closestOpponentBaseCoordinate.getY()+1);
-			temp3 = new Coordinate(closestOpponentBaseCoordinate.getX() , closestOpponentBaseCoordinate.getY()+1);
+			temp1 = new Coordinate(closestOpponentBaseCoordinate.getX() +tileLength, closestOpponentBaseCoordinate.getY());
+			temp2 = new Coordinate(closestOpponentBaseCoordinate.getX() +tileLength, closestOpponentBaseCoordinate.getY()+tileLength);
+			temp3 = new Coordinate(closestOpponentBaseCoordinate.getX() , closestOpponentBaseCoordinate.getY()+tileLength);
 		}
 		else
 		{

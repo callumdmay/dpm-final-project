@@ -315,7 +315,7 @@ public class Navigator extends Thread{
 				}
 				else
 				{
-					coordinate = new Coordinate(startPoint.getX() , endPoint.getY() + deltaY * (yMultiplier/8));
+					coordinate = new Coordinate(endPoint.getX() , startPoint.getY() + deltaY * (yMultiplier/8));
 				}
 
 				coordinateCount++;

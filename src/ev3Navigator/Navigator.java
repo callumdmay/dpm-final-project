@@ -9,6 +9,7 @@ import ev3ObjectDetector.ObjectDetector;
 import ev3ObjectDetector.ObstacleAvoider;
 import ev3Objects.CaptureTheFlagGameObject;
 import ev3Objects.Coordinate;
+import ev3Objects.FoundOpponentFlagException;
 import ev3Objects.Motors;
 import ev3Objects.ObstacleOnCoordinateException;
 import ev3Odometer.Odometer;
@@ -94,6 +95,15 @@ public class Navigator extends Thread{
 			break;
 		}
 
+		lightLocalizer.localizeDynamically();
+		try{
+			
+		searchForFlag(captureTheFlagGameObject.getOpponentBaseCoordinate_BL(), captureTheFlagGameObject.getOpponentBaseCoordinate_TR());
+		}
+		catch(FoundOpponentFlagException e)
+		{
+			Sound.beepSequenceUp();
+		}
 
 		navigatorMotorCommands.stopMotors();
 	}
@@ -331,6 +341,7 @@ public class Navigator extends Thread{
 			}
 		}
 
+		int coordinateCount =0;
 		for(Coordinate coordinate : searchCoordinateQueue)
 			while(Math.abs(coordinate.getX()- odometer.getX()) > locationError || Math.abs(coordinate.getY() - odometer.getY()) > locationError)
 			{
@@ -338,8 +349,12 @@ public class Navigator extends Thread{
 				{
 					Sound.beep();
 					investigateObject();
+					obstacleAvoider.avoidObstacle(coordinate.getX(), coordinate.getY());
 				}
 				moveToCoordinates(coordinate.getX(), coordinate.getY());
+				coordinateCount++;
+				if(coordinateCount ==4)
+					lightLocalizer.localizeDynamically();
 			}
 	}
 
@@ -348,14 +363,19 @@ public class Navigator extends Thread{
 	 */
 	private void investigateObject()
 	{
-		while(objectDetector.getObjectDistance() >=6 )
+		while(objectDetector.getObjectDistance() >=4 )
 		{
 			if(objectDetector.getObjectDistance()> objectDetector.getDefaultObstacleDistance())
 				break;
 			navigatorMotorCommands.driveStraight(30);
 		}
 
-		objectDetector.processObject();
+		objectDetector.determineIfObjectIsFlag(captureTheFlagGameObject.getOpponentFlagColour());
+		while(objectDetector.getObjectDistance() <=10 )
+		{
+			navigatorMotorCommands.driveStraight(-30);
+		}
+		
 	}
 
 

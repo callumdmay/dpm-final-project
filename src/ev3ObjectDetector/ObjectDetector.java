@@ -1,6 +1,7 @@
 package ev3ObjectDetector;
 
 
+import ev3Objects.FoundOpponentFlagException;
 import ev3Odometer.Odometer;
 import ev3WallFollower.UltrasonicPoller;
 import lejos.hardware.Sound;
@@ -15,7 +16,7 @@ public class ObjectDetector{
 	private Odometer odometer;
 	private UltrasonicPoller ultraSonicPoller;
 
-	public enum OBJECT_TYPE { block, obstacle } 
+	public enum OBJECT_TYPE { flag, obstacle } 
 
 	private float[] colorData;
 	private final int FILTER_OUT = 5;
@@ -93,15 +94,16 @@ public class ObjectDetector{
 	/**
 	 * Identifies between a blue block and a wooden obstacle
 	 */
-	public void processObject()
+	public void determineIfObjectIsFlag(int flagColour)
 	{
 
 		if(ultraSonicPoller.getLeftUltraSoundSensorDistance() <=8  && getCurrentObject() == null)
 		{
 			colorValue.fetchSample(colorData, 0);
-			if(colorData[0]== 2){
+			if(colorData[0]== flagColour){
 				Sound.beep();
-				setCurrentObject(OBJECT_TYPE.block);
+				setCurrentObject(OBJECT_TYPE.flag);
+				throw new FoundOpponentFlagException();
 			}
 			else
 			{

@@ -144,8 +144,7 @@ public class EV3Launcher {
 			usl.doLocalization();
 			odometer.setX(-8);
 			odometer.setY(-8);
-			Coordinate initialIntersection = new Coordinate(0,0);
-			lightLocalizer.localizeDynamically(initialIntersection);
+			lightLocalizer.localizeDynamically();
 			navigator.travelTo(0, 0);
 			/*
 			try {

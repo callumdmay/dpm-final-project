@@ -62,11 +62,6 @@ public class LightLocalizer {
 		}
 		
 		navigator.navigatorMotorCommands.stopMotors();
-		
-		// takes care of 360 wraparound
-		if (blackLineAngles[0] < Math.PI) {
-			blackLineAngles[0] += Math.PI*2;
-		}
 
 		odometer.setX(calibrationCoordinate.getX() + fixDisplacement(blackLineAngles[1], blackLineAngles[3]));
 		odometer.setY(calibrationCoordinate.getY() + fixDisplacement(blackLineAngles[0], blackLineAngles[2]));
@@ -115,9 +110,7 @@ public class LightLocalizer {
 	 * @return
 	 */
 	public double fixDisplacement(double angleA, double angleB) {
-		double z;
-		z = -1 * light_SensorDistanceFromOrigin * Math.cos((angleA - angleB) / 2);
-		return z;
+		return -1 * light_SensorDistanceFromOrigin * Math.cos((angleA - angleB) / 2);
 	}
 
 }

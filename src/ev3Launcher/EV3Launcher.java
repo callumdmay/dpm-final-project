@@ -116,8 +116,6 @@ public class EV3Launcher {
 		USLocalizer usl = new USLocalizer(odometer, rightUltraSonicSampleProvider, rightUltraSonicData, USLocalizer.LocalizationType.RISING_EDGE, navigator);
 		LightLocalizer lightLocalizer = new LightLocalizer(odometer, navigator, rearColorSensorSampleProvider, rearColorSensorData);
 
-		navigator.setLightLocalizer(lightLocalizer);
-		
 		int buttonChoice;
 		TextLCD textLCD = LocalEV3.get().getTextLCD();
 

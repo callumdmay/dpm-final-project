@@ -2,6 +2,7 @@ package ev3Localization;
 
 import ev3Navigator.Navigator;
 import ev3Objects.Coordinate;
+import ev3Objects.ObstacleOnCoordinateException;
 import ev3Odometer.Odometer;
 import lejos.hardware.Sound;
 import lejos.robotics.SampleProvider;
@@ -14,6 +15,7 @@ public class LightLocalizer {
 	public static int ROTATION_SPEED = 175;
 	private final int lineDetectionValue = 42;
 	private final double light_SensorDistanceFromOrigin = 14.1;
+	private double tileLength;
 
 	private Odometer odometer;
 	private SampleProvider colorSensor;
@@ -38,19 +40,38 @@ public class LightLocalizer {
 		this.colorSensor = colorSensor;
 		this.colorData = colorData;
 		this.navigator = navigator;
+
+		tileLength = navigator.tileLength;
+
+		navigator.setLightLocalizer(this);
 	}
 
 	/**
 	 * Go navigate to unoccupied corner closest to destination
 	 */
-	public void localizeDynamically(Coordinate calibrationCoordinate) {
+	public void localizeDynamically() {
 
 		odometer.setDistanceTravelled(0);
-		
+
+		Coordinate calibrationCoordinates[] = findOptimalLocalizationCoordinates();
+
 		double blackLineAngles[] = new double[4];
 
-		navigator.simpleTravelTo(calibrationCoordinate.getX(), calibrationCoordinate.getY());
+		Coordinate calibrationCoordinate = null;
+		
+		for(Coordinate coordinate : calibrationCoordinates)
+		{
+			try{
+				navigator.localizationTravelTo(coordinate.getX()-4, coordinate.getY()-4);
+			}
+			catch (ObstacleOnCoordinateException e){
+				continue;
+			}
 
+			calibrationCoordinate = coordinate;
+			break;
+		}
+		
 		for (int index = 0; index < blackLineAngles.length; index++) {
 			// Capture the angle when we first encounter the black line
 			while (!blackLineDetected())
@@ -60,11 +81,11 @@ public class LightLocalizer {
 			blackLineAngles[index] = odometer.getTheta();
 
 		}
-		
+
 		navigator.navigatorMotorCommands.stopMotors();
 
-		odometer.setX(calibrationCoordinate.getX() + fixDisplacement(blackLineAngles[1], blackLineAngles[3]));
-		odometer.setY(calibrationCoordinate.getY() + fixDisplacement(blackLineAngles[0], blackLineAngles[2]));
+		odometer.setX(calibrationCoordinate.getX() -1 * light_SensorDistanceFromOrigin * Math.cos((blackLineAngles[1] - blackLineAngles[3]) / 2));
+		odometer.setY(calibrationCoordinate.getY() -1 * light_SensorDistanceFromOrigin * Math.cos((blackLineAngles[0] - blackLineAngles[2]) / 2));
 		odometer.setTheta(fixAngle(blackLineAngles[1], blackLineAngles[3], odometer.getTheta()));
 	}
 
@@ -95,22 +116,58 @@ public class LightLocalizer {
 	 *            The current heading of the EV3
 	 * @return The corrected heading of the EV3
 	 */
-	public double fixAngle(double angleA, double angleB, double currentAngle) {
+	private double fixAngle(double angleA, double angleB, double currentAngle) {
 		double deltaTheta;
 		deltaTheta = Math.PI - (angleA - angleB) / 2 - angleB;
 		currentAngle += deltaTheta;
 		return currentAngle - Math.toRadians(6);
 	}
 
+
 	/**
-	 * Returns the corrected displacement of the EV3
-	 * 
-	 * @param angleA
-	 * @param angleB
+	 * Returns a list of coordinates for the corners of the tile the robot is in.
+	 */
+	private Coordinate[] findCorners(){
+		double bottomLeftX = odometer.getX() - odometer.getX() % tileLength;
+		double bottomLeftY = odometer.getY() - odometer.getY() % tileLength;
+		Coordinate bottomLeft = new Coordinate(bottomLeftX, bottomLeftY);
+		Coordinate bottomRight = new Coordinate((bottomLeft.getX() + tileLength), bottomLeft.getY());
+		Coordinate topLeft = new Coordinate(bottomLeft.getX(), (bottomLeft.getY() + tileLength));
+		Coordinate topRight = new Coordinate((bottomLeft.getX() + tileLength), (bottomLeft.getY() + tileLength));
+		Coordinate[] corners = {bottomLeft, bottomRight, topLeft, topRight};
+		return corners;
+	}
+
+	/**
+	 * Returns the coordinate of the corner closest to destination coordinate
+	 * @param corners The array of corners to choose from
+	 * @param destination The destination
 	 * @return
 	 */
-	public double fixDisplacement(double angleA, double angleB) {
-		return -1 * light_SensorDistanceFromOrigin * Math.cos((angleA - angleB) / 2);
+	private Coordinate[] findOptimalLocalizationCoordinates(){
+		Coordinate[] corners = findCorners();
+
+		if(odometer.getTheta()<=Math.toRadians(90) && odometer.getTheta()>=Math.toRadians(0))
+		{
+			return new Coordinate[] {corners[3], corners[1], corners[2], corners[0]};
+		}
+		else if (odometer.getTheta()>Math.toRadians(90) && odometer.getTheta()<=Math.toRadians(180))
+		{
+			return new Coordinate[] {corners[2], corners[3], corners[0], corners[1]};
+		}
+		else if (odometer.getTheta()>Math.toRadians(180) && odometer.getTheta()<=Math.toRadians(270))
+		{
+			return new Coordinate[] {corners[0], corners[2], corners[1], corners[3]};
+		}
+		else if (odometer.getTheta()>Math.toRadians(270) && odometer.getTheta()<=Math.toRadians(360))
+		{
+			return new Coordinate[] {corners[1], corners[0], corners[3], corners[2]};
+		}
+		
+		else{
+			throw new NullPointerException("Could not determine optimal localization coordinates");
+		}
 	}
+
 
 }

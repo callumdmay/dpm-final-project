@@ -125,11 +125,12 @@ public class EV3Launcher {
 		try {
 			conn = new WifiConnection(SERVER_IP, TEAM_NUMBER);
 		} catch (IOException e) {
-
+			System.out.println("can't connect");
 		}
 
 		Transmission t = conn.getTransmission();
 		if (t == null) {
+			System.out.println("can't transmit");
 		} else {
 			wifiInputString = t.getTransmissionData();
 		}
@@ -163,7 +164,7 @@ public class EV3Launcher {
 			lightLocalizer.lightLocalize(new Coordinate(0,0));
 			navigator.travelTo(0, 0);
 
-			navigator.setGameObject(new CaptureTheFlagGameObject(betaWifiInputString));
+			navigator.setGameObject(new CaptureTheFlagGameObject(wifiInputString));
 			navigator.start();
 			break;
 

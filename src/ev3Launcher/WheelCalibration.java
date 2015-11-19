@@ -15,7 +15,7 @@ public class WheelCalibration {
 	
 	// Constants
 		public static final double WHEEL_RADIUS = 2.1;
-		public static final double TRACK = 12.05;
+		public static final double TRACK = 12;
 	
 	public static void main(String[] args) {
 		int buttonChoice;
@@ -38,7 +38,7 @@ public class WheelCalibration {
 			t.drawString("< Left | Right >", 0, 0);
 			t.drawString("       |        ", 0, 1);
 			t.drawString("   Rotations    ", 0, 2);
-			t.drawString("   2 g |  5     ", 0, 3);
+			t.drawString("   2   |  5     ", 0, 3);
 			t.drawString("       |        ", 0, 4);
 
 			buttonChoice = Button.waitForAnyPress();

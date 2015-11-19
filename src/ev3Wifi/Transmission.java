@@ -40,4 +40,27 @@ public class Transmission {
 	public int flagType;
 	public int opponentFlagType;
 	
+
+public int[] getTransmissionData()
+{
+	int[] wifiInputs = new int[13];
+	
+	wifiInputs[0] = startingCorner.getId();
+	wifiInputs[1] = homeZoneBL_X;
+	wifiInputs[2] = homeZoneBL_Y;
+	wifiInputs[3] = homeZoneTR_X;
+	wifiInputs[4] = homeZoneTR_Y;
+	wifiInputs[5] = opponentHomeZoneBL_X;
+	wifiInputs[6] = opponentHomeZoneBL_Y;
+	wifiInputs[7] = opponentHomeZoneTR_X;
+	wifiInputs[8] = opponentHomeZoneTR_Y;
+	wifiInputs[9] = dropZone_X;
+	wifiInputs[10] = dropZone_Y;
+	wifiInputs[11] = flagType;
+	wifiInputs[12] = opponentFlagType;
+	
+	return wifiInputs;
 }
+}
+
+

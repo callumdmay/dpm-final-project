@@ -13,6 +13,7 @@ import ev3Objects.FoundOpponentFlagException;
 import ev3Objects.Motors;
 import ev3Objects.ObstacleOnCoordinateException;
 import ev3Odometer.Odometer;
+import ev3WallFollower.UltrasonicPoller;
 import lejos.hardware.Sound;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
@@ -23,6 +24,7 @@ public class Navigator extends Thread{
 
 	private EV3LargeRegulatedMotor leftMotor;
 	private EV3LargeRegulatedMotor rightMotor;
+	private EV3LargeRegulatedMotor blockLiftMotor;
 	private ObjectDetector objectDetector;
 	private ObstacleAvoider obstacleAvoider;
 	private Odometer odometer;
@@ -62,6 +64,7 @@ public class Navigator extends Thread{
 		obstacleAvoider				= pObstacleAvoider;
 		leftMotor 					= pMotors.getLeftMotor();
 		rightMotor 					= pMotors.getRightMotor();
+		blockLiftMotor					= pMotors.getBlockLiftMotor();
 		wheelRadius 				= pMotors.getWheelRadius();
 		axleLength 					= pMotors.getAxleLength();
 
@@ -103,6 +106,7 @@ public class Navigator extends Thread{
 		catch(FoundOpponentFlagException e)
 		{
 			Sound.beepSequenceUp();
+			pickUpFlag();
 		}
 
 		navigatorMotorCommands.stopMotors();
@@ -291,6 +295,22 @@ public class Navigator extends Thread{
 				if(coordinateCount ==4)
 					lightLocalizer.localizeDynamically();
 			}
+	}
+	
+	private void pickUpFlag()
+	{
+		
+		leftMotor.rotate(NavigatorUtility.convertDistance(wheelRadius, -10), true);
+		rightMotor.rotate(NavigatorUtility.convertDistance(wheelRadius, -10),false);
+		
+		turnTo(odometer.getTheta()+ Math.toRadians(180), false);
+		
+		leftMotor.rotate(NavigatorUtility.convertDistance(wheelRadius, -13), true);
+		rightMotor.rotate(NavigatorUtility.convertDistance(wheelRadius, -13),false);
+		
+		blockLiftMotor.setSpeed(30);
+		blockLiftMotor.setAcceleration(100);
+		blockLiftMotor.rotate(30, false);
 	}
 
 	

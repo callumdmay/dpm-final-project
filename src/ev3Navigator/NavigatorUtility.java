@@ -173,4 +173,9 @@ public class NavigatorUtility {
 	public static int convertAngle(double radius, double width, double angle) {
 		return (int) ((180.0 * Math.PI * width * angle / 360.0) / (Math.PI * radius));
 	}
+	
+	public static int convertDistance(double radius, double distance) {
+		return (int) ((180.0 * distance) / (Math.PI * radius));
+	}
+
 }

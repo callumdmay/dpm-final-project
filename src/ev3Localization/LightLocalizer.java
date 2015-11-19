@@ -16,6 +16,8 @@ public class LightLocalizer {
 	private final int lineDetectionValue = 42;
 	private final double light_SensorDistanceFromOrigin = 14.1;
 	private double tileLength;
+	
+	private static final double lightLocalizationAngleOffset = -9;
 
 	private Odometer odometer;
 	private SampleProvider colorSensor;
@@ -85,7 +87,7 @@ public class LightLocalizer {
 		for (int index = 0; index < blackLineAngles.length; index++) {
 			// Capture the angle when we first encounter the black line
 			while (!blackLineDetected())
-				navigator.navigatorMotorCommands.rotateClockWise(ROTATION_SPEED);
+				navigator.navigatorMotorCommands.rotateCounterClockWise(ROTATION_SPEED);
 
 			Sound.beep();
 			blackLineAngles[index] = odometer.getTheta();
@@ -97,10 +99,10 @@ public class LightLocalizer {
 		double deltaY = blackLineAngles[2] - blackLineAngles[0];
 		double deltaX = blackLineAngles[3] - blackLineAngles[1];
 
-		odometer.setX(-light_SensorDistanceFromOrigin * Math.cos(deltaY/2));
-		odometer.setY(-light_SensorDistanceFromOrigin * Math.cos(deltaX/2));
+		odometer.setX(calibrationCoordinate.getX() - light_SensorDistanceFromOrigin * Math.cos(deltaY/2));
+		odometer.setY(calibrationCoordinate.getY()-light_SensorDistanceFromOrigin * Math.cos(deltaX/2));
 
-		odometer.setTheta(odometer.getTheta() + blackLineAngles[0]+Math.toRadians(163) +deltaY/2);
+		odometer.setTheta(odometer.getTheta() + blackLineAngles[0]+Math.toRadians(180+ lightLocalizationAngleOffset) +deltaY/2);
 	}
 	
 	

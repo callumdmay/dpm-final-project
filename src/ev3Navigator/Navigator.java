@@ -122,6 +122,7 @@ public class Navigator extends Thread{
 		//While the robot is not at the objective coordinates, keep moving towards it 
 		while(Math.abs(pX- odometer.getX()) > locationError || Math.abs(pY - odometer.getY()) > locationError)
 		{
+			moveToCoordinates(pX, pY);
 			if(objectDetector.detectedObject())
 			{
 				determineIfObjectIsOnDestinationCoordinate(pX, pY);
@@ -132,7 +133,6 @@ public class Navigator extends Thread{
 				}
 
 			}
-			moveToCoordinates(pX, pY);
 			if (odometer.getDistanceTravelled() > CORRECTION_DIST){
 				lightLocalizer.localizeDynamically();
 			}

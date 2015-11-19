@@ -54,8 +54,8 @@ public class EV3Launcher {
 	private static final Port leftUltraSonicPort = LocalEV3.get().getPort("S4");
 
 	public static final double WHEEL_RADIUS = 2.1;
-	public static final double TRACK = 12;
-	private static final String SERVER_IP = "192.168.1.178";
+	public static final double TRACK = 11.3;
+	private static final String SERVER_IP = "172.20.10.2";
 	private static final int TEAM_NUMBER = 12;
 
 	private static final int betaWifiInputString[] = { 1, 0, 0, 0, 0, 4, 4, 6, 6, 6, 6, 0, 0 };
@@ -134,7 +134,7 @@ public class EV3Launcher {
 		} else {
 			wifiInputString = t.getTransmissionData();
 		}
-
+		
 		LCDInfo lcd;
 
 		do {
@@ -159,8 +159,8 @@ public class EV3Launcher {
 			lcd = new LCDInfo(odometer, objectDetector);
 
 			usl.doLocalization();
-			odometer.setX(-8);
-			odometer.setY(-8);
+			odometer.setX(-10);
+			odometer.setY(-10);
 			lightLocalizer.lightLocalize(new Coordinate(0,0));
 			navigator.travelTo(0, 0);
 
@@ -171,7 +171,14 @@ public class EV3Launcher {
 		// Test case
 		case Button.ID_RIGHT:
 			lcd = new LCDInfo(odometer, objectDetector);
-			navigator.travelTo(wifiInputString[1] * 30.48, wifiInputString[2] * 30.48);
+			
+			usl.doLocalization();
+			odometer.setX(-10);
+			odometer.setY(-10);
+			lightLocalizer.lightLocalize(new Coordinate(0,0));
+			navigator.travelTo(0, 0);
+			navigator.turnTo(0, false);
+			
 			break;
 
 		default:

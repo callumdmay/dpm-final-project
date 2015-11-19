@@ -39,7 +39,10 @@ public class CaptureTheFlagGameObject {
 
 		homeFlagColour = pInputArray[11];
 		opponentFlagColour = pInputArray[12];
-
+		
+		
+		
+		processFlagColour(opponentFlagColour);
 		determineStartingCoordinate();
 		determineClosestOpponentBaseCoordinate();
 		createPreSearchLocalizationCoordinatesArray();
@@ -51,6 +54,36 @@ public class CaptureTheFlagGameObject {
 	 * Alternative constructor, takes in Transmission object from wifi class, will be used for final game 
 	 * @param pT Transmission object from wifi package, contains necessary game parameters
 	 */
+	
+	private void processFlagColour(int opponentFlag)
+	{
+	switch(opponentFlag)
+	{
+	case 1:
+		opponentFlagColour = 7;
+		break;
+		
+	case 2:
+		opponentFlagColour = 0;
+		break;
+		
+	case 3: 
+		opponentFlagColour = 3;
+		break;
+	
+	
+	case 4:
+		opponentFlagColour = 6;
+		break;
+	
+	case 5:
+		opponentFlagColour = 2;
+		break;
+	}	
+		
+		 
+	}
+	
 	public CaptureTheFlagGameObject(Transmission pT)
 	{
 		this( new int[] {pT.startingCorner.getId(), pT.homeZoneBL_X, pT.homeZoneBL_Y, pT.homeZoneTR_X, pT.homeZoneTR_Y, 

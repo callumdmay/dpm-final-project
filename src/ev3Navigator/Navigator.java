@@ -267,79 +267,14 @@ public class Navigator extends Thread{
 			return false;
 	}
 
-
-
-
+	/**
+	 * This method searches a given area of tile width 2 and unlimited tile length, to find the flag
+	 * @param startPoint search area start point
+	 * @param endPoint search area endpoint
+	 */
 	private void searchForFlag(Coordinate startPoint, Coordinate endPoint)
 	{
-		Queue<Coordinate> searchCoordinateQueue = new LinkedList<Coordinate>();
-
-		if(Math.abs(endPoint.getY() - startPoint.getY())>= Math.abs(endPoint.getX() - startPoint.getX())){
-
-			double deltaX = endPoint.getX() - startPoint.getX();
-
-			int coordinateCount =1;
-			boolean useStartPoint = true;
-			for(int count = 1; count < 9; count++){
-
-				double xMultiplier = count;
-				Coordinate coordinate;
-				if(count % 2 ==0)
-					xMultiplier = count -1;
-
-				if(useStartPoint)
-				{
-					coordinate = new Coordinate(startPoint.getX() +deltaX * (xMultiplier/8), startPoint.getY());
-				}
-				else
-				{
-					coordinate = new Coordinate(startPoint.getX() +deltaX * (xMultiplier/8), endPoint.getY());
-				}
-
-				coordinateCount++;
-
-				if(coordinateCount > 1)
-				{
-					coordinateCount = 0;
-					useStartPoint =! useStartPoint;
-				}
-				searchCoordinateQueue.add(coordinate);
-			}
-
-		}
-		else
-		{
-			Sound.beep();
-			double deltaY = endPoint.getY() - startPoint.getY();
-
-			int coordinateCount =1;
-			boolean useStartPoint = true;
-			for(int count = 1; count < 9; count++){
-
-				double yMultiplier = count;
-				Coordinate coordinate;
-				if(count % 2 ==0)
-					yMultiplier = count - 1;
-
-				if(useStartPoint)
-				{
-					coordinate = new Coordinate(startPoint.getX(), startPoint.getY() + deltaY * (yMultiplier/8));
-				}
-				else
-				{
-					coordinate = new Coordinate(endPoint.getX() , startPoint.getY() + deltaY * (yMultiplier/8));
-				}
-
-				coordinateCount++;
-
-				if(coordinateCount > 1)
-				{
-					coordinateCount = 0;
-					useStartPoint =! useStartPoint;
-				}
-				searchCoordinateQueue.add(coordinate);
-			}
-		}
+		Queue<Coordinate> searchCoordinateQueue = NavigatorUtility.generateSearchCoordinateQueue(startPoint, endPoint);
 
 		int coordinateCount =0;
 		for(Coordinate coordinate : searchCoordinateQueue)
@@ -357,6 +292,8 @@ public class Navigator extends Thread{
 					lightLocalizer.localizeDynamically();
 			}
 	}
+
+	
 
 	/**
 	 * Determine what the object is when in range

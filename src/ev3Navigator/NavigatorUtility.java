@@ -1,5 +1,11 @@
 package ev3Navigator;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
+import ev3Objects.Coordinate;
+import lejos.hardware.Sound;
+
 /**
  * This class contains utility/math methods that are used by the navigator class
  * These methods were refactored out of the Navigator class to reduce the size of the
@@ -35,6 +41,81 @@ public class NavigatorUtility {
 		return newAngle;
 		
 	}
+	
+	
+	public static Queue<Coordinate> generateSearchCoordinateQueue(
+			Coordinate startPoint, Coordinate endPoint) {
+		Queue<Coordinate> searchCoordinateQueue = new LinkedList<Coordinate>();
+
+		if(Math.abs(endPoint.getY() - startPoint.getY())>= Math.abs(endPoint.getX() - startPoint.getX())){
+
+			double deltaX = endPoint.getX() - startPoint.getX();
+
+			int coordinateCount =1;
+			boolean useStartPoint = true;
+			for(int count = 1; count < 9; count++){
+
+				double xMultiplier = count;
+				Coordinate coordinate;
+				if(count % 2 ==0)
+					xMultiplier = count -1;
+
+				if(useStartPoint)
+				{
+					coordinate = new Coordinate(startPoint.getX() +deltaX * (xMultiplier/8), startPoint.getY());
+				}
+				else
+				{
+					coordinate = new Coordinate(startPoint.getX() +deltaX * (xMultiplier/8), endPoint.getY());
+				}
+
+				coordinateCount++;
+
+				if(coordinateCount > 1)
+				{
+					coordinateCount = 0;
+					useStartPoint =! useStartPoint;
+				}
+				searchCoordinateQueue.add(coordinate);
+			}
+
+		}
+		else
+		{
+			Sound.beep();
+			double deltaY = endPoint.getY() - startPoint.getY();
+
+			int coordinateCount =1;
+			boolean useStartPoint = true;
+			for(int count = 1; count < 9; count++){
+
+				double yMultiplier = count;
+				Coordinate coordinate;
+				if(count % 2 ==0)
+					yMultiplier = count - 1;
+
+				if(useStartPoint)
+				{
+					coordinate = new Coordinate(startPoint.getX(), startPoint.getY() + deltaY * (yMultiplier/8));
+				}
+				else
+				{
+					coordinate = new Coordinate(endPoint.getX() , startPoint.getY() + deltaY * (yMultiplier/8));
+				}
+
+				coordinateCount++;
+
+				if(coordinateCount > 1)
+				{
+					coordinateCount = 0;
+					useStartPoint =! useStartPoint;
+				}
+				searchCoordinateQueue.add(coordinate);
+			}
+		}
+		return searchCoordinateQueue;
+	}
+	
 	/**
 	 * This method determines how much the robot should turn, 
 	 * it return the smallest turning angle possible

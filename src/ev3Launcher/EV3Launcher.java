@@ -160,7 +160,7 @@ public class EV3Launcher {
 			usl.doLocalization();
 			odometer.setX(-8);
 			odometer.setY(-8);
-			lightLocalizer.localizeDynamically();
+			lightLocalizer.lightLocalize(new Coordinate(0,0));
 			navigator.travelTo(0, 0);
 
 			navigator.setGameObject(new CaptureTheFlagGameObject(betaWifiInputString));

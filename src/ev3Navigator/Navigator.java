@@ -140,7 +140,7 @@ public class Navigator extends Thread{
 	}
 
 	/**
-	 * Travel to a coordinate without avoiding objects or dynamic localization
+	 * Travel to a coordinate without dynamic localization, but checking for obstacles
 	 * @param pX The x coordinate to travel to
 	 * @param pY The y coordinate to travel to
 	 */

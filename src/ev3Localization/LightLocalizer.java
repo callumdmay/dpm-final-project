@@ -89,6 +89,33 @@ public class LightLocalizer {
 		odometer.setTheta(fixAngle(blackLineAngles[1], blackLineAngles[3], odometer.getTheta()));
 	}
 
+	
+	public void lightLocalize(Coordinate calibrationCoordinate)
+	{
+		odometer.setDistanceTravelled(0);
+		double blackLineAngles[] = new double[4];
+		
+		navigator.localizationTravelTo(calibrationCoordinate.getX()-4, calibrationCoordinate.getY()-4);
+		
+		for (int index = 0; index < blackLineAngles.length; index++) {
+			// Capture the angle when we first encounter the black line
+			while (!blackLineDetected())
+				navigator.navigatorMotorCommands.rotateClockWise(ROTATION_SPEED);
+
+			Sound.beep();
+			blackLineAngles[index] = odometer.getTheta();
+
+		}
+
+		navigator.navigatorMotorCommands.stopMotors();
+
+		odometer.setX(calibrationCoordinate.getX() -1 * light_SensorDistanceFromOrigin * Math.cos((blackLineAngles[1] - blackLineAngles[3]) / 2));
+		odometer.setY(calibrationCoordinate.getY() -1 * light_SensorDistanceFromOrigin * Math.cos((blackLineAngles[0] - blackLineAngles[2]) / 2));
+		odometer.setTheta(fixAngle(blackLineAngles[1], blackLineAngles[3], odometer.getTheta()));
+	}
+	
+	
+	
 	/**
 	 * Return true if a black line is detected by the color sensor.
 	 * 

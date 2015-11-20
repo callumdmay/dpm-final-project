@@ -9,6 +9,7 @@ import ev3ObjectDetector.ObjectDetector;
 import ev3ObjectDetector.ObstacleAvoider;
 import ev3Objects.CaptureTheFlagGameObject;
 import ev3Objects.Coordinate;
+import ev3Objects.FoundOpponentFlagException;
 import ev3Objects.Motors;
 import ev3Odometer.LCDInfo;
 import ev3Odometer.Odometer;
@@ -31,6 +32,7 @@ import ev3Wifi.Transmission;
 import ev3Wifi.StartCorner;
 import ev3Wifi.ParseTransmission;
 import ev3Wifi.WifiConnection;
+import ev3Objects.ColourSensorPoller;
 
 /**
  * A class to launch the EV3 program (main).
@@ -54,7 +56,7 @@ public class EV3Launcher {
 	private static final Port leftUltraSonicPort = LocalEV3.get().getPort("S4");
 
 	public static final double WHEEL_RADIUS = 2.1;
-	public static final double TRACK = 11.3;
+	public static final double TRACK = 12;
 	private static final String SERVER_IP = "172.20.10.2";
 	private static final int TEAM_NUMBER = 12;
 
@@ -89,7 +91,6 @@ public class EV3Launcher {
 		float[] rearColorSensorData = new float[rearColorSensorSampleProvider.sampleSize()];  // colorData is the buffer in which data are returned
 		
 		EV3ColorSensor forwardColorSensor = new EV3ColorSensor(forwardColorPort);
-		forwardColorSensor.setFloodlight(true);
 		SampleProvider forwardColorSensorSampleProvider = forwardColorSensor.getColorIDMode(); // colorValue provides samples from this instance
 		float[] forwardColorSensorData = new float[forwardColorSensorSampleProvider.sampleSize()]; // colorData is the buffer in which data are returned
 
@@ -105,12 +106,14 @@ public class EV3Launcher {
 		odometer.start();
 
 		UltrasonicController pController = new PController(motors);
-
+		ColourSensorPoller colourSensorPoller =  new ColourSensorPoller(forwardColorSensorSampleProvider, forwardColorSensorData);
+		
+		
 		ObstacleAvoider obstacleAvoider = new ObstacleAvoider(odometer, ultraSonicSampleProvider, pController, motors);
-		ObjectDetector objectDetector = new ObjectDetector(ultraSonicSampleProvider, forwardColorSensorSampleProvider,forwardColorSensorData, odometer);
+		ObjectDetector objectDetector = new ObjectDetector(ultraSonicSampleProvider, odometer, colourSensorPoller);
 
 		// Create navigator
-		Navigator navigator = new Navigator(odometer, objectDetector, obstacleAvoider, motors);
+		Navigator navigator = new Navigator(odometer, objectDetector, obstacleAvoider, motors,colourSensorPoller);
 
 		// create the ultrasonic localizers
 		USLocalizer usl = new USLocalizer(odometer, rightUltraSonicSampleProvider, rightUltraSonicData, USLocalizer.LocalizationType.RISING_EDGE, navigator);
@@ -119,21 +122,25 @@ public class EV3Launcher {
 		int buttonChoice;
 		TextLCD textLCD = LocalEV3.get().getTextLCD();
 		
-		int[] wifiInputString = new int[13];
 		
-		WifiConnection conn = null;
-		try {
-			conn = new WifiConnection(SERVER_IP, TEAM_NUMBER);
-		} catch (IOException e) {
-			System.out.println("can't connect");
-		}
-
-		Transmission t = conn.getTransmission();
-		if (t == null) {
-			System.out.println("can't transmit");
-		} else {
-			wifiInputString = t.getTransmissionData();
-		}
+		
+		
+		
+//		int[] wifiInputString = new int[13];
+//		
+//		WifiConnection conn = null;
+//		try {
+//			conn = new WifiConnection(SERVER_IP, TEAM_NUMBER);
+//		} catch (IOException e) {
+//			System.out.println("can't connect");
+//		}
+//
+//		Transmission t = conn.getTransmission();
+//		if (t == null) {
+//			System.out.println("can't transmit");
+//		} else {
+//			wifiInputString = t.getTransmissionData();
+//		}
 		
 		LCDInfo lcd;
 
@@ -164,20 +171,35 @@ public class EV3Launcher {
 			lightLocalizer.lightLocalize(new Coordinate(0,0));
 			navigator.travelTo(0, 0);
 
-			navigator.setGameObject(new CaptureTheFlagGameObject(wifiInputString));
+			//navigator.setGameObject(new CaptureTheFlagGameObject(wifiInputString));
 			navigator.start();
 			break;
 
 		// Test case
 		case Button.ID_RIGHT:
+			
 			lcd = new LCDInfo(odometer, objectDetector);
+//			float colorID=0;
+//			while(true)
+//			{
+//				objectDetector.determineIfObjectIsFlag(2);
+//				textLCD.drawString(""+objectDetector.getCurrentObject(), 0, 6);
+//
+//			}
 			
 			usl.doLocalization();
 			odometer.setX(-10);
 			odometer.setY(-10);
 			lightLocalizer.lightLocalize(new Coordinate(0,0));
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			navigator.travelTo(0, 0);
 			navigator.turnTo(0, false);
+		
 			
 			break;
 

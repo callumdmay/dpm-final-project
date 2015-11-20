@@ -12,7 +12,7 @@ import lejos.robotics.SampleProvider;
  */
 public class LightLocalizer {
 
-	public static int ROTATION_SPEED = 175;
+	public static int ROTATION_SPEED = 140;
 	private final int lineDetectionValue = 42;
 	private final double light_SensorDistanceFromOrigin = 14.1;
 	private double tileLength;
@@ -88,9 +88,8 @@ public class LightLocalizer {
 			// Capture the angle when we first encounter the black line
 			while (!blackLineDetected())
 				navigator.navigatorMotorCommands.rotateCounterClockWise(ROTATION_SPEED);
-
-			Sound.beep();
 			blackLineAngles[index] = odometer.getTheta();
+			Sound.beep();
 
 		}
 
@@ -100,7 +99,7 @@ public class LightLocalizer {
 		double deltaX = blackLineAngles[3] - blackLineAngles[1];
 
 		odometer.setX(calibrationCoordinate.getX() - light_SensorDistanceFromOrigin * Math.cos(deltaY/2));
-		odometer.setY(calibrationCoordinate.getY()-light_SensorDistanceFromOrigin * Math.cos(deltaX/2));
+		odometer.setY(calibrationCoordinate.getY() - light_SensorDistanceFromOrigin * Math.cos(deltaX/2));
 
 		odometer.setTheta(odometer.getTheta() + blackLineAngles[0]+Math.toRadians(180+ lightLocalizationAngleOffset) +deltaY/2);
 	}

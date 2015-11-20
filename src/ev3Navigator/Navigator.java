@@ -12,6 +12,7 @@ import ev3Objects.Coordinate;
 import ev3Objects.FoundOpponentFlagException;
 import ev3Objects.Motors;
 import ev3Objects.ObstacleOnCoordinateException;
+import ev3Objects.ColourSensorPoller;
 import ev3Odometer.Odometer;
 import ev3WallFollower.UltrasonicPoller;
 import lejos.hardware.Sound;
@@ -28,6 +29,7 @@ public class Navigator extends Thread{
 	private ObjectDetector objectDetector;
 	private ObstacleAvoider obstacleAvoider;
 	private Odometer odometer;
+	private ColourSensorPoller colourSensorPoller;
 	private CaptureTheFlagGameObject captureTheFlagGameObject;
 
 	private LightLocalizer lightLocalizer;
@@ -57,11 +59,12 @@ public class Navigator extends Thread{
 	 * @param pObstacleAvoider The Obstacle avoider to be used by the navigator
 	 * @param pMotors The Motors to be used by the navigator
 	 */
-	public Navigator(Odometer pOdometer, ObjectDetector pObjectDetector, ObstacleAvoider pObstacleAvoider, Motors pMotors)
+	public Navigator(Odometer pOdometer, ObjectDetector pObjectDetector, ObstacleAvoider pObstacleAvoider, Motors pMotors, ColourSensorPoller pColourSensorPoller)
 	{
 		odometer 					= pOdometer;
 		objectDetector 				= pObjectDetector;
 		obstacleAvoider				= pObstacleAvoider;
+		colourSensorPoller			= pColourSensorPoller;
 		leftMotor 					= pMotors.getLeftMotor();
 		rightMotor 					= pMotors.getRightMotor();
 		blockLiftMotor					= pMotors.getBlockLiftMotor();
@@ -99,6 +102,8 @@ public class Navigator extends Thread{
 		}
 
 		lightLocalizer.localizeDynamically();
+		
+		colourSensorPoller.start();
 		try{
 			
 		searchForFlag(captureTheFlagGameObject.getOpponentBaseCoordinate_BL(), captureTheFlagGameObject.getOpponentBaseCoordinate_TR());
@@ -123,6 +128,7 @@ public class Navigator extends Thread{
 		while(Math.abs(pX- odometer.getX()) > locationError || Math.abs(pY - odometer.getY()) > locationError)
 		{
 			moveToCoordinates(pX, pY);
+			
 			if(objectDetector.detectedObject())
 			{
 				determineIfObjectIsOnDestinationCoordinate(pX, pY);
@@ -276,7 +282,7 @@ public class Navigator extends Thread{
 	 * @param startPoint search area start point
 	 * @param endPoint search area endpoint
 	 */
-	private void searchForFlag(Coordinate startPoint, Coordinate endPoint)
+	public void searchForFlag(Coordinate startPoint, Coordinate endPoint)
 	{
 		Queue<Coordinate> searchCoordinateQueue = NavigatorUtility.generateSearchCoordinateQueue(startPoint, endPoint);
 
@@ -297,7 +303,7 @@ public class Navigator extends Thread{
 			}
 	}
 	
-	private void pickUpFlag()
+	public void pickUpFlag()
 	{
 		
 		leftMotor.rotate(NavigatorUtility.convertDistance(wheelRadius, -10), true);
@@ -320,18 +326,21 @@ public class Navigator extends Thread{
 	 */
 	private void investigateObject()
 	{
+		boolean foundObject = false;
 		while(objectDetector.getObjectDistance() >=4 )
 		{
 			if(objectDetector.getObjectDistance()> objectDetector.getDefaultObstacleDistance())
 				break;
 			navigatorMotorCommands.driveStraight(30);
 		}
-
+		
+	
 		objectDetector.determineIfObjectIsFlag(captureTheFlagGameObject.getOpponentFlagColour());
 		while(objectDetector.getObjectDistance() <=10 )
 		{
 			navigatorMotorCommands.driveStraight(-30);
 		}
+		
 		
 	}
 

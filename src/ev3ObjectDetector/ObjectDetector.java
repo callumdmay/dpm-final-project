@@ -1,6 +1,7 @@
 package ev3ObjectDetector;
 
 
+import ev3Objects.ColourSensorPoller;
 import ev3Objects.FoundOpponentFlagException;
 import ev3Odometer.Odometer;
 import ev3WallFollower.UltrasonicPoller;
@@ -15,15 +16,15 @@ public class ObjectDetector{
 	private SampleProvider colorValue;
 	private Odometer odometer;
 	private UltrasonicPoller ultraSonicPoller;
-
+	private ColourSensorPoller colourSensorPoller;
+	
+	
 	public enum OBJECT_TYPE { flag, obstacle } 
 
-	private float[] colorData;
 	private final int FILTER_OUT = 5;
 	private int filterControl;
 	private final double defaultObstacleDistance = 18;
-	private OBJECT_TYPE currentObject;
-	private boolean objectDetected;
+	
 
 	private Object lock = new Object();
 	/**
@@ -33,11 +34,10 @@ public class ObjectDetector{
 	 * @param pColorData An array to store data
 	 * @param pOdometer The odometer to be used
 	 */
-	public ObjectDetector(UltrasonicPoller pUltraSonicPoller, SampleProvider pColorValue, float[] pColorData, Odometer pOdometer)
+	public ObjectDetector(UltrasonicPoller pUltraSonicPoller, Odometer pOdometer, ColourSensorPoller colourSensor)
 	{
+		colourSensorPoller = colourSensor;
 		ultraSonicPoller  = pUltraSonicPoller;
-		colorValue = pColorValue;
-		colorData = pColorData;
 		odometer = pOdometer;
 	}
 
@@ -51,19 +51,9 @@ public class ObjectDetector{
 
 		if( ultraSonicPoller.getLeftUltraSoundSensorDistance() < distance || ultraSonicPoller.getRightUltraSoundSensorDistance() < distance)
 		{
-			synchronized(lock)
-			{
-				setObjectDetected(true);
-			}
 			return true;
-
 		}
 		
-		synchronized(lock)
-		{
-			setObjectDetected(false);
-			setCurrentObject(null);
-		}
 		return false;
 	}
 	/**
@@ -75,19 +65,11 @@ public class ObjectDetector{
 
 		if( ultraSonicPoller.getLeftUltraSoundSensorDistance() < defaultObstacleDistance || ultraSonicPoller.getRightUltraSoundSensorDistance() < defaultObstacleDistance)
 		{
-			synchronized(lock)
-			{
-				setObjectDetected(true);
-			}
+
 			return true;
 
 		}
-		
-		synchronized(lock)
-		{
-			setObjectDetected(false);
-			setCurrentObject(null);
-		}
+
 		return false;
 
 	}
@@ -97,75 +79,25 @@ public class ObjectDetector{
 	public void determineIfObjectIsFlag(int flagColour)
 	{
 
-		if(ultraSonicPoller.getLeftUltraSoundSensorDistance() <=8  && getCurrentObject() == null)
+		if(ultraSonicPoller.getLeftUltraSoundSensorDistance() <=6 || ultraSonicPoller.getRightUltraSoundSensorDistance() <=6)
 		{
-			colorValue.fetchSample(colorData, 0);
-			if(colorData[0]== flagColour){
+			if(colourSensorPoller.getColorID()== flagColour){
 				Sound.beep();
-				setCurrentObject(OBJECT_TYPE.flag);
-				throw new FoundOpponentFlagException();
 			}
 			else
 			{
 				Sound.beep();
 				Sound.beep();
-				setCurrentObject(OBJECT_TYPE.obstacle);
 			}
 		}
 	}
-	/**
-	 * Returns true if an object has been detected
-	 * @return The boolean representing this information
-	 */
-	public boolean isObjectDetected()
-	{
-		boolean returnedValue;
-		synchronized(lock)
-		{
-			returnedValue = objectDetected;
-		}
-		return returnedValue;
-	}
-	/**
-	 * Set the status of if an object has been detected
-	 * @param objectDetected The boolean representing this information
-	 */
-	public void setObjectDetected(boolean objectDetected) {
-		synchronized(lock)
-		{
-			this.objectDetected = objectDetected;
-		}
-	}		
-	/**
-	 * Set the type of object detected
-	 * @param pObject The Object type of the object detected
-	 */
-	public void setCurrentObject(OBJECT_TYPE pObject)
-	{
-		synchronized(lock)
-		{
-			currentObject = pObject;
-		}	
-	}
+
 	/**
 	 * Get the default obstacle distance
 	 * @return The default obstacle distance
 	 */
 	public double getDefaultObstacleDistance() {
 		return defaultObstacleDistance;
-	}
-	
-	/**
-	 * Get the current object type
-	 * @return The currect object type
-	 */
-	public OBJECT_TYPE getCurrentObject() {
-		OBJECT_TYPE returnedValue;
-		synchronized(lock)
-		{
-			returnedValue = currentObject;
-		}	
-		return returnedValue;
 	}
 
 	/**
@@ -183,6 +115,7 @@ public class ObjectDetector{
 		
 		return 100;
 	}
+
 
 
 }

@@ -23,7 +23,7 @@ public class ColourSensors {
 		forwardColourSensor = pForwardColourSensor;
 		rearColourSensor = pRearColourSensor;
 		colourSensorSample = pColourSensorSample;
-
+		
 	}
 	
 	

@@ -61,8 +61,11 @@ public class ObstacleAvoider {
 		leftMotor.stop();
 
 		leftUltraSoundMotor.rotate(neckMotor_OFFSET, true);
-		leftMotor.rotate(NavigatorUtility.convertAngle(wheelRadius, axleLength, 45), true);
-		rightMotor.rotate(-NavigatorUtility.convertAngle(wheelRadius, axleLength, 45), false);
+		
+		leftMotor.setSpeed(100);
+		rightMotor.setSpeed(100);
+		leftMotor.rotate(NavigatorUtility.convertAngle(wheelRadius, axleLength, 80), true);
+		rightMotor.rotate(-NavigatorUtility.convertAngle(wheelRadius, axleLength, 80), false);
 
 		double currentX;
 		double currentY;

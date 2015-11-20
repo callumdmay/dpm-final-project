@@ -8,11 +8,11 @@ import ev3Localization.LightLocalizer;
 import ev3ObjectDetector.ObjectDetector;
 import ev3ObjectDetector.ObstacleAvoider;
 import ev3Objects.CaptureTheFlagGameObject;
+import ev3Objects.ColourSensorPoller;
 import ev3Objects.Coordinate;
 import ev3Objects.FoundOpponentFlagException;
 import ev3Objects.Motors;
 import ev3Objects.ObstacleOnCoordinateException;
-import ev3Objects.ColourSensorPoller;
 import ev3Odometer.Odometer;
 import ev3WallFollower.UltrasonicPoller;
 import lejos.hardware.Sound;
@@ -38,14 +38,14 @@ public class Navigator extends Thread{
 	private double axleLength;
 
 	private final double locationError = 1;
-	private final double navigatingAngleError = 1;
+	private final double navigatingAngleError = 2;
 	public static final double  tileLength = 30.48;
 
 	private final int FORWARD_SPEED = 300;
 	private final int ROTATE_SPEED = 100;
 	private final int SMALL_CORRECTION_SPEED =100;
 	private final int SMALL_ROTATION_SPEED = 50;
-	private final double CORRECTION_DIST = 100;
+	private final double CORRECTION_DIST = 150;
 	public NavigatorMotorCommands navigatorMotorCommands;
 
 
@@ -97,16 +97,14 @@ public class Navigator extends Thread{
 			catch (ObstacleOnCoordinateException e){
 				continue;
 			}
-
+			lightLocalizer.lightLocalize(coordinate);
 			break;
 		}
 
-		lightLocalizer.localizeDynamically();
-		
+		Sound.beepSequenceUp();
 		colourSensorPoller.start();
 		try{
-			
-		searchForFlag(captureTheFlagGameObject.getOpponentBaseCoordinate_BL(), captureTheFlagGameObject.getOpponentBaseCoordinate_TR());
+			searchForFlag(captureTheFlagGameObject.getOpponentBaseCoordinate_BL(), captureTheFlagGameObject.getOpponentBaseCoordinate_TR());
 		}
 		catch(FoundOpponentFlagException e)
 		{
@@ -128,7 +126,6 @@ public class Navigator extends Thread{
 		while(Math.abs(pX- odometer.getX()) > locationError || Math.abs(pY - odometer.getY()) > locationError)
 		{
 			moveToCoordinates(pX, pY);
-			
 			if(objectDetector.detectedObject())
 			{
 				determineIfObjectIsOnDestinationCoordinate(pX, pY);
@@ -162,7 +159,7 @@ public class Navigator extends Thread{
 			determineIfObjectIsOnDestinationCoordinate(pX, pY);
 			if(objectIsInTheWay(pX, pY))
 				throw new ObstacleOnCoordinateException();
-			
+
 			moveToCoordinates(pX, pY);
 		}
 		navigatorMotorCommands.stopMotors();
@@ -228,7 +225,7 @@ public class Navigator extends Thread{
 		{
 			//Basic proportional control, when the robot gets close to 
 			//required coordinates, slow down 
-			if(Math.abs(pX - currentX) <= 3 && Math.abs(pY - currentY ) <= 3)
+			if(Math.abs(pX - currentX) <= 5 && Math.abs(pY - currentY ) <= 5)
 			{
 				leftMotor.setSpeed(SMALL_CORRECTION_SPEED);
 				rightMotor.setSpeed(SMALL_CORRECTION_SPEED);
@@ -253,7 +250,7 @@ public class Navigator extends Thread{
 	private void determineIfObjectIsOnDestinationCoordinate(double pX, double pY){
 		double objectX = odometer.getX() + Math.cos(odometer.getTheta()) * objectDetector.getObjectDistance();
 		double objectY = odometer.getY() + Math.sin(odometer.getTheta()) * objectDetector.getObjectDistance();
-		if(Math.abs(objectX-pX)<6 &&Math.abs(objectY-pY)<6)
+		if(Math.abs(objectX-pX)<13 &&Math.abs(objectY-pY)<13)
 			throw new ObstacleOnCoordinateException();
 
 	}
@@ -282,66 +279,65 @@ public class Navigator extends Thread{
 	 * @param startPoint search area start point
 	 * @param endPoint search area endpoint
 	 */
-	public void searchForFlag(Coordinate startPoint, Coordinate endPoint)
+	private void searchForFlag(Coordinate startPoint, Coordinate endPoint)
 	{
 		Queue<Coordinate> searchCoordinateQueue = NavigatorUtility.generateSearchCoordinateQueue(startPoint, endPoint);
 
 		int coordinateCount =0;
-		for(Coordinate coordinate : searchCoordinateQueue)
+		for(Coordinate coordinate : searchCoordinateQueue){
 			while(Math.abs(coordinate.getX()- odometer.getX()) > locationError || Math.abs(coordinate.getY() - odometer.getY()) > locationError)
 			{
+				moveToCoordinates(coordinate.getX(), coordinate.getY());
 				if(objectDetector.detectedObject())
 				{
 					Sound.beep();
 					investigateObject();
 					obstacleAvoider.avoidObstacle(coordinate.getX(), coordinate.getY());
 				}
-				moveToCoordinates(coordinate.getX(), coordinate.getY());
-				coordinateCount++;
-				if(coordinateCount ==4)
-					lightLocalizer.localizeDynamically();
+
 			}
+			coordinateCount++;
+			if(coordinateCount ==4)
+				lightLocalizer.localizeDynamically();
+		}
 	}
-	
-	public void pickUpFlag()
+
+	private void pickUpFlag()
 	{
-		
+
 		leftMotor.rotate(NavigatorUtility.convertDistance(wheelRadius, -10), true);
 		rightMotor.rotate(NavigatorUtility.convertDistance(wheelRadius, -10),false);
-		
+
 		turnTo(odometer.getTheta()+ Math.toRadians(180), false);
-		
+
 		leftMotor.rotate(NavigatorUtility.convertDistance(wheelRadius, -13), true);
 		rightMotor.rotate(NavigatorUtility.convertDistance(wheelRadius, -13),false);
-		
+
 		blockLiftMotor.setSpeed(30);
 		blockLiftMotor.setAcceleration(100);
 		blockLiftMotor.rotate(30, false);
 	}
 
-	
+
 
 	/**
 	 * Determine what the object is when in range
 	 */
 	private void investigateObject()
 	{
-		boolean foundObject = false;
 		while(objectDetector.getObjectDistance() >=4 )
 		{
 			if(objectDetector.getObjectDistance()> objectDetector.getDefaultObstacleDistance())
 				break;
 			navigatorMotorCommands.driveStraight(30);
 		}
-		
-	
+
 		objectDetector.determineIfObjectIsFlag(captureTheFlagGameObject.getOpponentFlagColour());
 		while(objectDetector.getObjectDistance() <=10 )
 		{
 			navigatorMotorCommands.driveStraight(-30);
 		}
-		
-		
+
 	}
 
 

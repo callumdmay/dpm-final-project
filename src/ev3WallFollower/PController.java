@@ -66,7 +66,7 @@ public class PController implements UltrasonicController {
 		
 		
 		//Too close to wall
-				else if (distanceError < bandWidth*(-1) || rightUltraSonicDistance < 25)
+				else if (distanceError < bandWidth*(-1) || rightUltraSonicDistance < 15)
 				{
 					int leftSpeed =0;
 					int rightSpeed =0;

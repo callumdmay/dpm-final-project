@@ -14,10 +14,10 @@ public class LightLocalizer {
 
 	public static int ROTATION_SPEED = 140;
 	private final int lineDetectionValue = 42;
-	private final double light_SensorDistanceFromOrigin = 14.1;
+	private final double light_SensorDistanceFromOrigin = 13.3;
 	private double tileLength;
 	
-	private static final double lightLocalizationAngleOffset = -9;
+	private static final double lightLocalizationAngleOffset = -6;
 
 	private Odometer odometer;
 	private SampleProvider colorSensor;
@@ -62,6 +62,8 @@ public class LightLocalizer {
 		
 		for(Coordinate coordinate : calibrationCoordinates)
 		{
+			if(Math.round(coordinate.getX() / tileLength )==3 ||Math.round(coordinate.getY() / tileLength ) ==3)
+				continue;
 			try{
 				navigator.localizationTravelTo(coordinate.getX()-4, coordinate.getY()-4);
 			}
@@ -78,16 +80,19 @@ public class LightLocalizer {
 	
 	public void lightLocalize(Coordinate calibrationCoordinate)
 	{
-		odometer.setDistanceTravelled(0);
 		double blackLineAngles[] = new double[4];
-		navigator.turnTo(Math.toRadians(45), false);
 		
 		navigator.localizationTravelTo(calibrationCoordinate.getX()-4, calibrationCoordinate.getY()-4);
+
+		navigator.navigatorMotorCommands.setSpeed(ROTATION_SPEED);
+
+		navigator.turnTo(Math.toRadians(45), false);
+
 		
 		for (int index = 0; index < blackLineAngles.length; index++) {
 			// Capture the angle when we first encounter the black line
 			while (!blackLineDetected())
-				navigator.navigatorMotorCommands.rotateCounterClockWise(ROTATION_SPEED);
+				navigator.navigatorMotorCommands.rotateClockWise(ROTATION_SPEED);
 			blackLineAngles[index] = odometer.getTheta();
 			Sound.beep();
 
@@ -95,13 +100,18 @@ public class LightLocalizer {
 
 		navigator.navigatorMotorCommands.stopMotors();
 
-		double deltaY = blackLineAngles[2] - blackLineAngles[0];
-		double deltaX = blackLineAngles[3] - blackLineAngles[1];
+		// takes care of 360 wraparound
+		if (blackLineAngles[0] < Math.PI) {
+			blackLineAngles[0] += Math.PI*2;
+		}
+		
+		odometer.setDistanceTravelled(0);
 
-		odometer.setX(calibrationCoordinate.getX() - light_SensorDistanceFromOrigin * Math.cos(deltaY/2));
-		odometer.setY(calibrationCoordinate.getY() - light_SensorDistanceFromOrigin * Math.cos(deltaX/2));
 
-		odometer.setTheta(odometer.getTheta() + blackLineAngles[0]+Math.toRadians(180+ lightLocalizationAngleOffset) +deltaY/2);
+		odometer.setX(calibrationCoordinate.getX() + fixDisplacement(blackLineAngles[1], blackLineAngles[3]));
+		odometer.setY(calibrationCoordinate.getY() + fixDisplacement(blackLineAngles[0], blackLineAngles[2]));
+		odometer.setTheta(fixAngle(blackLineAngles[1], blackLineAngles[3], odometer.getTheta()));
+		
 	}
 	
 	
@@ -137,7 +147,7 @@ public class LightLocalizer {
 		double deltaTheta;
 		deltaTheta = Math.PI - (angleA - angleB) / 2 - angleB;
 		currentAngle += deltaTheta;
-		return currentAngle - Math.toRadians(6);
+		return currentAngle  +Math.toRadians(lightLocalizationAngleOffset);
 	}
 
 
@@ -186,5 +196,8 @@ public class LightLocalizer {
 		}
 	}
 
+	public double fixDisplacement(double angleA, double angleB) {
+		return -1 * light_SensorDistanceFromOrigin * Math.cos((angleA - angleB) / 2);
+	}
 
 }

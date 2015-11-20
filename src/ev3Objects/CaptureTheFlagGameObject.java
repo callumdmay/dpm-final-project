@@ -153,11 +153,13 @@ public class CaptureTheFlagGameObject {
 		Coordinate temp2;
 		Coordinate temp3;
 
+		//TODO
+		//HARDCODED THESE VALUES FOR THE BETA
 		if(closestOpponentBaseCoordinate.equals(opponentBaseCoordinate_BL))
 		{
-			temp1 = new Coordinate(closestOpponentBaseCoordinate.getX() -tileLength, closestOpponentBaseCoordinate.getY());
-			temp2 = new Coordinate(closestOpponentBaseCoordinate.getX() -tileLength, closestOpponentBaseCoordinate.getY()-tileLength);
+			temp2 = new Coordinate(closestOpponentBaseCoordinate.getX() , closestOpponentBaseCoordinate.getY());
 			temp3 = new Coordinate(closestOpponentBaseCoordinate.getX() , closestOpponentBaseCoordinate.getY()-tileLength);
+			temp1 = new Coordinate(closestOpponentBaseCoordinate.getX() +tileLength, closestOpponentBaseCoordinate.getY()- tileLength);
 		}
 
 		else if(closestOpponentBaseCoordinate.equals(opponentBaseCoordinate_TL))

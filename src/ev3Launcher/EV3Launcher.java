@@ -113,7 +113,7 @@ public class EV3Launcher {
 		ObjectDetector objectDetector = new ObjectDetector(ultraSonicSampleProvider, odometer, colourSensorPoller);
 
 		// Create navigator
-		Navigator navigator = new Navigator(odometer, objectDetector, obstacleAvoider, motors,colourSensorPoller);
+		Navigator navigator = new Navigator(odometer, objectDetector, obstacleAvoider, motors, colourSensorPoller);
 
 		// create the ultrasonic localizers
 		USLocalizer usl = new USLocalizer(odometer, rightUltraSonicSampleProvider, rightUltraSonicData, USLocalizer.LocalizationType.RISING_EDGE, navigator);
@@ -169,9 +169,8 @@ public class EV3Launcher {
 			odometer.setX(-10);
 			odometer.setY(-10);
 			lightLocalizer.lightLocalize(new Coordinate(0,0));
-			navigator.travelTo(0, 0);
 
-			//navigator.setGameObject(new CaptureTheFlagGameObject(wifiInputString));
+			navigator.setGameObject(new CaptureTheFlagGameObject(betaWifiInputString));
 			navigator.start();
 			break;
 
@@ -192,7 +191,7 @@ public class EV3Launcher {
 			odometer.setY(-10);
 			lightLocalizer.lightLocalize(new Coordinate(0,0));
 			try {
-				Thread.sleep(5000);
+				Thread.sleep(2000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

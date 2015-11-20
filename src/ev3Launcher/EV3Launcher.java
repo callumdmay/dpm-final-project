@@ -57,10 +57,10 @@ public class EV3Launcher {
 
 	public static final double WHEEL_RADIUS = 2.1;
 	public static final double TRACK = 12;
-	private static final String SERVER_IP = "172.20.10.2";
+	private static final String SERVER_IP = "192.168.10.200";
 	private static final int TEAM_NUMBER = 12;
 
-	private static final int betaWifiInputString[] = { 1, 0, 0, 0, 0, 4, 4, 6, 6, 6, 6, 0, 0 };
+	private static final int betaWifiInputString[] = { 1, 0, 0, 0, 0, 1, 1, 3, 3, 1, 1, 0, 5 };
 	
 
 	@SuppressWarnings("resource")
@@ -121,27 +121,7 @@ public class EV3Launcher {
 
 		int buttonChoice;
 		TextLCD textLCD = LocalEV3.get().getTextLCD();
-		
-		
-		
-		
-		
-//		int[] wifiInputString = new int[13];
-//		
-//		WifiConnection conn = null;
-//		try {
-//			conn = new WifiConnection(SERVER_IP, TEAM_NUMBER);
-//		} catch (IOException e) {
-//			System.out.println("can't connect");
-//		}
-//
-//		Transmission t = conn.getTransmission();
-//		if (t == null) {
-//			System.out.println("can't transmit");
-//		} else {
-//			wifiInputString = t.getTransmissionData();
-//		}
-		
+				
 		LCDInfo lcd;
 
 		do {
@@ -163,14 +143,32 @@ public class EV3Launcher {
 		// Capture the Flag case
 		case Button.ID_LEFT:
 			
+			int[] wifiInputString = new int[13];
+			
+			WifiConnection conn = null;
+			try {
+				conn = new WifiConnection(SERVER_IP, TEAM_NUMBER);
+			} catch (IOException e) {
+				System.out.println("can't connect");
+			}
+
+			Transmission t = conn.getTransmission();
+			if (t == null) {
+				System.out.println("can't transmit");
+			} else {
+				wifiInputString = t.getTransmissionData();
+			}
+
+			
 			lcd = new LCDInfo(odometer, objectDetector);
 
 			usl.doLocalization();
 			odometer.setX(-10);
 			odometer.setY(-10);
 			lightLocalizer.lightLocalize(new Coordinate(0,0));
+			navigator.travelTo(0, 0);
 
-			navigator.setGameObject(new CaptureTheFlagGameObject(betaWifiInputString));
+			navigator.setGameObject(new CaptureTheFlagGameObject(wifiInputString));
 			navigator.start();
 			break;
 
@@ -178,26 +176,22 @@ public class EV3Launcher {
 		case Button.ID_RIGHT:
 			
 			lcd = new LCDInfo(odometer, objectDetector);
-//			float colorID=0;
-//			while(true)
-//			{
-//				objectDetector.determineIfObjectIsFlag(2);
-//				textLCD.drawString(""+objectDetector.getCurrentObject(), 0, 6);
-//
-//			}
+
+			navigator.setGameObject(new CaptureTheFlagGameObject(betaWifiInputString));
+			navigator.start();
 			
-			usl.doLocalization();
-			odometer.setX(-10);
-			odometer.setY(-10);
-			lightLocalizer.lightLocalize(new Coordinate(0,0));
-			try {
-				Thread.sleep(2000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			navigator.travelTo(0, 0);
-			navigator.turnTo(0, false);
+//			usl.doLocalization();
+//			odometer.setX(-10);
+//			odometer.setY(-10);
+//			lightLocalizer.lightLocalize(new Coordinate(0,0));
+//			try {
+//				Thread.sleep(2000);
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			navigator.travelTo(0, 0);
+//			navigator.turnTo(0, false);
 		
 			
 			break;

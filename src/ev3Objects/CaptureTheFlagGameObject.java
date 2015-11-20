@@ -60,7 +60,7 @@ public class CaptureTheFlagGameObject {
 	switch(opponentFlag)
 	{
 	case 1:
-		opponentFlagColour = 7;
+		opponentFlagColour = 6;
 		break;
 		
 	case 2:
@@ -157,7 +157,7 @@ public class CaptureTheFlagGameObject {
 		//HARDCODED THESE VALUES FOR THE BETA
 		if(closestOpponentBaseCoordinate.equals(opponentBaseCoordinate_BL))
 		{
-			temp2 = new Coordinate(closestOpponentBaseCoordinate.getX() , closestOpponentBaseCoordinate.getY());
+			temp2 = new Coordinate(closestOpponentBaseCoordinate.getX() -1*tileLength, closestOpponentBaseCoordinate.getY());
 			temp3 = new Coordinate(closestOpponentBaseCoordinate.getX() , closestOpponentBaseCoordinate.getY()-tileLength);
 			temp1 = new Coordinate(closestOpponentBaseCoordinate.getX() +tileLength, closestOpponentBaseCoordinate.getY()- tileLength);
 		}

@@ -103,6 +103,14 @@ public class Navigator extends Thread{
 
 		Sound.beepSequenceUp();
 		colourSensorPoller.start();
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
 		try{
 			searchForFlag(captureTheFlagGameObject.getOpponentBaseCoordinate_BL(), captureTheFlagGameObject.getOpponentBaseCoordinate_TR());
 		}
@@ -250,8 +258,8 @@ public class Navigator extends Thread{
 	private void determineIfObjectIsOnDestinationCoordinate(double pX, double pY){
 		double objectX = odometer.getX() + Math.cos(odometer.getTheta()) * objectDetector.getObjectDistance();
 		double objectY = odometer.getY() + Math.sin(odometer.getTheta()) * objectDetector.getObjectDistance();
-		if(Math.abs(objectX-pX)<13 &&Math.abs(objectY-pY)<13)
-			throw new ObstacleOnCoordinateException();
+		//		if(Math.abs(objectX-pX)<13 &&Math.abs(objectY-pY)<13)
+		//			throw new ObstacleOnCoordinateException();
 
 	}
 
@@ -292,9 +300,13 @@ public class Navigator extends Thread{
 				{
 					Sound.beep();
 					investigateObject();
-					obstacleAvoider.avoidObstacle(coordinate.getX(), coordinate.getY());
+					throw new FoundOpponentFlagException();
+					//obstacleAvoider.avoidObstacle(coordinate.getX(), coordinate.getY());
 				}
-
+				if(objectDetector.getFlagBlock() == true)
+				{
+					break;
+				}
 			}
 			coordinateCount++;
 			if(coordinateCount ==4)
@@ -305,6 +317,7 @@ public class Navigator extends Thread{
 	private void pickUpFlag()
 	{
 
+		navigatorMotorCommands.setSpeed(100);
 		leftMotor.rotate(NavigatorUtility.convertDistance(wheelRadius, -10), true);
 		rightMotor.rotate(NavigatorUtility.convertDistance(wheelRadius, -10),false);
 
@@ -315,7 +328,7 @@ public class Navigator extends Thread{
 
 		blockLiftMotor.setSpeed(30);
 		blockLiftMotor.setAcceleration(100);
-		blockLiftMotor.rotate(30, false);
+		blockLiftMotor.rotate(NavigatorUtility.convertAngle(wheelRadius, axleLength, -50), false);
 	}
 
 
@@ -325,18 +338,14 @@ public class Navigator extends Thread{
 	 */
 	private void investigateObject()
 	{
-		while(objectDetector.getObjectDistance() >=4 )
+		while(objectDetector.getColorID() != 3 && objectDetector.getColorID() != 6 && objectDetector.getColorID() != 0 && objectDetector.getColorID() != 2)
 		{
-			if(objectDetector.getObjectDistance()> objectDetector.getDefaultObstacleDistance())
-				break;
+			//			if(objectDetector.getObjectDistance()> objectDetector.getDefaultObstacleDistance())
+			//				break;
 			navigatorMotorCommands.driveStraight(30);
 		}
-
 		objectDetector.determineIfObjectIsFlag(captureTheFlagGameObject.getOpponentFlagColour());
-		while(objectDetector.getObjectDistance() <=10 )
-		{
-			navigatorMotorCommands.driveStraight(-30);
-		}
+
 
 	}
 

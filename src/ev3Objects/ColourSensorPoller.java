@@ -30,6 +30,7 @@ public class ColourSensorPoller extends Thread {
 			{
 			setColorID(colorID);
 			}
+			
 		}
 		
 	}

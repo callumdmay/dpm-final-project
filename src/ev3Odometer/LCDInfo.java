@@ -1,6 +1,7 @@
 package ev3Odometer;
 
 import ev3ObjectDetector.ObjectDetector;
+import ev3WallFollower.UltrasonicPoller;
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.lcd.TextLCD;
 import lejos.utility.Timer;
@@ -54,9 +55,12 @@ public class LCDInfo implements TimerListener{
 		LCD.drawString(formattedDoubleToString(pos[2], 2), 3, 2);
 		
 
-		LCD.drawString("Obj Distance:"+ objectDetector.getObjectDistance(), 0, 3);		
+		LCD.drawString("Right US:"+objectDetector.getRightUSDistance(), 0, 3);		
+		LCD.drawString("Left US:"+objectDetector.getLeftUSDistance(), 0, 4);		
 		LCD.drawString("D: ", 0, 5);
 		LCD.drawString(formattedDoubleToString(distTravelled, 2), 3, 5);
+		
+		LCD.drawString("ColorID :" + objectDetector.getColorID(), 1, 6);
 		
 
 

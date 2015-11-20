@@ -17,14 +17,15 @@ public class ObjectDetector{
 	private Odometer odometer;
 	private UltrasonicPoller ultraSonicPoller;
 	private ColourSensorPoller colourSensorPoller;
-	
-	
+	private boolean setFlag = false;
+
+
 	public enum OBJECT_TYPE { flag, obstacle } 
 
 	private final int FILTER_OUT = 5;
 	private int filterControl;
 	private final double defaultObstacleDistance = 18;
-	
+
 
 	private Object lock = new Object();
 	/**
@@ -53,7 +54,7 @@ public class ObjectDetector{
 		{
 			return true;
 		}
-		
+
 		return false;
 	}
 	/**
@@ -73,24 +74,26 @@ public class ObjectDetector{
 		return false;
 
 	}
+
 	/**
 	 * Identifies between a blue block and a wooden obstacle
 	 */
 	public void determineIfObjectIsFlag(int flagColour)
 	{
 
-		if(ultraSonicPoller.getLeftUltraSoundSensorDistance() <=6 || ultraSonicPoller.getRightUltraSoundSensorDistance() <=6)
+		if(colourSensorPoller.getColorID()== flagColour){
+
+			Sound.beepSequenceUp();
+			setFlagBlock(true);
+		}
+		else
 		{
-			if(colourSensorPoller.getColorID()== flagColour){
-				Sound.beep();
-			}
-			else
-			{
-				Sound.beep();
-				Sound.beep();
-			}
+			Sound.beep();
+			Sound.beep();
+			setFlagBlock(false);
 		}
 	}
+
 
 	/**
 	 * Get the default obstacle distance
@@ -106,14 +109,37 @@ public class ObjectDetector{
 	 */
 	public double getObjectDistance(){
 
-		
+
 		if(ultraSonicPoller.getRightUltraSoundSensorDistance() < defaultObstacleDistance)
 			return ultraSonicPoller.getRightUltraSoundSensorDistance();
-		
+
 		if(ultraSonicPoller.getLeftUltraSoundSensorDistance() < defaultObstacleDistance)
 			return ultraSonicPoller.getLeftUltraSoundSensorDistance();
-		
+
 		return 100;
+	}
+
+	public double getRightUSDistance()
+	{
+		return ultraSonicPoller.getRightUltraSoundSensorDistance();
+	}
+	public double getLeftUSDistance()
+	{
+		return ultraSonicPoller.getLeftUltraSoundSensorDistance();
+	}
+
+	public void setFlagBlock (boolean flagDetected)
+	{
+		setFlag = flagDetected;
+	}
+	public boolean getFlagBlock()
+	{
+		return setFlag;
+	}
+
+	public int getColorID()
+	{
+		return colourSensorPoller.getColorID();
 	}
 
 

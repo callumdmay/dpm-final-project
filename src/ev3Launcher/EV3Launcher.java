@@ -176,23 +176,13 @@ public class EV3Launcher {
 		case Button.ID_RIGHT:
 			
 			lcd = new LCDInfo(odometer, objectDetector);
+			usl.doLocalization();
+			odometer.setX(-10);
+			odometer.setY(-10);
+			lightLocalizer.lightLocalize(new Coordinate(0,0));
+			navigator.travelTo(30.48*6, 30.48*6);
+			navigator.travelTo(0, 0);
 
-			navigator.setGameObject(new CaptureTheFlagGameObject(betaWifiInputString));
-			navigator.start();
-			
-//			usl.doLocalization();
-//			odometer.setX(-10);
-//			odometer.setY(-10);
-//			lightLocalizer.lightLocalize(new Coordinate(0,0));
-//			try {
-//				Thread.sleep(2000);
-//			} catch (InterruptedException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//			navigator.travelTo(0, 0);
-//			navigator.turnTo(0, false);
-		
 			
 			break;
 

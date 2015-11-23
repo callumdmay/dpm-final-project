@@ -45,7 +45,7 @@ public class Navigator extends Thread{
 	private final int ROTATE_SPEED = 100;
 	private final int SMALL_CORRECTION_SPEED =100;
 	private final int SMALL_ROTATION_SPEED = 50;
-	private final double CORRECTION_DIST = 150;
+	private final double CORRECTION_DIST = 100;
 	public NavigatorMotorCommands navigatorMotorCommands;
 
 

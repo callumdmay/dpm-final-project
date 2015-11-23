@@ -16,8 +16,8 @@ public class LightLocalizer {
 	private final int lineDetectionValue = 42;
 	private final double light_SensorDistanceFromOrigin = 13.3;
 	private double tileLength;
-	
-	private static final double lightLocalizationAngleOffset = -6;
+
+	private static final double lightLocalizationAngleOffset = 0;
 
 	private Odometer odometer;
 	private SampleProvider colorSensor;
@@ -56,39 +56,31 @@ public class LightLocalizer {
 		odometer.setDistanceTravelled(0);
 
 		Coordinate calibrationCoordinates[] = findOptimalLocalizationCoordinates();
-
-		double blackLineAngles[] = new double[4];
-
 		
-		for(Coordinate coordinate : calibrationCoordinates)
-		{
-			if(Math.round(coordinate.getX() / tileLength )==3 ||Math.round(coordinate.getY() / tileLength ) ==3)
+		for (Coordinate coordinate : calibrationCoordinates) {
+			// Must avoid grid gaps
+			if ((coordinate.getX()+ tileLength)% (tileLength*4) == 0 || (coordinate.getY() + tileLength) % (tileLength*4) == 0 )
 				continue;
-			try{
-				navigator.localizationTravelTo(coordinate.getX()-4, coordinate.getY()-4);
-			}
-			catch (ObstacleOnCoordinateException e){
+			try {
+				navigator.localizationTravelTo(coordinate.getX(), coordinate.getY());
+			} catch (ObstacleOnCoordinateException e) {
 				continue;
 			}
-
 			lightLocalize(coordinate);
 			break;
 		}
-		
+
 	}
 
-	
-	public void lightLocalize(Coordinate calibrationCoordinate)
-	{
+	public void lightLocalize(Coordinate calibrationCoordinate) {
 		double blackLineAngles[] = new double[4];
-		
-		navigator.localizationTravelTo(calibrationCoordinate.getX()-4, calibrationCoordinate.getY()-4);
+
+		navigator.localizationTravelTo(calibrationCoordinate.getX(), calibrationCoordinate.getY());
 
 		navigator.navigatorMotorCommands.setSpeed(ROTATION_SPEED);
 
 		navigator.turnTo(Math.toRadians(45), false);
 
-		
 		for (int index = 0; index < blackLineAngles.length; index++) {
 			// Capture the angle when we first encounter the black line
 			while (!blackLineDetected())
@@ -102,20 +94,17 @@ public class LightLocalizer {
 
 		// takes care of 360 wraparound
 		if (blackLineAngles[0] < Math.PI) {
-			blackLineAngles[0] += Math.PI*2;
+			blackLineAngles[0] += Math.PI * 2;
 		}
-		
-		odometer.setDistanceTravelled(0);
 
+		odometer.setDistanceTravelled(0);
 
 		odometer.setX(calibrationCoordinate.getX() + fixDisplacement(blackLineAngles[1], blackLineAngles[3]));
 		odometer.setY(calibrationCoordinate.getY() + fixDisplacement(blackLineAngles[0], blackLineAngles[2]));
-		odometer.setTheta(fixAngle(blackLineAngles[1], blackLineAngles[3], odometer.getTheta()));
-		
+		odometer.setTheta(fixAngle(blackLineAngles[1], blackLineAngles[3], odometer.getTheta()) + Math.toRadians(lightLocalizationAngleOffset) );
+
 	}
-	
-	
-	
+
 	/**
 	 * Return true if a black line is detected by the color sensor.
 	 * 
@@ -130,7 +119,6 @@ public class LightLocalizer {
 		else
 			return false;
 	}
-
 
 	/**
 	 * Returns the corrected angle of the EV3
@@ -147,51 +135,47 @@ public class LightLocalizer {
 		double deltaTheta;
 		deltaTheta = Math.PI - (angleA - angleB) / 2 - angleB;
 		currentAngle += deltaTheta;
-		return currentAngle  +Math.toRadians(lightLocalizationAngleOffset);
+		return currentAngle;
 	}
 
-
 	/**
-	 * Returns a list of coordinates for the corners of the tile the robot is in.
+	 * Returns a list of coordinates for the corners of the tile the robot is
+	 * in.
 	 */
-	private Coordinate[] findCorners(){
+	private Coordinate[] findCorners() {
 		double bottomLeftX = odometer.getX() - odometer.getX() % tileLength;
 		double bottomLeftY = odometer.getY() - odometer.getY() % tileLength;
 		Coordinate bottomLeft = new Coordinate(bottomLeftX, bottomLeftY);
 		Coordinate bottomRight = new Coordinate((bottomLeft.getX() + tileLength), bottomLeft.getY());
 		Coordinate topLeft = new Coordinate(bottomLeft.getX(), (bottomLeft.getY() + tileLength));
 		Coordinate topRight = new Coordinate((bottomLeft.getX() + tileLength), (bottomLeft.getY() + tileLength));
-		Coordinate[] corners = {bottomLeft, bottomRight, topLeft, topRight};
+		Coordinate[] corners = { bottomLeft, bottomRight, topLeft, topRight };
 		return corners;
 	}
 
 	/**
 	 * Returns the coordinate of the corner closest to destination coordinate
-	 * @param corners The array of corners to choose from
-	 * @param destination The destination
+	 * 
+	 * @param corners
+	 *            The array of corners to choose from
+	 * @param destination
+	 *            The destination
 	 * @return
 	 */
-	private Coordinate[] findOptimalLocalizationCoordinates(){
+	private Coordinate[] findOptimalLocalizationCoordinates() {
 		Coordinate[] corners = findCorners();
 
-		if(odometer.getTheta()<=Math.toRadians(90) && odometer.getTheta()>=Math.toRadians(0))
-		{
-			return new Coordinate[] {corners[3], corners[1], corners[2], corners[0]};
+		if (odometer.getTheta() <= Math.toRadians(90) && odometer.getTheta() >= Math.toRadians(0)) {
+			return new Coordinate[] { corners[3], corners[1], corners[2], corners[0] };
+		} else if (odometer.getTheta() > Math.toRadians(90) && odometer.getTheta() <= Math.toRadians(180)) {
+			return new Coordinate[] { corners[2], corners[3], corners[0], corners[1] };
+		} else if (odometer.getTheta() > Math.toRadians(180) && odometer.getTheta() <= Math.toRadians(270)) {
+			return new Coordinate[] { corners[0], corners[2], corners[1], corners[3] };
+		} else if (odometer.getTheta() > Math.toRadians(270) && odometer.getTheta() <= Math.toRadians(360)) {
+			return new Coordinate[] { corners[1], corners[0], corners[3], corners[2] };
 		}
-		else if (odometer.getTheta()>Math.toRadians(90) && odometer.getTheta()<=Math.toRadians(180))
-		{
-			return new Coordinate[] {corners[2], corners[3], corners[0], corners[1]};
-		}
-		else if (odometer.getTheta()>Math.toRadians(180) && odometer.getTheta()<=Math.toRadians(270))
-		{
-			return new Coordinate[] {corners[0], corners[2], corners[1], corners[3]};
-		}
-		else if (odometer.getTheta()>Math.toRadians(270) && odometer.getTheta()<=Math.toRadians(360))
-		{
-			return new Coordinate[] {corners[1], corners[0], corners[3], corners[2]};
-		}
-		
-		else{
+
+		else {
 			throw new NullPointerException("Could not determine optimal localization coordinates");
 		}
 	}

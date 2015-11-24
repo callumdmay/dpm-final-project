@@ -69,12 +69,23 @@ public class ObstacleAvoider {
 
 		double currentX;
 		double currentY;
+		
+		double initialAngle = odometer.getTheta();
+		double abortAngle = odometer.getTheta() - Math.toRadians(130);
+		
+		if(abortAngle <0)
+			abortAngle+= Math.toRadians(360);
 
 		do{
 			currentX = odometer.getX();
 			currentY = odometer.getY();
 			wallFollowerController.processUSData(ultraSonicPoller.getLeftUltraSoundSensorDistance() , ultraSonicPoller.getRightUltraSoundSensorDistance());
-		} while(Math.abs(NavigatorUtility.calculateAngleError(pX - currentX, pY - currentY, odometer.getTheta())*180/Math.PI) > wallFollowingAngleError);
+			
+			//Failsafe: If the robot ends up 230 degrees from its initial orientation, clearly it has gone awry and needs to reset itself
+			if(Math.abs(odometer.getTheta()-abortAngle)<wallFollowingAngleError)
+				break;
+			
+		} while(Math.abs(NavigatorUtility.calculateAngleError(pX - currentX, pY - currentY, Math.toDegrees(odometer.getTheta()))) > wallFollowingAngleError);
 		
 		leftUltraSoundMotor.rotate(-neckMotor_OFFSET, true);
 

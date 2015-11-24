@@ -289,7 +289,7 @@ public class Navigator extends Thread{
 	 */
 	private void searchForFlag(Coordinate startPoint, Coordinate endPoint)
 	{
-		Queue<Coordinate> searchCoordinateQueue = NavigatorUtility.generateSearchCoordinateQueue(startPoint, endPoint);
+		Queue<Coordinate> searchCoordinateQueue = NavigatorUtility.generateSimpleSearchCoordinateQueue(startPoint, endPoint);
 
 		int coordinateCount =0;
 		for(Coordinate coordinate : searchCoordinateQueue){
@@ -299,18 +299,16 @@ public class Navigator extends Thread{
 				if(objectDetector.detectedObject())
 				{
 					Sound.beep();
+					navigatorMotorCommands.stopMotors();
 					investigateObject();
-					throw new FoundOpponentFlagException();
-					//obstacleAvoider.avoidObstacle(coordinate.getX(), coordinate.getY());
-				}
-				if(objectDetector.getFlagBlock() == true)
-				{
-					break;
+					disposeFlag();
 				}
 			}
 			coordinateCount++;
-			if(coordinateCount ==4)
+			if(coordinateCount ==searchCoordinateQueue.size()/2){
+				coordinateCount=0;
 				lightLocalizer.localizeDynamically();
+			}
 		}
 	}
 
@@ -330,6 +328,13 @@ public class Navigator extends Thread{
 		blockLiftMotor.setAcceleration(100);
 		blockLiftMotor.rotate(NavigatorUtility.convertAngle(wheelRadius, axleLength, -50), false);
 	}
+	
+	private void disposeFlag()
+	{
+		pickUpFlag();
+		turnTo(odometer.getTheta()+ Math.toRadians(180), false);
+		blockLiftMotor.rotate(NavigatorUtility.convertAngle(wheelRadius, axleLength, 50), false);
+	}
 
 
 
@@ -338,6 +343,30 @@ public class Navigator extends Thread{
 	 */
 	private void investigateObject()
 	{
+		double angle1 = 0; 
+		double angle2 = 0;
+		
+		if(objectDetector.getRightUSDistance() <objectDetector.getDefaultObstacleDistance())
+		{
+			while(objectDetector.getRightUSDistance()<objectDetector.getDefaultObstacleDistance()+5)
+				navigatorMotorCommands.rotateClockWise(30);
+		}
+		
+		if(objectDetector.getRightUSDistance() >objectDetector.getDefaultObstacleDistance())
+		{
+			while(objectDetector.getRightUSDistance()>objectDetector.getDefaultObstacleDistance()+5)
+				navigatorMotorCommands.rotateCounterClockWise(30);
+
+			angle1 = odometer.getTheta();
+
+			while(objectDetector.getRightUSDistance()<objectDetector.getDefaultObstacleDistance())
+				navigatorMotorCommands.rotateCounterClockWise(30);
+
+			angle2 = odometer.getTheta();
+		}	
+
+		turnTo(NavigatorUtility.calculateAngleAverage(angle1, angle2), true);
+		
 		while(objectDetector.getColorID() != 3 && objectDetector.getColorID() != 6 && objectDetector.getColorID() != 0 && objectDetector.getColorID() != 2)
 		{
 			//			if(objectDetector.getObjectDistance()> objectDetector.getDefaultObstacleDistance())

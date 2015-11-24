@@ -85,6 +85,7 @@ public class ObjectDetector{
 
 			Sound.beepSequenceUp();
 			setFlagBlock(true);
+			throw new FoundOpponentFlagException();
 		}
 		else
 		{

@@ -16,8 +16,9 @@ public class LightLocalizer {
 	private final int lineDetectionValue = 42;
 	private final double light_SensorDistanceFromOrigin = 13.3;
 	private double tileLength;
+	private double tileDiagonal;
 
-	private static final double lightLocalizationAngleOffset = 0;
+	private static final double lightLocalizationAngleOffset = 1;
 
 	private Odometer odometer;
 	private SampleProvider colorSensor;
@@ -44,7 +45,7 @@ public class LightLocalizer {
 		this.navigator = navigator;
 
 		tileLength = navigator.tileLength;
-
+		tileDiagonal = Math.pow(2*Math.pow(navigator.tileLength, 2),0.5);
 		navigator.setLightLocalizer(this);
 	}
 
@@ -53,7 +54,7 @@ public class LightLocalizer {
 	 */
 	public void localizeDynamically() {
 
-		odometer.setDistanceTravelled(0);
+		odometer.setDistanceTravelled(Navigator.CORRECTION_DIST - tileDiagonal);
 
 		Coordinate calibrationCoordinates[] = findOptimalLocalizationCoordinates();
 		
@@ -67,6 +68,7 @@ public class LightLocalizer {
 				continue;
 			}
 			lightLocalize(coordinate);
+			odometer.setDistanceTravelled(0);
 			break;
 		}
 

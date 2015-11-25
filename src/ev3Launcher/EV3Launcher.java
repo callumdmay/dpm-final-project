@@ -180,8 +180,9 @@ public class EV3Launcher {
 			odometer.setX(-10);
 			odometer.setY(-10);
 			lightLocalizer.lightLocalize(new Coordinate(0,0));
-			navigator.travelTo(30.48*6, 30.48*6);
-			navigator.travelTo(0, 0);
+//			navigator.travelTo(30.48*6, 30.48*6);
+			navigator.travelTo(6*30.48, 6*30.48);
+			navigator.turnTo(0, true);
 
 			
 			break;

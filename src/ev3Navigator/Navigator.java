@@ -45,7 +45,7 @@ public class Navigator extends Thread{
 	private final int ROTATE_SPEED = 100;
 	private final int SMALL_CORRECTION_SPEED =100;
 	private final int SMALL_ROTATION_SPEED = 50;
-	private final double CORRECTION_DIST = 100;
+	public final static double CORRECTION_DIST = 100;
 	public NavigatorMotorCommands navigatorMotorCommands;
 
 
@@ -164,7 +164,7 @@ public class Navigator extends Thread{
 		//While the robot is not at the objective coordinates, keep moving towards it 
 		while(Math.abs(pX- odometer.getX()) > locationError || Math.abs(pY - odometer.getY()) > locationError)
 		{
-			determineIfObjectIsOnDestinationCoordinate(pX, pY);
+			// determineIfObjectIsOnDestinationCoordinate(pX, pY);
 			if(objectIsInTheWay(pX, pY))
 				throw new ObstacleOnCoordinateException();
 

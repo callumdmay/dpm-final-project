@@ -147,11 +147,8 @@ public class Navigator extends Thread{
 			if (odometer.getDistanceTravelled() > CORRECTION_DIST){
 				lightLocalizer.localizeDynamically();
 			}
-
 		}
-
 		navigatorMotorCommands.stopMotors();
-
 	}
 
 	/**
@@ -164,7 +161,6 @@ public class Navigator extends Thread{
 		//While the robot is not at the objective coordinates, keep moving towards it 
 		while(Math.abs(pX- odometer.getX()) > locationError || Math.abs(pY - odometer.getY()) > locationError)
 		{
-			// determineIfObjectIsOnDestinationCoordinate(pX, pY);
 			if(objectIsInTheWay(pX, pY))
 				throw new ObstacleOnCoordinateException();
 
@@ -258,8 +254,8 @@ public class Navigator extends Thread{
 	private void determineIfObjectIsOnDestinationCoordinate(double pX, double pY){
 		double objectX = odometer.getX() + Math.cos(odometer.getTheta()) * objectDetector.getObjectDistance();
 		double objectY = odometer.getY() + Math.sin(odometer.getTheta()) * objectDetector.getObjectDistance();
-		//		if(Math.abs(objectX-pX)<13 &&Math.abs(objectY-pY)<13)
-		//			throw new ObstacleOnCoordinateException();
+				if(Math.abs(objectX-pX)<13 &&Math.abs(objectY-pY)<13)
+					throw new ObstacleOnCoordinateException();
 
 	}
 
@@ -296,7 +292,7 @@ public class Navigator extends Thread{
 			while(Math.abs(coordinate.getX()- odometer.getX()) > locationError || Math.abs(coordinate.getY() - odometer.getY()) > locationError)
 			{
 				moveToCoordinates(coordinate.getX(), coordinate.getY());
-				if(objectDetector.detectedObject())
+				if(objectDetector.detectedObject(12))
 				{
 					Sound.beep();
 					navigatorMotorCommands.stopMotors();
@@ -369,8 +365,8 @@ public class Navigator extends Thread{
 		
 		while(objectDetector.getColorID() != 3 && objectDetector.getColorID() != 6 && objectDetector.getColorID() != 0 && objectDetector.getColorID() != 2)
 		{
-			//			if(objectDetector.getObjectDistance()> objectDetector.getDefaultObstacleDistance())
-			//				break;
+						//if(objectDetector.getObjectDistance()> objectDetector.getDefaultObstacleDistance())
+					//		break;
 			navigatorMotorCommands.driveStraight(30);
 		}
 		objectDetector.determineIfObjectIsFlag(captureTheFlagGameObject.getOpponentFlagColour());

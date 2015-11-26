@@ -144,45 +144,23 @@ public class EV3Launcher {
 		case Button.ID_LEFT:
 			
 			int[] wifiInputString = new int[13];
-			
-			WifiConnection conn = null;
-			try {
-				conn = new WifiConnection(SERVER_IP, TEAM_NUMBER);
-			} catch (IOException e) {
-				System.out.println("can't connect");
-			}
-
-			Transmission t = conn.getTransmission();
-			if (t == null) {
-				System.out.println("can't transmit");
-			} else {
-				wifiInputString = t.getTransmissionData();
-			}
-
+			wifiInputString = getWifiGameInput(wifiInputString);
 			
 			lcd = new LCDInfo(odometer, objectDetector);
 
-			usl.doLocalization();
-			odometer.setX(-10);
-			odometer.setY(-10);
-			lightLocalizer.lightLocalize(new Coordinate(0,0));
+			performInitialLocalization(odometer, navigator, usl, lightLocalizer);
 			navigator.travelTo(0, 0);
 
 			navigator.setGameObject(new CaptureTheFlagGameObject(wifiInputString));
 			navigator.start();
+			
 			break;
 
 		// Test case
 		case Button.ID_RIGHT:
 			
 			lcd = new LCDInfo(odometer, objectDetector);
-			usl.doLocalization();
-			odometer.setX(-10);
-			odometer.setY(-10);
-			lightLocalizer.lightLocalize(new Coordinate(0,0));
-//			navigator.travelTo(30.48*6, 30.48*6);
-			navigator.travelTo(6*30.48, 6*30.48);
-			navigator.turnTo(0, true);
+			performInitialLocalization(odometer, navigator, usl, lightLocalizer);
 
 			
 			break;
@@ -198,5 +176,32 @@ public class EV3Launcher {
 		System.exit(0);
 
 	}
+
+	private static void performInitialLocalization(Odometer odometer,
+			Navigator navigator, USLocalizer usl, LightLocalizer lightLocalizer) {
+		usl.doLocalization();
+		odometer.setX(-10);
+		odometer.setY(-10);
+		lightLocalizer.lightLocalize(new Coordinate(0,0));
+	}
+
+	
+	private static int[] getWifiGameInput(int[] wifiInputString) {
+		WifiConnection conn = null;
+		try {
+			conn = new WifiConnection(SERVER_IP, TEAM_NUMBER);
+		} catch (IOException e) {
+			System.out.println("can't connect");
+		}
+
+		Transmission t = conn.getTransmission();
+		if (t == null) {
+			System.out.println("can't transmit");
+		} else {
+			wifiInputString = t.getTransmissionData();
+		}
+		return wifiInputString;
+	}
+
 
 }

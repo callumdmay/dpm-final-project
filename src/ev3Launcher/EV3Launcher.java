@@ -56,7 +56,7 @@ public class EV3Launcher {
 	private static final Port leftUltraSonicPort = LocalEV3.get().getPort("S4");
 
 	public static final double WHEEL_RADIUS = 2.1;
-	public static final double TRACK = 12;
+	public static final double TRACK = 11.9;
 	private static final String SERVER_IP = "192.168.10.200";
 	private static final int TEAM_NUMBER = 12;
 
@@ -161,7 +161,6 @@ public class EV3Launcher {
 			
 			lcd = new LCDInfo(odometer, objectDetector);
 			performInitialLocalization(odometer, navigator, usl, lightLocalizer);
-
 			
 			break;
 

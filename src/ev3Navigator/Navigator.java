@@ -11,6 +11,7 @@ import ev3Objects.CaptureTheFlagGameObject;
 import ev3Objects.ColourSensorPoller;
 import ev3Objects.Coordinate;
 import ev3Objects.FoundOpponentFlagException;
+import ev3Objects.MissedObjectException;
 import ev3Objects.Motors;
 import ev3Objects.ObstacleOnCoordinateException;
 import ev3Odometer.Odometer;
@@ -40,6 +41,7 @@ public class Navigator extends Thread{
 	private final double locationError = 1;
 	private final double navigatingAngleError = 2;
 	public static final double  tileLength = 30.48;
+	private final int investigateObjectDistance = 12;
 
 	private final int FORWARD_SPEED = 300;
 	private final int ROTATE_SPEED = 100;
@@ -102,13 +104,6 @@ public class Navigator extends Thread{
 		}
 
 		Sound.beepSequenceUp();
-		colourSensorPoller.start();
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 
 
 		try{
@@ -118,6 +113,7 @@ public class Navigator extends Thread{
 		{
 			Sound.beepSequenceUp();
 			pickUpFlag();
+			travelTo(captureTheFlagGameObject.getHomeFlagDropCoordinate().getX(), captureTheFlagGameObject.getHomeFlagDropCoordinate().getY());
 		}
 
 		navigatorMotorCommands.stopMotors();
@@ -283,30 +279,40 @@ public class Navigator extends Thread{
 	 * @param startPoint search area start point
 	 * @param endPoint search area endpoint
 	 */
-	private void searchForFlag(Coordinate startPoint, Coordinate endPoint)
+	public void searchForFlag(Coordinate startPoint, Coordinate endPoint)
 	{
+		colourSensorPoller.start();
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		Queue<Coordinate> searchCoordinateQueue = NavigatorUtility.generateSimpleSearchCoordinateQueue(startPoint, endPoint);
 
-		int coordinateCount =0;
 		while(true){
 			for(Coordinate coordinate : searchCoordinateQueue){
 				while(Math.abs(coordinate.getX()- odometer.getX()) > locationError || Math.abs(coordinate.getY() - odometer.getY()) > locationError)
 				{
 					moveToCoordinates(coordinate.getX(), coordinate.getY());
-					if(objectDetector.detectedObject(12))
+					if(objectDetector.detectedObject(investigateObjectDistance))
 					{
 						Sound.beep();
 						navigatorMotorCommands.stopMotors();
+						try{
 						investigateObject();
 						disposeFlag();
+						}
+						catch(MissedObjectException e)
+						{
+						
+						}
 					}
 				}
-				coordinateCount++;
-				if(coordinateCount ==searchCoordinateQueue.size()/2){
-					coordinateCount=0;
-					lightLocalizer.localizeDynamically();
-				}
+
 			}
+			lightLocalizer.localizeDynamically();
 		}
 	}
 
@@ -324,16 +330,15 @@ public class Navigator extends Thread{
 
 		blockLiftMotor.setSpeed(30);
 		blockLiftMotor.setAcceleration(100);
-		blockLiftMotor.rotate(NavigatorUtility.convertAngle(wheelRadius, axleLength, -50), false);
+		blockLiftMotor.rotate(NavigatorUtility.convertAngle(wheelRadius, axleLength, -100), false);
 	}
 
 	private void disposeFlag()
 	{
 		pickUpFlag();
 		turnTo(odometer.getTheta()+ Math.toRadians(180), false);
-		blockLiftMotor.rotate(NavigatorUtility.convertAngle(wheelRadius, axleLength, 50), false);
+		blockLiftMotor.rotate(NavigatorUtility.convertAngle(wheelRadius, axleLength, 100), false);
 	}
-
 
 
 	/**
@@ -344,32 +349,35 @@ public class Navigator extends Thread{
 		double angle1 = 0; 
 		double angle2 = 0;
 
-		if(objectDetector.getRightUSDistance() <objectDetector.getDefaultObstacleDistance())
+		if(objectDetector.getRightUSDistance() <investigateObjectDistance + 2)
 		{
-			while(objectDetector.getRightUSDistance()<objectDetector.getDefaultObstacleDistance()+5)
-				navigatorMotorCommands.rotateClockWise(30);
+			while(objectDetector.getRightUSDistance()<investigateObjectDistance + 2)
+				navigatorMotorCommands.rotateClockWise(60);
 		}
 
-		if(objectDetector.getRightUSDistance() >objectDetector.getDefaultObstacleDistance())
+		if(objectDetector.getRightUSDistance() > investigateObjectDistance -2)
 		{
-			while(objectDetector.getRightUSDistance()>objectDetector.getDefaultObstacleDistance()+5)
-				navigatorMotorCommands.rotateCounterClockWise(30);
-
+			while(objectDetector.getRightUSDistance()>investigateObjectDistance-2)
+				navigatorMotorCommands.rotateCounterClockWise(60);
+			Sound.beep();
 			angle1 = odometer.getTheta();
 
-			while(objectDetector.getRightUSDistance()<objectDetector.getDefaultObstacleDistance())
-				navigatorMotorCommands.rotateCounterClockWise(30);
-
+			while(objectDetector.getRightUSDistance()<investigateObjectDistance + 2)
+				navigatorMotorCommands.rotateCounterClockWise(60);
+			Sound.beep();
 			angle2 = odometer.getTheta();
 		}	
 
 		turnTo(NavigatorUtility.calculateAngleAverage(angle1, angle2), true);
 
+		odometer.setDistanceTravelled(0);
 		while(objectDetector.getColorID() != 3 && objectDetector.getColorID() != 6 && objectDetector.getColorID() != 0 && objectDetector.getColorID() != 2)
 		{
 			//if(objectDetector.getObjectDistance()> objectDetector.getDefaultObstacleDistance())
 			//		break;
 			navigatorMotorCommands.driveStraight(30);
+			if(odometer.getDistanceTravelled()> investigateObjectDistance+3)
+				throw new MissedObjectException();
 		}
 		objectDetector.determineIfObjectIsFlag(captureTheFlagGameObject.getOpponentFlagColour());
 

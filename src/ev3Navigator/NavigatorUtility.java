@@ -42,81 +42,6 @@ public class NavigatorUtility {
 
 	}
 
-
-	public static Queue<Coordinate> generateSearchCoordinateQueue(
-			Coordinate startPoint, Coordinate endPoint) {
-		Queue<Coordinate> searchCoordinateQueue = new LinkedList<Coordinate>();
-
-		if(Math.abs(endPoint.getY() - startPoint.getY())>= Math.abs(endPoint.getX() - startPoint.getX())){
-
-			double deltaX = endPoint.getX() - startPoint.getX();
-
-			int coordinateCount =1;
-			boolean useStartPoint = true;
-			for(int count = 1; count < 9; count++){
-
-				double xMultiplier = count;
-				Coordinate coordinate;
-				if(count % 2 ==0)
-					xMultiplier = count -1;
-
-				if(useStartPoint)
-				{
-					coordinate = new Coordinate(startPoint.getX() +deltaX * (xMultiplier/8), startPoint.getY());
-				}
-				else
-				{
-					coordinate = new Coordinate(startPoint.getX() +deltaX * (xMultiplier/8), endPoint.getY());
-				}
-
-				coordinateCount++;
-
-				if(coordinateCount > 1)
-				{
-					coordinateCount = 0;
-					useStartPoint =! useStartPoint;
-				}
-				searchCoordinateQueue.add(coordinate);
-			}
-
-		}
-		else
-		{
-			Sound.beep();
-			double deltaY = endPoint.getY() - startPoint.getY();
-
-			int coordinateCount =1;
-			boolean useStartPoint = true;
-			for(int count = 1; count < 9; count++){
-
-				double yMultiplier = count;
-				Coordinate coordinate;
-				if(count % 2 ==0)
-					yMultiplier = count - 1;
-
-				if(useStartPoint)
-				{
-					coordinate = new Coordinate(startPoint.getX(), startPoint.getY() + deltaY * (yMultiplier/8));
-				}
-				else
-				{
-					coordinate = new Coordinate(endPoint.getX() , startPoint.getY() + deltaY * (yMultiplier/8));
-				}
-
-				coordinateCount++;
-
-				if(coordinateCount > 1)
-				{
-					coordinateCount = 0;
-					useStartPoint =! useStartPoint;
-				}
-				searchCoordinateQueue.add(coordinate);
-			}
-		}
-		return searchCoordinateQueue;
-	}
-
-
 	/**
 	 * Algorithm that generates simple search coordinates in a rectangular space defined by 2 coordinate points
 	 * @param startPoint First coordinate that defines the rectangle
@@ -133,6 +58,7 @@ public class NavigatorUtility {
 		if(Math.abs(endPoint.getY() - startPoint.getY())>= Math.abs(endPoint.getX() - startPoint.getX())){
 
 			double deltaX = endPoint.getX() - startPoint.getX();
+			double deltaY = endPoint.getY() - startPoint.getY();
 
 			int coordinateCount =1;
 			boolean useStartPoint = true;
@@ -145,11 +71,11 @@ public class NavigatorUtility {
 
 				if(useStartPoint)
 				{
-					coordinate = new Coordinate(startPoint.getX() +deltaX * (xMultiplier/4), startPoint.getY());
+					coordinate = new Coordinate(startPoint.getX() +deltaX * (xMultiplier/4), startPoint.getY() + deltaY/9);
 				}
 				else
 				{
-					coordinate = new Coordinate(startPoint.getX() +deltaX * (xMultiplier/4), endPoint.getY());
+					coordinate = new Coordinate(startPoint.getX() +deltaX * (xMultiplier/4), endPoint.getY() - deltaY/9);
 				}
 
 				coordinateCount++;
@@ -165,7 +91,7 @@ public class NavigatorUtility {
 		}
 		else
 		{
-			Sound.beep();
+			double deltaX = endPoint.getX() - startPoint.getX();
 			double deltaY = endPoint.getY() - startPoint.getY();
 
 			int coordinateCount =1;
@@ -179,11 +105,11 @@ public class NavigatorUtility {
 
 				if(useStartPoint)
 				{
-					coordinate = new Coordinate(startPoint.getX(), startPoint.getY() + deltaY * (yMultiplier/4));
+					coordinate = new Coordinate(startPoint.getX() + deltaX/9, startPoint.getY() + deltaY * (yMultiplier/4));
 				}
 				else
 				{
-					coordinate = new Coordinate(endPoint.getX() , startPoint.getY() + deltaY * (yMultiplier/4));
+					coordinate = new Coordinate(endPoint.getX() - deltaY/9, startPoint.getY() + deltaY * (yMultiplier/4));
 				}
 
 				coordinateCount++;

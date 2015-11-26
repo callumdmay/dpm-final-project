@@ -254,8 +254,8 @@ public class Navigator extends Thread{
 	private void determineIfObjectIsOnDestinationCoordinate(double pX, double pY){
 		double objectX = odometer.getX() + Math.cos(odometer.getTheta()) * objectDetector.getObjectDistance();
 		double objectY = odometer.getY() + Math.sin(odometer.getTheta()) * objectDetector.getObjectDistance();
-				if(Math.abs(objectX-pX)<13 &&Math.abs(objectY-pY)<13)
-					throw new ObstacleOnCoordinateException();
+		if(Math.abs(objectX-pX)<13 &&Math.abs(objectY-pY)<13)
+			throw new ObstacleOnCoordinateException();
 
 	}
 
@@ -288,22 +288,24 @@ public class Navigator extends Thread{
 		Queue<Coordinate> searchCoordinateQueue = NavigatorUtility.generateSimpleSearchCoordinateQueue(startPoint, endPoint);
 
 		int coordinateCount =0;
-		for(Coordinate coordinate : searchCoordinateQueue){
-			while(Math.abs(coordinate.getX()- odometer.getX()) > locationError || Math.abs(coordinate.getY() - odometer.getY()) > locationError)
-			{
-				moveToCoordinates(coordinate.getX(), coordinate.getY());
-				if(objectDetector.detectedObject(12))
+		while(true){
+			for(Coordinate coordinate : searchCoordinateQueue){
+				while(Math.abs(coordinate.getX()- odometer.getX()) > locationError || Math.abs(coordinate.getY() - odometer.getY()) > locationError)
 				{
-					Sound.beep();
-					navigatorMotorCommands.stopMotors();
-					investigateObject();
-					disposeFlag();
+					moveToCoordinates(coordinate.getX(), coordinate.getY());
+					if(objectDetector.detectedObject(12))
+					{
+						Sound.beep();
+						navigatorMotorCommands.stopMotors();
+						investigateObject();
+						disposeFlag();
+					}
 				}
-			}
-			coordinateCount++;
-			if(coordinateCount ==searchCoordinateQueue.size()/2){
-				coordinateCount=0;
-				lightLocalizer.localizeDynamically();
+				coordinateCount++;
+				if(coordinateCount ==searchCoordinateQueue.size()/2){
+					coordinateCount=0;
+					lightLocalizer.localizeDynamically();
+				}
 			}
 		}
 	}
@@ -324,7 +326,7 @@ public class Navigator extends Thread{
 		blockLiftMotor.setAcceleration(100);
 		blockLiftMotor.rotate(NavigatorUtility.convertAngle(wheelRadius, axleLength, -50), false);
 	}
-	
+
 	private void disposeFlag()
 	{
 		pickUpFlag();
@@ -341,13 +343,13 @@ public class Navigator extends Thread{
 	{
 		double angle1 = 0; 
 		double angle2 = 0;
-		
+
 		if(objectDetector.getRightUSDistance() <objectDetector.getDefaultObstacleDistance())
 		{
 			while(objectDetector.getRightUSDistance()<objectDetector.getDefaultObstacleDistance()+5)
 				navigatorMotorCommands.rotateClockWise(30);
 		}
-		
+
 		if(objectDetector.getRightUSDistance() >objectDetector.getDefaultObstacleDistance())
 		{
 			while(objectDetector.getRightUSDistance()>objectDetector.getDefaultObstacleDistance()+5)
@@ -362,11 +364,11 @@ public class Navigator extends Thread{
 		}	
 
 		turnTo(NavigatorUtility.calculateAngleAverage(angle1, angle2), true);
-		
+
 		while(objectDetector.getColorID() != 3 && objectDetector.getColorID() != 6 && objectDetector.getColorID() != 0 && objectDetector.getColorID() != 2)
 		{
-						//if(objectDetector.getObjectDistance()> objectDetector.getDefaultObstacleDistance())
-					//		break;
+			//if(objectDetector.getObjectDistance()> objectDetector.getDefaultObstacleDistance())
+			//		break;
 			navigatorMotorCommands.driveStraight(30);
 		}
 		objectDetector.determineIfObjectIsFlag(captureTheFlagGameObject.getOpponentFlagColour());

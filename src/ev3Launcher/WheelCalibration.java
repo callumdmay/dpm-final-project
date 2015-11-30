@@ -15,7 +15,7 @@ public class WheelCalibration {
 	
 	// Constants
 		public static final double WHEEL_RADIUS = 2.1;
-		public static final double TRACK = 11.9;
+		public static final double TRACK = 12;
 		//Track without claw is about 11.3
 		//Track with claw is 11.9
 	public static void main(String[] args) {

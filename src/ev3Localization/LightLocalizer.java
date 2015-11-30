@@ -18,7 +18,7 @@ public class LightLocalizer {
 	private double tileLength;
 	private double tileDiagonal;
 
-	private static final double lightLocalizationAngleOffset = -5;
+	private static final double lightLocalizationAngleOffset = 1;
 
 	private Odometer odometer;
 	private SampleProvider colorSensor;

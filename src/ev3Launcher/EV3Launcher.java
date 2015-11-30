@@ -56,11 +56,11 @@ public class EV3Launcher {
 	private static final Port leftUltraSonicPort = LocalEV3.get().getPort("S4");
 
 	public static final double WHEEL_RADIUS = 2.1;
-	public static final double TRACK = 11.9;
+	public static final double TRACK = 12;
 	private static final String SERVER_IP = "192.168.10.200";
 	private static final int TEAM_NUMBER = 12;
 
-	private static final int betaWifiInputString[] = { 1, 0, 0, 0, 0, 1, 1, 3, 3, 1, 1, 0, 5 };
+	private static final int betaWifiInputString[] = { 1, 0, 0, 0, 0, 4, 4, 6, 7, 1, 1, 0, 5 };
 	
 
 	@SuppressWarnings("resource")
@@ -161,6 +161,16 @@ public class EV3Launcher {
 			
 			lcd = new LCDInfo(odometer, objectDetector);
 			performInitialLocalization(odometer, navigator, usl, lightLocalizer);
+			navigator.localizationTravelTo(0, 0);
+
+			navigator.setGameObject( new CaptureTheFlagGameObject(betaWifiInputString));
+			navigator.start();
+			
+			//navigator.travelTo(0, 0);
+			//navigator.turnTo(0, false);
+	//		navigator.travelTo(2*30.48, 6*30.48);
+	//		navigator.travelTo(4*30.48, 0);
+			//navigator.travelTo(6*30.48, 6*30.48);
 			
 			break;
 

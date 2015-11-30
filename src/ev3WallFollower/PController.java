@@ -75,7 +75,7 @@ public class PController implements UltrasonicController {
 					{
 						
 						leftMotor.setSpeed(motorVeryHigh);		
-						rightMotor.setSpeed(motorVeryLow);
+						rightMotor.setSpeed(motorStraight);
 						//start moving
 						leftMotor.forward();
 						rightMotor.forward();

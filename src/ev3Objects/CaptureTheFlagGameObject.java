@@ -171,14 +171,14 @@ public class CaptureTheFlagGameObject {
 	 */
 	private void createPreSearchLocalizationCoordinatesArray()
 	{
-
+		Coordinate temp0;
 		Coordinate temp1;
 		Coordinate temp2;
 		Coordinate temp3;
 
 		if(closestOpponentBaseCoordinate.equals(opponentBaseCoordinate_BL))
 		{
-			Sound.beep();
+			temp0 = new Coordinate(closestOpponentBaseCoordinate.getX(), closestOpponentBaseCoordinate.getY());
 			temp1 = new Coordinate(closestOpponentBaseCoordinate.getX() -tileLength, closestOpponentBaseCoordinate.getY()- tileLength);
 			temp2 = new Coordinate(closestOpponentBaseCoordinate.getX() -tileLength, closestOpponentBaseCoordinate.getY());
 			temp3 = new Coordinate(closestOpponentBaseCoordinate.getX() , closestOpponentBaseCoordinate.getY()-tileLength);
@@ -187,8 +187,7 @@ public class CaptureTheFlagGameObject {
 
 		else if(closestOpponentBaseCoordinate.equals(opponentBaseCoordinate_TL))
 		{
-			Sound.beep();
-			Sound.beep();
+			temp0 = new Coordinate(closestOpponentBaseCoordinate.getX(), closestOpponentBaseCoordinate.getY());
 			temp1 = new Coordinate(closestOpponentBaseCoordinate.getX() -tileLength, closestOpponentBaseCoordinate.getY()+tileLength);
 			temp2 = new Coordinate(closestOpponentBaseCoordinate.getX() -tileLength, closestOpponentBaseCoordinate.getY());
 			temp3 = new Coordinate(closestOpponentBaseCoordinate.getX() , closestOpponentBaseCoordinate.getY()+tileLength);
@@ -196,9 +195,7 @@ public class CaptureTheFlagGameObject {
 
 		else if(closestOpponentBaseCoordinate.equals(opponentBaseCoordinate_BR))
 		{
-			Sound.beep();
-			Sound.beep();
-			Sound.beep();
+			temp0 = new Coordinate(closestOpponentBaseCoordinate.getX(), closestOpponentBaseCoordinate.getY());
 			temp1 = new Coordinate(closestOpponentBaseCoordinate.getX() +tileLength, closestOpponentBaseCoordinate.getY()-tileLength);
 			temp2 = new Coordinate(closestOpponentBaseCoordinate.getX() +tileLength, closestOpponentBaseCoordinate.getY());
 			temp3 = new Coordinate(closestOpponentBaseCoordinate.getX() , closestOpponentBaseCoordinate.getY()-tileLength);
@@ -206,10 +203,7 @@ public class CaptureTheFlagGameObject {
 
 		else if(closestOpponentBaseCoordinate.equals(opponentBaseCoordinate_TR))
 		{
-			Sound.beep();
-			Sound.beep();
-			Sound.beep();
-			Sound.beep();
+			temp0 = new Coordinate(closestOpponentBaseCoordinate.getX(), closestOpponentBaseCoordinate.getY());
 			temp1 = new Coordinate(closestOpponentBaseCoordinate.getX() +tileLength, closestOpponentBaseCoordinate.getY()+tileLength);
 			temp2 = new Coordinate(closestOpponentBaseCoordinate.getX() +tileLength, closestOpponentBaseCoordinate.getY());
 			temp3 = new Coordinate(closestOpponentBaseCoordinate.getX() , closestOpponentBaseCoordinate.getY()+tileLength);
@@ -220,6 +214,7 @@ public class CaptureTheFlagGameObject {
 		}
 
 		preSearchLocalizationCoordinates = new ArrayList<Coordinate>();
+		preSearchLocalizationCoordinates.add(temp0);
 		preSearchLocalizationCoordinates.add(temp1);
 		preSearchLocalizationCoordinates.add(temp2);
 		preSearchLocalizationCoordinates.add(temp3);

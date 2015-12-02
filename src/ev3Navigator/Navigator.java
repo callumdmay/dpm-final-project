@@ -32,7 +32,8 @@ public class Navigator extends Thread{
 	private Odometer odometer;
 	private ColourSensorPoller colourSensorPoller;
 	private CaptureTheFlagGameObject captureTheFlagGameObject;
-
+	public NavigatorMotorCommands navigatorMotorCommands;
+	
 	private LightLocalizer lightLocalizer;
 
 	private double wheelRadius;
@@ -41,7 +42,7 @@ public class Navigator extends Thread{
 	
 	private final double locationError = 1;
 	private final double navigatingAngleError = 2;
-	private final int searchOffSet = -10;
+	private final int searchOffSet = -20;
 	public static final double  tileLength = 30.48;
 	private final int investigateObjectDistance = 8;
 
@@ -49,9 +50,8 @@ public class Navigator extends Thread{
 	private final int ROTATE_SPEED = 100;
 	private final int SMALL_CORRECTION_SPEED =100;
 	private final int SMALL_ROTATION_SPEED = 50;
-	public final static double CORRECTION_DIST = 100;
-	public NavigatorMotorCommands navigatorMotorCommands;
-	
+	public final static double CORRECTION_DIST = 135;
+	private final static int clawMotorAngleOffset = 100;
 	
 
 
@@ -94,6 +94,7 @@ public class Navigator extends Thread{
 
 		odometer.setX(captureTheFlagGameObject.getStartingCoordinate().getX());
 		odometer.setY(captureTheFlagGameObject.getStartingCoordinate().getY());
+		odometer.setTheta(captureTheFlagGameObject.getStartingAngle());
 
 		for(Coordinate coordinate : captureTheFlagGameObject.getPreSearchLocalizationCoordinates())
 		{
@@ -114,16 +115,18 @@ public class Navigator extends Thread{
 
 
 		try{
-			searchForFlag(captureTheFlagGameObject.getOpponentBaseCoordinate_BL(), captureTheFlagGameObject.getOpponentBaseCoordinate_TR());
+			searchForFlag(captureTheFlagGameObject.getClosestOpponentBaseCoordinate(), captureTheFlagGameObject.getFurthestOpponentBaseCoordinate());
 		}
 		catch(FoundOpponentFlagException e)
 		{
 			Sound.beepSequenceUp();
 			pickUpFlag();
+			lightLocalizer.localizeDynamically();
 			travelTo(captureTheFlagGameObject.getHomeFlagDropCoordinate().getX(), captureTheFlagGameObject.getHomeFlagDropCoordinate().getY());
 		}
 
 		navigatorMotorCommands.stopMotors();
+		dropFlag();
 	}
 	/**
 	 * Travel to a coordinate while avoiding objects
@@ -143,11 +146,12 @@ public class Navigator extends Thread{
 				if(objectIsInTheWay(pX, pY))
 				{
 					obstacleAvoider.avoidObstacle(pX, pY);
-					lightLocalizer.localizeDynamically();
+					if(!objectDetector.getFlagBlock())
+						lightLocalizer.localizeDynamically();
 				}
 
 			}
-			if (odometer.getDistanceTravelled() > CORRECTION_DIST){
+			if (odometer.getDistanceTravelled() > CORRECTION_DIST && !objectDetector.getFlagBlock()){
 				lightLocalizer.localizeDynamically();
 			}
 		}
@@ -332,19 +336,29 @@ public class Navigator extends Thread{
 
 		turnTo(odometer.getTheta()+ Math.toRadians(180), false);
 
-		leftMotor.rotate(NavigatorUtility.convertDistance(wheelRadius, -13), true);
-		rightMotor.rotate(NavigatorUtility.convertDistance(wheelRadius, -13),false);
+		leftMotor.rotate(NavigatorUtility.convertDistance(wheelRadius, -11), true);
+		rightMotor.rotate(NavigatorUtility.convertDistance(wheelRadius, -11),false);
 
 		blockLiftMotor.setSpeed(30);
 		blockLiftMotor.setAcceleration(100);
-		blockLiftMotor.rotate(NavigatorUtility.convertAngle(wheelRadius, axleLength, -50), false);
+		blockLiftMotor.rotate(NavigatorUtility.convertAngle(wheelRadius, axleLength, -clawMotorAngleOffset), false);
 	}
 
 	private void disposeFlag()
 	{
 		pickUpFlag();
 		turnTo(odometer.getTheta()+ Math.toRadians(180), false);
-		blockLiftMotor.rotate(NavigatorUtility.convertAngle(wheelRadius, axleLength, 50), false);
+		blockLiftMotor.rotate(NavigatorUtility.convertAngle(wheelRadius, axleLength, clawMotorAngleOffset), false);
+	}
+	
+	private void dropFlag()
+	{
+		leftMotor.rotate(NavigatorUtility.convertDistance(wheelRadius, 10), true);
+		rightMotor.rotate(NavigatorUtility.convertDistance(wheelRadius, 10),false);
+
+		blockLiftMotor.setSpeed(30);
+		blockLiftMotor.setAcceleration(100);
+		blockLiftMotor.rotate(NavigatorUtility.convertAngle(wheelRadius, axleLength, clawMotorAngleOffset), false);
 	}
 
 

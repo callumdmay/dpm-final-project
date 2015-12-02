@@ -60,7 +60,7 @@ public class EV3Launcher {
 	private static final String SERVER_IP = "192.168.10.200";
 	private static final int TEAM_NUMBER = 12;
 
-	private static final int betaWifiInputString[] = { 1, 0, 0, 0, 0, 4, 4, 6, 7, 1, 1, 0, 5 };
+	private static final int betaWifiInputString[] = { 4, 0, 0, 0, 0, 5, 5, 7, 8, 1, 1, 0, 5 };
 	
 
 	@SuppressWarnings("resource")
@@ -149,7 +149,8 @@ public class EV3Launcher {
 			lcd = new LCDInfo(odometer, objectDetector);
 
 			performInitialLocalization(odometer, navigator, usl, lightLocalizer);
-			navigator.travelTo(0, 0);
+			navigator.localizationTravelTo(0, 0);
+			navigator.turnTo(Math.toRadians(0), true);
 
 			navigator.setGameObject(new CaptureTheFlagGameObject(wifiInputString));
 			navigator.start();
@@ -160,17 +161,12 @@ public class EV3Launcher {
 		case Button.ID_RIGHT:
 			
 			lcd = new LCDInfo(odometer, objectDetector);
+			
 			performInitialLocalization(odometer, navigator, usl, lightLocalizer);
 			navigator.localizationTravelTo(0, 0);
-
+			navigator.turnTo(Math.toRadians(0),true);
 			navigator.setGameObject( new CaptureTheFlagGameObject(betaWifiInputString));
 			navigator.start();
-			
-			//navigator.travelTo(0, 0);
-			//navigator.turnTo(0, false);
-	//		navigator.travelTo(2*30.48, 6*30.48);
-	//		navigator.travelTo(4*30.48, 0);
-			//navigator.travelTo(6*30.48, 6*30.48);
 			
 			break;
 

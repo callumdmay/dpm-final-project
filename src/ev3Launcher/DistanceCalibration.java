@@ -12,7 +12,7 @@ public class DistanceCalibration {
 	private static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
 	private static final EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
 
-	private static final int FORWARD_SPEED = 150;
+	private static final int FORWARD_SPEED = 300;
 
 	// Constants
 	public static final double WHEEL_RADIUS = 2.1;

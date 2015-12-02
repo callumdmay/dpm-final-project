@@ -72,17 +72,17 @@ public class ObstacleAvoider {
 		
 		double abortAngle = odometer.getTheta() + Math.toRadians(160);
 		
-		if(abortAngle > Math.toRadians(360))
-			abortAngle-= Math.toRadians(360);
+//		if(abortAngle > Math.toRadians(360))
+//			abortAngle-= Math.toRadians(360);
 
 		do{
 			currentX = odometer.getX();
 			currentY = odometer.getY();
 			wallFollowerController.processUSData(ultraSonicPoller.getLeftUltraSoundSensorDistance() , ultraSonicPoller.getRightUltraSoundSensorDistance());
-			
-			if(Math.abs(odometer.getTheta() - abortAngle) < Math.toRadians(wallFollowingAngleError))
-				break;
-			
+//			
+//			if(Math.abs(odometer.getTheta() - abortAngle) < Math.toRadians(wallFollowingAngleError))
+//				break;
+//			
 		} while(Math.abs(NavigatorUtility.calculateAngleError(pX - currentX, pY - currentY, odometer.getTheta())*180/Math.PI) > wallFollowingAngleError);
 		
 		leftUltraSoundMotor.rotate(-neckMotor_OFFSET, false);

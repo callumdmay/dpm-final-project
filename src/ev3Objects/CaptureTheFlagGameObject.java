@@ -3,6 +3,7 @@ package ev3Objects;
 import java.util.ArrayList;
 
 import ev3Wifi.Transmission;
+import lejos.hardware.Sound;
 
 /**
  * Creates an object to handle the coordinates received by wifi.
@@ -16,6 +17,8 @@ public class CaptureTheFlagGameObject {
 
 	private ArrayList<Coordinate> preSearchLocalizationCoordinates; 
 	private int homeFlagColour, opponentFlagColour;
+	private double startingAngle;
+
 	private static final double tileLength = 30.48;
 
 
@@ -44,6 +47,7 @@ public class CaptureTheFlagGameObject {
 		
 		processFlagColour(opponentFlagColour);
 		determineStartingCoordinate();
+		determineStartingAngle();
 		determineClosestOpponentBaseCoordinate();
 		createPreSearchLocalizationCoordinatesArray();
 	}
@@ -106,7 +110,7 @@ public class CaptureTheFlagGameObject {
 			startingCoordinate = new Coordinate(10*tileLength,10*tileLength);
 			break;
 		case 4:
-			startingCoordinate = new Coordinate(10*tileLength,10*tileLength);
+			startingCoordinate = new Coordinate(0,10*tileLength);
 			break;
 		}
 	}
@@ -125,8 +129,8 @@ public class CaptureTheFlagGameObject {
 			if(coordinate.getX()<1*tileLength ||coordinate.getX()>9*tileLength || coordinate.getY() < 1*tileLength ||coordinate.getY()>9*tileLength)
 				continue;
 
-			double deltaX = Math.abs(startingCoordinate.getX() - coordinate.getX());
-			double deltaY = Math.abs(startingCoordinate.getY() - coordinate.getY());
+			double deltaX = Math.abs(coordinate.getX() - startingCoordinate.getX());
+			double deltaY = Math.abs(coordinate.getY() - startingCoordinate.getY());
 
 			double distance = Math.sqrt(deltaX*deltaX + deltaY*deltaY);
 			if(distance < currentDistance){
@@ -138,6 +142,25 @@ public class CaptureTheFlagGameObject {
 		if(closestOpponentBaseCoordinate == null)
 			throw new NullPointerException("Could not determine closest opponent base coordinate");
 
+	}
+	
+	private void determineStartingAngle()
+	{
+		switch(startingCorner){
+		
+		case 1:
+			startingAngle = Math.toRadians(0);
+			break;
+		case 2:
+			startingAngle = Math.toRadians(90);
+			break;
+		case 3:	
+			startingAngle = Math.toRadians(180);
+			break;
+		case 4:
+			startingAngle = Math.toRadians(270);
+			break;
+		}
 	}
 
 
@@ -153,33 +176,42 @@ public class CaptureTheFlagGameObject {
 		Coordinate temp2;
 		Coordinate temp3;
 
-		//TODO
-		//HARDCODED THESE VALUES FOR THE BETA
 		if(closestOpponentBaseCoordinate.equals(opponentBaseCoordinate_BL))
 		{
-			temp2 = new Coordinate(closestOpponentBaseCoordinate.getX() -1*tileLength, closestOpponentBaseCoordinate.getY());
+			Sound.beep();
+			temp1 = new Coordinate(closestOpponentBaseCoordinate.getX() -tileLength, closestOpponentBaseCoordinate.getY()- tileLength);
+			temp2 = new Coordinate(closestOpponentBaseCoordinate.getX() -tileLength, closestOpponentBaseCoordinate.getY());
 			temp3 = new Coordinate(closestOpponentBaseCoordinate.getX() , closestOpponentBaseCoordinate.getY()-tileLength);
-			temp1 = new Coordinate(closestOpponentBaseCoordinate.getX() +tileLength, closestOpponentBaseCoordinate.getY()- tileLength);
+		
 		}
 
 		else if(closestOpponentBaseCoordinate.equals(opponentBaseCoordinate_TL))
 		{
-			temp1 = new Coordinate(closestOpponentBaseCoordinate.getX() -tileLength, closestOpponentBaseCoordinate.getY());
-			temp2 = new Coordinate(closestOpponentBaseCoordinate.getX() -tileLength, closestOpponentBaseCoordinate.getY()+tileLength);
+			Sound.beep();
+			Sound.beep();
+			temp1 = new Coordinate(closestOpponentBaseCoordinate.getX() -tileLength, closestOpponentBaseCoordinate.getY()+tileLength);
+			temp2 = new Coordinate(closestOpponentBaseCoordinate.getX() -tileLength, closestOpponentBaseCoordinate.getY());
 			temp3 = new Coordinate(closestOpponentBaseCoordinate.getX() , closestOpponentBaseCoordinate.getY()+tileLength);
 		}
 
 		else if(closestOpponentBaseCoordinate.equals(opponentBaseCoordinate_BR))
 		{
-			temp1 = new Coordinate(closestOpponentBaseCoordinate.getX() +tileLength, closestOpponentBaseCoordinate.getY());
-			temp2 = new Coordinate(closestOpponentBaseCoordinate.getX() +tileLength, closestOpponentBaseCoordinate.getY()-tileLength);
+			Sound.beep();
+			Sound.beep();
+			Sound.beep();
+			temp1 = new Coordinate(closestOpponentBaseCoordinate.getX() +tileLength, closestOpponentBaseCoordinate.getY()-tileLength);
+			temp2 = new Coordinate(closestOpponentBaseCoordinate.getX() +tileLength, closestOpponentBaseCoordinate.getY());
 			temp3 = new Coordinate(closestOpponentBaseCoordinate.getX() , closestOpponentBaseCoordinate.getY()-tileLength);
 		}
 
 		else if(closestOpponentBaseCoordinate.equals(opponentBaseCoordinate_TR))
 		{
-			temp1 = new Coordinate(closestOpponentBaseCoordinate.getX() +tileLength, closestOpponentBaseCoordinate.getY());
-			temp2 = new Coordinate(closestOpponentBaseCoordinate.getX() +tileLength, closestOpponentBaseCoordinate.getY()+tileLength);
+			Sound.beep();
+			Sound.beep();
+			Sound.beep();
+			Sound.beep();
+			temp1 = new Coordinate(closestOpponentBaseCoordinate.getX() +tileLength, closestOpponentBaseCoordinate.getY()+tileLength);
+			temp2 = new Coordinate(closestOpponentBaseCoordinate.getX() +tileLength, closestOpponentBaseCoordinate.getY());
 			temp3 = new Coordinate(closestOpponentBaseCoordinate.getX() , closestOpponentBaseCoordinate.getY()+tileLength);
 		}
 		else
@@ -194,6 +226,16 @@ public class CaptureTheFlagGameObject {
 
 	}
 
+	public Coordinate getFurthestOpponentBaseCoordinate()
+	{
+		for(Coordinate coordinate : new Coordinate[] {opponentBaseCoordinate_BL,opponentBaseCoordinate_TR,opponentBaseCoordinate_TL,opponentBaseCoordinate_BR})
+		{
+			if(closestOpponentBaseCoordinate.getX() != coordinate.getX() && closestOpponentBaseCoordinate.getY() != coordinate.getY())
+				return coordinate;
+		}
+		
+		throw new NullPointerException("Could not find opposite coordinate");
+	}
 
 	/**
 	 * Get the corner of the starting position, a number from 1 to 4
@@ -297,6 +339,11 @@ public class CaptureTheFlagGameObject {
 	 */
 	public int getOpponentFlagColour() {
 		return opponentFlagColour;
+	}
+
+	
+	public double getStartingAngle() {
+		return startingAngle;
 	}
 
 }

@@ -57,8 +57,8 @@ public class ObstacleAvoider {
 	public void avoidObstacle(double pX, double pY) {
 
 
-		rightMotor.stop();
-		leftMotor.stop();
+		rightMotor.stop(true);
+		leftMotor.stop(false);
 
 		leftUltraSoundMotor.rotate(neckMotor_OFFSET, true);
 		

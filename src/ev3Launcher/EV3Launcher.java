@@ -57,6 +57,7 @@ public class EV3Launcher {
 
 	public static final double WHEEL_RADIUS = 2.1;
 	public static final double TRACK = 12;
+	//"192.168.10.200"
 	private static final String SERVER_IP = "192.168.10.200";
 	private static final int TEAM_NUMBER = 12;
 
@@ -144,7 +145,19 @@ public class EV3Launcher {
 		case Button.ID_LEFT:
 			
 			int[] wifiInputString = new int[13];
-			wifiInputString = getWifiGameInput(wifiInputString);
+			WifiConnection conn = null;
+			try {
+				conn = new WifiConnection(SERVER_IP, TEAM_NUMBER);
+			} catch (IOException e) {
+				System.out.println("can't connect");
+			}
+
+			Transmission t = conn.getTransmission();
+			if (t == null) {
+				System.out.println("can't transmit");
+			} else {
+				wifiInputString = t.getTransmissionData();
+			}
 			
 			lcd = new LCDInfo(odometer, objectDetector);
 

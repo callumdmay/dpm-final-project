@@ -73,7 +73,10 @@ public class LightLocalizer {
 		}
 
 	}
-
+	/**
+	 * Travel to an intersection to localize using the light sensor
+	 * @param calibrationCoordinate The coordinate to localize on
+	 */
 	public void lightLocalize(Coordinate calibrationCoordinate) {
 		double blackLineAngles[] = new double[4];
 
@@ -182,6 +185,12 @@ public class LightLocalizer {
 		}
 	}
 
+	/**
+	 * Returns the angle correction for light localization
+	 * @param angleA The first angle required for this calculation
+	 * @param angleB The second angle required for this calculation
+	 * @return The angle correction offset
+	 */
 	public double fixDisplacement(double angleA, double angleB) {
 		return -1 * light_SensorDistanceFromOrigin * Math.cos((angleA - angleB) / 2);
 	}

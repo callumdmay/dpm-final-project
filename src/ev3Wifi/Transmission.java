@@ -13,7 +13,7 @@
 */
 package ev3Wifi;
 
-/*
+/**
  * Skeleton class to hold datatypes needed for final project
  * 
  * Simply all public variables so can be accessed with 
@@ -40,7 +40,10 @@ public class Transmission {
 	public int flagType;
 	public int opponentFlagType;
 	
-
+/**
+ * Encodes the transmission into in an int array
+ * @return The int array with the transmission info
+ */
 public int[] getTransmissionData()
 {
 	int[] wifiInputs = new int[13];

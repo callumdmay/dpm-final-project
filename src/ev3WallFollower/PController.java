@@ -128,6 +128,11 @@ public class PController implements UltrasonicController {
 
 	}
 
+	/**
+	 * Used the cap pcontroller speeds
+	 * @param error The acceptable error
+	 * @return The capped speed
+	 */
 	public int scaledSpeedDelta(int error)
 	{
 		//Don't know what will happen at very large values, this if statement caps the max and min speeds

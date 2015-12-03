@@ -6,7 +6,9 @@ import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.lcd.TextLCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
-
+/**
+ * A class to calibrate the wheel radius.
+ */
 public class DistanceCalibration {
 
 	private static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
@@ -79,7 +81,12 @@ public class DistanceCalibration {
 	}
 
 
-
+/**
+ * Converts the wheel radius and wanted travel distance to how much each motor should rotate
+ * @param radius The radius of the wheel.
+ * @param distance The wanted distance traveled.
+ * @return
+ */
 	private static int convertDistance(double radius, double distance) {
 		return (int) ((180.0 * distance) / (Math.PI * radius));
 	}

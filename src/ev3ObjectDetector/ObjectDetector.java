@@ -28,6 +28,7 @@ public class ObjectDetector{
 
 
 	private Object lock = new Object();
+	
 	/**
 	 * Stores an objects necessary for object detection and identification
 	 * @param pUltraSonicPoller The ultrasonic sensor to be used
@@ -120,24 +121,46 @@ public class ObjectDetector{
 		return 100;
 	}
 
+	/**
+	 * Get distance from the right US sensor
+	 * @return The distance from the right US sensor
+	 */
 	public double getRightUSDistance()
 	{
 		return ultraSonicPoller.getRightUltraSoundSensorDistance();
 	}
+	
+	/**
+	 * Get distance from the left US sensor
+	 * @return The distance from the left US sensor
+	 */
 	public double getLeftUSDistance()
 	{
 		return ultraSonicPoller.getLeftUltraSoundSensorDistance();
 	}
 
+	/**
+	 * Set the setFlag boolean
+	 * @param flagDetected Whether or not the block detected is the desired one
+	 */
 	public void setFlagBlock (boolean flagDetected)
 	{
 		setFlag = flagDetected;
 	}
+	
+	/**
+	 * Returns the setFlag boolean
+	 * @return Whether or not the block detected is the desired one
+	 */
 	public boolean getFlagBlock()
 	{
 		return setFlag;
 	}
 
+	/**
+	 * Returns the color of the block
+	 * @return Returns the color of the block
+	 */
 	public int getColorID()
 	{
 		return colourSensorPoller.getColorID();

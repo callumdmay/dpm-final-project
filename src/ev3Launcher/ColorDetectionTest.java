@@ -15,7 +15,9 @@ import lejos.hardware.sensor.SensorModes;
 import lejos.robotics.SampleProvider;
 import ev3Odometer.LCDInfo;
 
-
+/**
+ * A class to test color detection functionality.
+ */
 public class ColorDetectionTest {
 
 

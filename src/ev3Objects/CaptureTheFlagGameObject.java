@@ -88,6 +88,10 @@ public class CaptureTheFlagGameObject {
 		 
 	}
 	
+	/**
+	 * Decode the wifi transmission
+	 * @param pT The wifi transmission
+	 */
 	public CaptureTheFlagGameObject(Transmission pT)
 	{
 		this( new int[] {pT.startingCorner.getId(), pT.homeZoneBL_X, pT.homeZoneBL_Y, pT.homeZoneTR_X, pT.homeZoneTR_Y, 
@@ -95,7 +99,7 @@ public class CaptureTheFlagGameObject {
 	}
 
 	/**
-	 * Determines the starting coordinate of the robot based on the inputted starting corner
+	 * Determines the starting coordinate of the robot based on the input starting corner
 	 */
 	private void determineStartingCoordinate() {
 		switch(startingCorner){
@@ -144,6 +148,9 @@ public class CaptureTheFlagGameObject {
 
 	}
 	
+	/**
+	 * Determine the starting angle based on the known corner start
+	 */
 	private void determineStartingAngle()
 	{
 		switch(startingCorner){
@@ -221,6 +228,10 @@ public class CaptureTheFlagGameObject {
 
 	}
 
+	/**
+	 * Get the furthest opponent base coordinate
+	 * @return The furthest opponent base coordinate
+	 */
 	public Coordinate getFurthestOpponentBaseCoordinate()
 	{
 		for(Coordinate coordinate : new Coordinate[] {opponentBaseCoordinate_BL,opponentBaseCoordinate_TR,opponentBaseCoordinate_TL,opponentBaseCoordinate_BR})
@@ -240,7 +251,10 @@ public class CaptureTheFlagGameObject {
 		return startingCorner;
 	}
 	
-
+	/**
+	 * Get the coordinate to perform light localization before search
+	 * @return The coordinate to perform light localization before search
+	 */
 	public ArrayList<Coordinate> getPreSearchLocalizationCoordinates() {
 		return preSearchLocalizationCoordinates;
 	}
@@ -336,7 +350,10 @@ public class CaptureTheFlagGameObject {
 		return opponentFlagColour;
 	}
 
-	
+	/**
+	 * Get the starting angle of the EV3 before the run
+	 * @return The starting angle of the EV3 before the run
+	 */
 	public double getStartingAngle() {
 		return startingAngle;
 	}

@@ -20,7 +20,7 @@ import java.net.Socket;
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.lcd.TextLCD;
 
-/*
+/**
  * This class opens a wifi connection, waits for the data
  * and then allows access to the data after closing the wifi socket.
  * 
@@ -36,6 +36,12 @@ public class WifiConnection {
 	
 	private TextLCD LCD = LocalEV3.get().getTextLCD();
 	
+	/**
+	 * Handles the transmission reception
+	 * @param serverIP The server IP address
+	 * @param teamNumber The team number
+	 * @throws IOException
+	 */
 	public WifiConnection(String serverIP, int teamNumber) throws IOException {
 		LCD.clear();
 		
@@ -65,10 +71,17 @@ public class WifiConnection {
 		
 	}
 	
+	/**
+	 * Returns the transmission
+	 * @return The trasmission received via wifi
+	 */
 	public Transmission getTransmission() {
 		return this.trans;
 	}
 	
+	/**
+	 * Decodes the transmission and prints the information
+	 */
 	public void printTransmission() {
 		try {
 			LCD.clear();

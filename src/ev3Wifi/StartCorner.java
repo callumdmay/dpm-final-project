@@ -19,6 +19,14 @@ public enum StartCorner {
 	
 	private int id, x, y;
 	private String name;
+	
+	/**
+	 * Returns the start corner
+	 * @param id The corner ID
+	 * @param x The x coordinate
+	 * @param y The y coordinate
+	 * @param name The name
+	 */
 	private StartCorner(int id, int x, int y, String name) {
 		this.id = id;
 		this.x = x;
@@ -26,26 +34,50 @@ public enum StartCorner {
 		this.name = name;
 	}
 	
+	/**
+	 * Returns the name
+	 */
 	public String toString() {
 		return this.name;
 	}
 	
+	/**
+	 * Get the x and y coordinates
+	 * @return An int array holding the x and y coordinates
+	 */
 	public int[] getCooridinates() {
 		return new int[] {this.x, this.y};
 	}
 	
+	/**
+	 * Get the X coordinate
+	 * @return The X coordinate
+	 */
 	public int getX() {
 		return this.x;
 	}
 	
+	/**
+	 * Get the Y coordinate
+	 * @return The Y coordinate
+	 */
 	public int getY() {
 		return this.y;
 	}
 	
+	/**
+	 * Get the cornerID
+	 * @return The cornerID
+	 */
 	public int getId() {
 		return this.id;
 	}
 	
+	/**
+	 * Computes the starting corner for the game
+	 * @param cornerId The corner ID from the transmission
+	 * @return The starting corner for the game
+	 */
 	public static StartCorner lookupCorner(int cornerId) {
 		for (StartCorner corner : StartCorner.values())
 			if (corner.id == cornerId)

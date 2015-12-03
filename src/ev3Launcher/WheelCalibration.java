@@ -5,6 +5,10 @@ import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.lcd.TextLCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
+/**
+ * A class to test track and wheel calibration.
+ *
+ */
 public class WheelCalibration {
 
 	
@@ -77,7 +81,13 @@ public class WheelCalibration {
 
 	}
 	
-	
+	/**
+	 * Converts the parameters of the EV3 and the wanted turn angle for motor use
+	 * @param radius The radius of a wheel
+	 * @param width The track of the EV3
+	 * @param angle The desired turn angle
+	 * @return The turn angle for motor use
+	 */
 	public static int convertAngle(double radius, double width, double angle) {
 		return (int) ((180.0 * Math.PI * width * angle / 360.0) / (Math.PI * radius));
 	}

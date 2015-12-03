@@ -5,8 +5,6 @@ import lejos.hardware.motor.EV3LargeRegulatedMotor;
 /**
  * Helper class to refactor out the basic motor commands of the navigator, to
  * shorten the navigator class size
- * 
- * @author Callum
  *
  */
 public class NavigatorMotorCommands {

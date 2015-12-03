@@ -1,10 +1,10 @@
 package ev3Objects;
 
-public class FoundOpponentFlagException extends RuntimeException{
-
 	/**
 	 * Thrown whenever the opponent flag is found
 	 */
+public class FoundOpponentFlagException extends RuntimeException{
+
 	private static final long serialVersionUID = 1L;
 
 	public FoundOpponentFlagException() {

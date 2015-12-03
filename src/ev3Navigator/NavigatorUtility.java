@@ -203,6 +203,12 @@ public class NavigatorUtility {
 		return (int) ((180.0 * Math.PI * width * angle / 360.0) / (Math.PI * radius));
 	}
 
+	/**
+	 * Convert physical distance we want into a parameter for the motor
+	 * @param radius The wheel radius
+	 * @param distance The desired physical distance
+	 * @return
+	 */
 	public static int convertDistance(double radius, double distance) {
 		return (int) ((180.0 * distance) / (Math.PI * radius));
 	}

@@ -87,6 +87,9 @@ public class Navigator extends Thread{
 
 	}
 
+	/**
+	 * Run the game
+	 */
 	@Override
 	public void run()
 	{
@@ -327,6 +330,9 @@ public class Navigator extends Thread{
 		}
 	}
 
+	/**
+	 * Sequence to pick up the flag
+	 */
 	private void pickUpFlag()
 	{
 
@@ -344,13 +350,18 @@ public class Navigator extends Thread{
 		blockLiftMotor.rotate(NavigatorUtility.convertAngle(wheelRadius, axleLength, -clawMotorAngleOffset), false);
 	}
 
+	/**
+	 * Sequence to toss the flag
+	 */
 	private void disposeFlag()
 	{
 		pickUpFlag();
 		turnTo(odometer.getTheta()+ Math.toRadians(180), false);
 		blockLiftMotor.rotate(NavigatorUtility.convertAngle(wheelRadius, axleLength, clawMotorAngleOffset), false);
 	}
-	
+	/**
+	 * Sequence to lower the flag
+	 */
 	private void dropFlag()
 	{
 		leftMotor.rotate(NavigatorUtility.convertDistance(wheelRadius, 10), true);
@@ -386,7 +397,6 @@ public class Navigator extends Thread{
 			try {
 				Thread.sleep(1500);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -401,8 +411,6 @@ public class Navigator extends Thread{
 		odometer.setDistanceTravelled(0);
 		while(objectDetector.getColorID() != 3 && objectDetector.getColorID() != 6 && objectDetector.getColorID() != 0 && objectDetector.getColorID() != 2)
 		{
-			//if(objectDetector.getObjectDistance()> objectDetector.getDefaultObstacleDistance())
-			//		break;
 			navigatorMotorCommands.driveStraight(30);
 			if(odometer.getDistanceTravelled()> investigateObjectDistance+3)
 				throw new MissedObjectException();

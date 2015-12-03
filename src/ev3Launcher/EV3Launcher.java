@@ -195,6 +195,13 @@ public class EV3Launcher {
 
 	}
 
+	/**
+	 * Performs the initial localization when starting on a corner tile
+	 * @param odometer The odometer used
+	 * @param navigator The navigator used
+	 * @param usl The ultrasonic localization used
+	 * @param lightLocalizer The light localization used
+	 */
 	private static void performInitialLocalization(Odometer odometer,
 			Navigator navigator, USLocalizer usl, LightLocalizer lightLocalizer) {
 		usl.doLocalization();
@@ -203,7 +210,11 @@ public class EV3Launcher {
 		lightLocalizer.lightLocalize(new Coordinate(0,0));
 	}
 
-	
+	/**
+	 * Receives the wifi input to be used to calculate the coordinates of important locations
+	 * @param wifiInputString An empty array of int
+	 * @return The input array of integers to be decoded
+	 */
 	private static int[] getWifiGameInput(int[] wifiInputString) {
 		WifiConnection conn = null;
 		try {

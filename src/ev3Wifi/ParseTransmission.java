@@ -20,7 +20,7 @@ import java.io.IOException;
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.lcd.TextLCD;
 
-/*
+/**
  * Static parsers for parsing data off the communication channel
  * 
  * The order of data is defined in the Server's Transmission class
@@ -30,7 +30,12 @@ public class ParseTransmission {
 	
 	public static TextLCD LCD = LocalEV3.get().getTextLCD();
 	
-	// This should only be called after verifying that there is data in the input stream
+	/**
+	 * Parses the Data Input Steam
+	 * This should only be called after verifying that there is data in the input stream
+	 * @param dis The data input stream
+	 * @return The transmission
+	 */
 	public static Transmission parse(DataInputStream dis) {
 		Transmission trans = null;
 		try {

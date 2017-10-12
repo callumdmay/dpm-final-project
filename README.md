@@ -1,6 +1,6 @@
 # ECSE 211 "Design Principles and Methods" Final Project
 
-##1st Place Winner of the Fall 2015 competition
+## 1st Place Winner of the Fall 2015 competition
 
 The project description is as follows:
 
